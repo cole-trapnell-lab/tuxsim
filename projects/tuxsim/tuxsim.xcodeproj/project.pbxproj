@@ -1,0 +1,283 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
+		8DD76F6A0486A84900D96B5E /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
+		ED0035BC1164509500E19F3F /* GArgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AD1164509500E19F3F /* GArgs.cpp */; };
+		ED0035BD1164509500E19F3F /* GBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AF1164509500E19F3F /* GBase.cpp */; };
+		ED0035BE1164509500E19F3F /* gdna.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035B11164509500E19F3F /* gdna.cpp */; };
+		ED0035BF1164509500E19F3F /* GFaSeqGet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035B31164509500E19F3F /* GFaSeqGet.cpp */; };
+		ED0035C01164509500E19F3F /* gff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035B61164509500E19F3F /* gff.cpp */; };
+		ED0035C11164509500E19F3F /* GStr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035B81164509500E19F3F /* GStr.cpp */; };
+		ED0035C21164509500E19F3F /* gtf_tracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035BA1164509500E19F3F /* gtf_tracking.cpp */; };
+		ED00383B116457BD00E19F3F /* codons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED003839116457BD00E19F3F /* codons.cpp */; };
+		ED003840116457DA00E19F3F /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED00383F116457DA00E19F3F /* common.cpp */; };
+		ED00385B1164627900E19F3F /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
+		ED0038631164630200E19F3F /* scaffolds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038611164630200E19F3F /* scaffolds.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76F690486A84900D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76F6A0486A84900D96B5E /* tuxsim.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		8DD76F6C0486A84900D96B5E /* tuxsim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tuxsim; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6859E8B029090EE04C91782 /* tuxsim.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = tuxsim.1; sourceTree = "<group>"; };
+		ED0035AD1164509500E19F3F /* GArgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GArgs.cpp; path = src/GArgs.cpp; sourceTree = "<group>"; };
+		ED0035AE1164509500E19F3F /* GArgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GArgs.h; path = src/GArgs.h; sourceTree = "<group>"; };
+		ED0035AF1164509500E19F3F /* GBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GBase.cpp; path = src/GBase.cpp; sourceTree = "<group>"; };
+		ED0035B01164509500E19F3F /* GBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GBase.h; path = src/GBase.h; sourceTree = "<group>"; };
+		ED0035B11164509500E19F3F /* gdna.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gdna.cpp; path = src/gdna.cpp; sourceTree = "<group>"; };
+		ED0035B21164509500E19F3F /* gdna.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gdna.h; path = src/gdna.h; sourceTree = "<group>"; };
+		ED0035B31164509500E19F3F /* GFaSeqGet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GFaSeqGet.cpp; path = src/GFaSeqGet.cpp; sourceTree = "<group>"; };
+		ED0035B41164509500E19F3F /* GFaSeqGet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GFaSeqGet.h; path = src/GFaSeqGet.h; sourceTree = "<group>"; };
+		ED0035B51164509500E19F3F /* GFastaFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GFastaFile.h; path = src/GFastaFile.h; sourceTree = "<group>"; };
+		ED0035B61164509500E19F3F /* gff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gff.cpp; path = src/gff.cpp; sourceTree = "<group>"; };
+		ED0035B71164509500E19F3F /* gff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gff.h; path = src/gff.h; sourceTree = "<group>"; };
+		ED0035B81164509500E19F3F /* GStr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GStr.cpp; path = src/GStr.cpp; sourceTree = "<group>"; };
+		ED0035B91164509500E19F3F /* GStr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GStr.h; path = src/GStr.h; sourceTree = "<group>"; };
+		ED0035BA1164509500E19F3F /* gtf_tracking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gtf_tracking.cpp; path = src/gtf_tracking.cpp; sourceTree = "<group>"; };
+		ED0035BB1164509500E19F3F /* gtf_tracking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gtf_tracking.h; path = src/gtf_tracking.h; sourceTree = "<group>"; };
+		ED0038351164579F00E19F3F /* GHash.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GHash.hh; path = src/GHash.hh; sourceTree = "<group>"; };
+		ED0038361164579F00E19F3F /* GList.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = GList.hh; path = src/GList.hh; sourceTree = "<group>"; };
+		ED003839116457BD00E19F3F /* codons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = codons.cpp; path = src/codons.cpp; sourceTree = "<group>"; };
+		ED00383A116457BD00E19F3F /* codons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = codons.h; path = src/codons.h; sourceTree = "<group>"; };
+		ED00383E116457DA00E19F3F /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = src/common.h; sourceTree = "<group>"; };
+		ED00383F116457DA00E19F3F /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = common.cpp; path = src/common.cpp; sourceTree = "<group>"; };
+		ED0038591164627900E19F3F /* hits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hits.cpp; path = src/hits.cpp; sourceTree = "<group>"; };
+		ED00385A1164627900E19F3F /* hits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hits.h; path = src/hits.h; sourceTree = "<group>"; };
+		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
+		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76F660486A84900D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* tuxsim */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6859E8C029090F304C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = tuxsim;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				ED003839116457BD00E19F3F /* codons.cpp */,
+				ED00383A116457BD00E19F3F /* codons.h */,
+				ED00383E116457DA00E19F3F /* common.h */,
+				ED00383F116457DA00E19F3F /* common.cpp */,
+				ED0035AD1164509500E19F3F /* GArgs.cpp */,
+				ED0035AE1164509500E19F3F /* GArgs.h */,
+				ED0035AF1164509500E19F3F /* GBase.cpp */,
+				ED0035B01164509500E19F3F /* GBase.h */,
+				ED0035B11164509500E19F3F /* gdna.cpp */,
+				ED0035B21164509500E19F3F /* gdna.h */,
+				ED0035B31164509500E19F3F /* GFaSeqGet.cpp */,
+				ED0035B41164509500E19F3F /* GFaSeqGet.h */,
+				ED0035B51164509500E19F3F /* GFastaFile.h */,
+				ED0035B61164509500E19F3F /* gff.cpp */,
+				ED0035B71164509500E19F3F /* gff.h */,
+				ED0035B81164509500E19F3F /* GStr.cpp */,
+				ED0035B91164509500E19F3F /* GStr.h */,
+				ED0038351164579F00E19F3F /* GHash.hh */,
+				ED0038361164579F00E19F3F /* GList.hh */,
+				ED0035BA1164509500E19F3F /* gtf_tracking.cpp */,
+				ED0035BB1164509500E19F3F /* gtf_tracking.h */,
+				ED0038591164627900E19F3F /* hits.cpp */,
+				ED00385A1164627900E19F3F /* hits.h */,
+				08FB7796FE84155DC02AAC07 /* main.cpp */,
+				ED0038611164630200E19F3F /* scaffolds.cpp */,
+				ED0038621164630200E19F3F /* scaffolds.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76F6C0486A84900D96B5E /* tuxsim */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6859E8C029090F304C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6859E8B029090EE04C91782 /* tuxsim.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76F620486A84900D96B5E /* tuxsim */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "tuxsim" */;
+			buildPhases = (
+				8DD76F640486A84900D96B5E /* Sources */,
+				8DD76F660486A84900D96B5E /* Frameworks */,
+				8DD76F690486A84900D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = tuxsim;
+			productInstallPath = "$(HOME)/bin";
+			productName = tuxsim;
+			productReference = 8DD76F6C0486A84900D96B5E /* tuxsim */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "tuxsim" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* tuxsim */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76F620486A84900D96B5E /* tuxsim */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76F640486A84900D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8DD76F650486A84900D96B5E /* main.cpp in Sources */,
+				ED0035BC1164509500E19F3F /* GArgs.cpp in Sources */,
+				ED0035BD1164509500E19F3F /* GBase.cpp in Sources */,
+				ED0035BE1164509500E19F3F /* gdna.cpp in Sources */,
+				ED0035BF1164509500E19F3F /* GFaSeqGet.cpp in Sources */,
+				ED0035C01164509500E19F3F /* gff.cpp in Sources */,
+				ED0035C11164509500E19F3F /* GStr.cpp in Sources */,
+				ED0035C21164509500E19F3F /* gtf_tracking.cpp in Sources */,
+				ED00383B116457BD00E19F3F /* codons.cpp in Sources */,
+				ED003840116457DA00E19F3F /* common.cpp in Sources */,
+				ED00385B1164627900E19F3F /* hits.cpp in Sources */,
+				ED0038631164630200E19F3F /* scaffolds.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB923208733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				HEADER_SEARCH_PATHS = (
+					./src,
+					"/usr/local/include/boost-1_41",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = tuxsim;
+			};
+			name = Debug;
+		};
+		1DEB923308733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = tuxsim;
+			};
+			name = Release;
+		};
+		1DEB923608733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		1DEB923708733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "tuxsim" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923208733DC60010E9CD /* Debug */,
+				1DEB923308733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "tuxsim" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923608733DC60010E9CD /* Debug */,
+				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
