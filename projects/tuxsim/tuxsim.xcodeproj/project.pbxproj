@@ -20,6 +20,9 @@
 		ED00385B1164627900E19F3F /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
 		ED0038631164630200E19F3F /* scaffolds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038611164630200E19F3F /* scaffolds.cpp */; };
 		ED003B081164725100E19F3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED003B071164725100E19F3F /* main.cpp */; };
+		ED50796E1173A70500883983 /* abundances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED50796D1173A70500883983 /* abundances.cpp */; };
+		ED5079751173A7BA00883983 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
+		ED5079841173A8EF00883983 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -64,6 +67,12 @@
 		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
 		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
 		ED003B071164725100E19F3F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		ED50796C1173A70500883983 /* abundances.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = abundances.h; path = src/abundances.h; sourceTree = "<group>"; };
+		ED50796D1173A70500883983 /* abundances.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abundances.cpp; path = src/abundances.cpp; sourceTree = "<group>"; };
+		ED5079731173A7BA00883983 /* fragments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fragments.h; path = src/fragments.h; sourceTree = "<group>"; };
+		ED5079741173A7BA00883983 /* fragments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fragments.cpp; path = src/fragments.cpp; sourceTree = "<group>"; };
+		ED5079821173A8EF00883983 /* sequencing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sequencing.h; path = src/sequencing.h; sourceTree = "<group>"; };
+		ED5079831173A8EF00883983 /* sequencing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sequencing.cpp; path = src/sequencing.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,10 +99,14 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				ED50796C1173A70500883983 /* abundances.h */,
+				ED50796D1173A70500883983 /* abundances.cpp */,
 				ED003839116457BD00E19F3F /* codons.cpp */,
 				ED00383A116457BD00E19F3F /* codons.h */,
 				ED00383E116457DA00E19F3F /* common.h */,
 				ED00383F116457DA00E19F3F /* common.cpp */,
+				ED5079731173A7BA00883983 /* fragments.h */,
+				ED5079741173A7BA00883983 /* fragments.cpp */,
 				ED0035AD1164509500E19F3F /* GArgs.cpp */,
 				ED0035AE1164509500E19F3F /* GArgs.h */,
 				ED0035AF1164509500E19F3F /* GBase.cpp */,
@@ -115,6 +128,8 @@
 				ED00385A1164627900E19F3F /* hits.h */,
 				ED0038611164630200E19F3F /* scaffolds.cpp */,
 				ED0038621164630200E19F3F /* scaffolds.h */,
+				ED5079821173A8EF00883983 /* sequencing.h */,
+				ED5079831173A8EF00883983 /* sequencing.cpp */,
 				ED003B071164725100E19F3F /* main.cpp */,
 			);
 			name = Source;
@@ -191,6 +206,9 @@
 				ED00385B1164627900E19F3F /* hits.cpp in Sources */,
 				ED0038631164630200E19F3F /* scaffolds.cpp in Sources */,
 				ED003B081164725100E19F3F /* main.cpp in Sources */,
+				ED50796E1173A70500883983 /* abundances.cpp in Sources */,
+				ED5079751173A7BA00883983 /* fragments.cpp in Sources */,
+				ED5079841173A8EF00883983 /* sequencing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

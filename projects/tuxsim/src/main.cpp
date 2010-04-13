@@ -10,16 +10,12 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+#include <locale>
+
+
 //#include <boost/math/distributions/normal.hpp> 
 //using boost::math::normal;
-
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/variate_generator.hpp>
-
-#include <boost/random/normal_distribution.hpp>
-//#include <boost/random/variate_generator.hpp>
 
 #include "common.h"
 #include "scaffolds.h"
@@ -29,11 +25,14 @@
 #include "GFaSeqGet.h"
 
 #include "hits.h"
+#include "abundances.h"
+#include "fragments.h"
+#include "sequencing.h"
 
 using namespace std;
 using namespace boost;
 
-const char *short_options = "";
+const char *short_options = "s:m:";
 
 static struct option long_options[] = {
 	{"inner-dist-mean",			required_argument,       0,          'm'},
@@ -303,8 +302,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				{
 					ref_scaff.annotated_tss_id(tss_id);
 				}
-				
-				ref_scaff.seq(rna_seq);
+				string rs = rna_seq;
+                reverse_complement(rs);
+				ref_scaff.seq(rs);
 				GFREE(rna_seq);
 				
 				ref_mRNAs.push_back(ref_scaff); 
@@ -312,90 +312,6 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 		}
 		ScaffoldSorter sorter(rt);
 		sort(ref_mRNAs.begin(), ref_mRNAs.end(), sorter);
-	}
-}
-
-void assign_expression_ranks(const vector<Scaffold>& ref_mRNAs,
-							 vector<unsigned int>& expr_rank)
-{
-	for (size_t i = 0; i < expr_rank.size(); ++i)
-	{
-		expr_rank[i] = (unsigned int)i;
-	}
-	
-	random_shuffle(expr_rank.begin(), expr_rank.end());
-}
-
-
-struct FluxRankAbundancePolicy
-{
-	FluxRankAbundancePolicy(double x_0, double k, double x_1) : 
-		_x_0(x_0), 
-		_k(k), 
-		_x_1(x_1) {}
-	
-	double rho(unsigned int rank) const
-	{
-		double x = rank + 1;
-		double e = exp((x / _x_1) * (-1 - (x / _x_1))); 
-		double r = pow((x / _x_0), _k) * e;
-		return r;
-	} 
-	
-private:
-	double _x_0;
-	double _k;
-	double _x_1;
-};
-
-// Assigns the transcriptome wide relative abundances
-template<class RankedBasedAbundancePolicy>
-void assign_abundances(const vector<Scaffold>& ref_mRNAs,
-					   const RankedBasedAbundancePolicy& rank_based,
-					   vector<double>& expr_rho)
-{
-	vector<unsigned int> expr_rank(ref_mRNAs.size(), 0);
-	
-	assert(expr_rho.size() == expr_rank.size());
-	
-	assign_expression_ranks(ref_mRNAs, expr_rank);
-	
-	double total_mols = 0.0;
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
-	{
-		int rank = expr_rank[i];
-		double rho = rank_based.rho(rank);
-		expr_rho[i] = rho;
-		total_mols += rho;
-	}
-	
-	assert (total_mols > 0.0);
-	
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
-	{
-		expr_rho[i] /= total_mols;
-	}
-}
-
-// FIXME: should use effective length
-void calc_frag_abundances(const vector<Scaffold>& ref_mRNAs,
-						  const vector<double>& expr_rho,
-						  vector<double>& expr_alpha)
-{
-	double fragment_pool_size = 0.0;
-	
-	assert (expr_alpha.size() == ref_mRNAs.size() &&
-			expr_alpha.size() == expr_rho.size());
-	
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
-	{
-		fragment_pool_size += ref_mRNAs[i].length() * expr_rho[i];
-	}
-	
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
-	{
-		double frag_n = ref_mRNAs[i].length() * expr_rho[i];
-		expr_alpha[i] = frag_n / fragment_pool_size;
 	}
 }
 
@@ -409,107 +325,7 @@ struct FastqOutfilePair
 	FILE* right_out_file;
 };
 
-struct LibraryFragment
-{
-	const Scaffold* source_seq;
-	
-	// Fragment specified as an open interval [start, end)
-	int start;
-	int end;	
-};
 
-class FragmentPolicy
-{
-public:
-	virtual void next_fragment(const Scaffold& molecule,
-							   LibraryFragment& fragment) = 0;
-};
-
-class NormalFragments : public FragmentPolicy
-{
-	
-	// This is a typedef for a random number generator.
-	// Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
-	typedef boost::minstd_rand base_generator_type;
-	
-	typedef variate_generator<base_generator_type&, boost::uniform_real<> > uniform_generator_type;
-	typedef variate_generator<base_generator_type&, normal_distribution<> > normal_generator_type;
-	
-	
-	//boost::uniform_real<> uni_dist(0,1);
-	// uni(generator, uni_dist);
-	
-public:
-	
-	NormalFragments(int mean_frag_length, int frag_length_sd) :
-		_base_generator(base_generator_type(time(NULL))),
-		_uniform_generator(uniform_generator_type(_base_generator, uniform_real<>(0,1))),
-		_length_generator(normal_generator_type(_base_generator, 
-												normal_distribution<>(mean_frag_length, frag_length_sd)))
-	{
-	}
-	
-	virtual void next_fragment(const Scaffold& molecule,
-							   LibraryFragment& fragment)
-	{
-		int frag_length = _length_generator();
-		int frag_start = (molecule.length() - frag_length) * 
-			_uniform_generator();
-		assert (frag_start < molecule.length());
-		
-		int frag_end = frag_start + frag_length;
-		assert (frag_end < molecule.length());
-		
-		fragment.source_seq = &molecule;
-		fragment.start = frag_start;
-		fragment.end = frag_end;
-	}
-	
-private:
-	base_generator_type _base_generator;
-	uniform_generator_type _uniform_generator;
-	normal_generator_type _length_generator;
-};
-
-typedef vector<shared_ptr<ReadHit> > ReadsForFragment; 
-
-class SequencingPolicy
-{
-public:
-	virtual bool reads_for_fragment(const LibraryFragment& frag, 
-									ReadsForFragment& reads) = 0;
-};
-
-/*******************************************************************************
-                            Sequencing Policies
-*******************************************************************************/
-struct IlluminaChIPSeqPE : public SequencingPolicy
-{
-	
-	IlluminaChIPSeqPE(int left_read_len, 
-					  int right_read_len) :
-		_left_len(left_read_len),
-		_right_len(right_read_len) {}
-	
-	bool reads_for_fragment(const LibraryFragment& frag, 
-							ReadsForFragment& reads)
-	{
-		int frag_length = frag.end - frag.start;
-		if (frag_length < _left_len ||
-			frag_length < _right_len)
-		{
-			return false;
-		}
-		
-		// Generate a new read
-		
-		return true;
-	}
-	
-private:
-	int _left_len;
-	int _right_len;
-};
 /******************************************************************************/
 
 class AssayProtocol
@@ -532,20 +348,169 @@ private:
 	SequencingPolicy& _seq_impl;
 };
 
-void generate_reads(const vector<Scaffold>& ref_mRNAs, 
+struct SortReads
+{
+    bool operator()(shared_ptr<ReadHit> lhs, shared_ptr<ReadHit> rhs)
+    {
+        return lhs->left() < rhs->left();
+    }
+};
+
+void print_sam_header(FILE* sam_out)
+{
+    
+}
+
+void print_fastq_read(const ReadHit& read,
+                      FILE* fastq_file)
+{
+    fprintf(fastq_file, "@%s\n",read.name().c_str());
+    fprintf(fastq_file, "%s\n", read.seq().c_str());
+    fprintf(fastq_file, "+\n");
+    fprintf(fastq_file, "%s\n", read.qual().c_str());
+}
+
+void print_fastq_pair(const ReadsForFragment& reads, 
+                      FastqOutfilePair& fastq_out)
+{
+    assert (reads.size() == 2);
+    print_fastq_read(*(reads.front()), fastq_out.left_out_file);
+    print_fastq_read(*(reads.back()), fastq_out.right_out_file);
+    
+}
+
+void print_aligned_read(const ReadHit& read,
+                        RefSequenceTable& rt,
+                        FILE* sam_out)
+{
+    
+    const char* read_name = read.name().c_str();
+    int sam_flag = read.sam_flag();
+    const char* ref_name = rt.get_name(read.ref_id());
+    int ref_pos = read.left();
+    const vector<CigarOp>& cigar = read.cigar();
+    string cigar_str;
+    for (size_t i = 0; i < cigar.size(); ++i)
+    {
+        char buf[256];
+        char opcode = 0;
+        switch(cigar[i].opcode)
+        {
+            case MATCH:
+                opcode = 'M';
+                break;
+            case INS:
+                opcode = 'I';
+                break;
+            case DEL:
+                opcode = 'D';
+                break;
+            case REF_SKIP:
+                opcode = 'N';
+                break;
+            case SOFT_CLIP:
+                opcode = 'S';
+                break;
+            case HARD_CLIP:
+                opcode = 'H';
+                break;
+            case PAD:
+                opcode = 'P';
+                break;
+        }
+        sprintf(buf, "%d%c", cigar[i].length, opcode);
+        cigar_str += buf;
+    }
+    
+    const char* mate_ref_name = rt.get_name(read.partner_ref_id());
+    int mate_ref_pos = read.partner_pos();
+    
+    string seq = read.seq();
+    string qual = read.qual();
+    
+    if (sam_flag & BAM_FREVERSE)
+    {
+        reverse_complement(seq);
+        reverse(qual.begin(), qual.end());
+    }
+    
+    string tag_str;
+    CuffStrand source_strand = read.source_strand();
+    if (source_strand != CUFF_STRAND_UNKNOWN)
+    {
+        tag_str += source_strand == CUFF_FWD ? "XS:A:+" : "XS:A:-";
+    }
+    
+    fprintf(sam_out,
+            "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s\n",
+            read_name,
+            sam_flag,
+            ref_name,
+            ref_pos + 1,
+            cigar_str.c_str(),
+            mate_ref_name,
+            mate_ref_pos,
+            seq.c_str(),
+            qual.c_str(),
+            tag_str.c_str());
+}
+
+void generate_reads(RefSequenceTable& rt,
+                    const vector<Scaffold>& ref_mRNAs, 
 					const vector<double>& frag_abundances,
+					AssayProtocol* sequencer,
 					int total_frags,
 					FILE* sam_frag_out,
 					FastqOutfilePair& fastq_out)
 {
+    RefID last_ref_id = 0;
+    int rna_rightmost = 0;
+    vector<shared_ptr<ReadHit> > read_chunk; 
 	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
 	{
 		int num_frags_for_mRNA = frag_abundances[i] * total_frags;
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 		{
-			
+			ReadsForFragment reads;
+			sequencer->next_reads(ref_mRNAs[i], reads);
+            read_chunk.push_back(reads.front());
+            read_chunk.push_back(reads.back());
+            
+            print_fastq_pair(reads, fastq_out);
 		}
+        
+        if (last_ref_id &&
+            (last_ref_id != ref_mRNAs[i].ref_id() ||
+            rna_rightmost < ref_mRNAs[i].left()))
+        {
+            sort(read_chunk.begin(), read_chunk.end(), SortReads());
+            
+            for (size_t j = 0; j < read_chunk.size(); ++j)
+            {
+                print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+            }
+            
+            read_chunk.clear();
+        }
+        if (last_ref_id != ref_mRNAs[i].ref_id())
+        {
+            rna_rightmost = ref_mRNAs[i].right();
+        }
+        else 
+        {
+            rna_rightmost = max(rna_rightmost, ref_mRNAs[i].right());
+        }
 	}
+    
+    sort(read_chunk.begin(), read_chunk.end(), SortReads());
+        
+    for (size_t j = 0; j < read_chunk.size(); ++j)
+    {
+        print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+    }
+    
+    read_chunk.clear();
+
 }
 
 void driver(FILE* ref_gtf, 
@@ -575,8 +540,17 @@ void driver(FILE* ref_gtf,
 	
 	int total_frags = 100;
 	
-	generate_reads(ref_mRNAs,
+	NormalFragments frag_policy(frag_length_mean, 
+                                frag_length_std_dev,
+                                75, 9999999);
+	IlluminaChIPSeqPE seq_policy(75, 75, false);
+	
+	AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy);
+	
+	generate_reads(rt, 
+                   ref_mRNAs,
 				   expr_alpha,
+				   sequencer,
 				   total_frags,
 				   sam_out,
 				   fastq_out);
@@ -613,7 +587,10 @@ int main(int argc, char** argv)
     string out_prefix = argv[optind++];
     	
 	// seed the random number generator 
-	srand(time(NULL));
+	//random_seed = time(NULL);
+	
+	random_seed = 1111111;
+	srand(random_seed);
 	
 	FILE* ref_gtf = NULL;
 	if (ref_gtf_filename != "")
@@ -648,7 +625,7 @@ int main(int argc, char** argv)
 	}
 	
 	FILE* right_fastq_out = NULL;
-	string right_out_fastq_filename = out_prefix + "_1.fq";
+	string right_out_fastq_filename = out_prefix + "_2.fq";
 	right_fastq_out = fopen(right_out_fastq_filename.c_str(), "w");
 	if (!sam_out)
 	{
@@ -658,7 +635,7 @@ int main(int argc, char** argv)
 	}
 	
 	FastqOutfilePair fastq_out(left_fastq_out, right_fastq_out);
-	
+    
 	driver(ref_gtf, sam_out, fastq_out);
 	
 	return 0;
