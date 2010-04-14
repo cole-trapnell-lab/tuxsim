@@ -24,6 +24,8 @@
 #include "GStr.h"
 #include "GFaSeqGet.h"
 
+#include "options.h"
+
 #include "hits.h"
 #include "abundances.h"
 #include "fragments.h"

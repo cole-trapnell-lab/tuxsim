@@ -129,13 +129,13 @@
 				ED0035BB1164509500E19F3F /* gtf_tracking.h */,
 				ED0038591164627900E19F3F /* hits.cpp */,
 				ED00385A1164627900E19F3F /* hits.h */,
+				EDCCF4DD117624E4000D83D5 /* options.h */,
+				EDCCF4DE117624E5000D83D5 /* options.cpp */,
 				ED0038611164630200E19F3F /* scaffolds.cpp */,
 				ED0038621164630200E19F3F /* scaffolds.h */,
 				ED5079821173A8EF00883983 /* sequencing.h */,
 				ED5079831173A8EF00883983 /* sequencing.cpp */,
 				ED003B071164725100E19F3F /* main.cpp */,
-				EDCCF4DD117624E4000D83D5 /* options.h */,
-				EDCCF4DE117624E5000D83D5 /* options.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
