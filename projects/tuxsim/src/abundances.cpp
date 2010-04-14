@@ -1,0 +1,44 @@
+/*
+ *  abundances.cpp
+ *  tuxsim
+ *
+ *  Created by Cole Trapnell on 4/12/10.
+ *  Copyright 2010 Cole Trapnell. All rights reserved.
+ *
+ */
+
+#include "abundances.h"
+
+void assign_expression_ranks(const vector<Scaffold>& ref_mRNAs,
+							 vector<unsigned int>& expr_rank)
+{
+	for (size_t i = 0; i < expr_rank.size(); ++i)
+	{
+		expr_rank[i] = (unsigned int)i;
+	}
+	
+	random_shuffle(expr_rank.begin(), expr_rank.end());
+}
+
+
+// FIXME: should use effective length
+void calc_frag_abundances(const vector<Scaffold>& ref_mRNAs,
+						  const vector<double>& expr_rho,
+						  vector<double>& expr_alpha)
+{
+	double fragment_pool_size = 0.0;
+	
+	assert (expr_alpha.size() == ref_mRNAs.size() &&
+			expr_alpha.size() == expr_rho.size());
+	
+	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+	{
+		fragment_pool_size += ref_mRNAs[i].length() * expr_rho[i];
+	}
+	
+	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+	{
+		double frag_n = ref_mRNAs[i].length() * expr_rho[i];
+		expr_alpha[i] = frag_n / fragment_pool_size;
+	}
+}

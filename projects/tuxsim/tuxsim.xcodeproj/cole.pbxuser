@@ -8,19 +8,24 @@
 			8DD76F620486A84900D96B5E /* tuxsim */,
 		);
 		breakpoints = (
-			ED003B1D116ABDE100E19F3F /* main.cpp:536 */,
-			ED003B37116ABE7400E19F3F /* main.cpp:532 */,
-			ED003B50116AC16A00E19F3F /* main.cpp:317 */,
-			EDDB8BDD116BE5F600B6A083 /* main.cpp:307 */,
-			EDDB8BDF116BE5F900B6A083 /* main.cpp:223 */,
-			EDDB8C37116D33A200B6A083 /* main.cpp:329 */,
-			EDDB8D20116E310800B6A083 /* main.cpp:329 */,
-			EDDB8D44116E32FB00B6A083 /* main.cpp:329 */,
-			EDDB8D57116E387E00B6A083 /* main.cpp:329 */,
+			ED003B1D116ABDE100E19F3F /* main.cpp:491 */,
+			ED003B37116ABE7400E19F3F /* main.cpp:487 */,
+			ED003B50116AC16A00E19F3F /* main.cpp:272 */,
+			EDDB8BDD116BE5F600B6A083 /* main.cpp:262 */,
+			EDDB8BDF116BE5F900B6A083 /* main.cpp:178 */,
+			EDDB8C37116D33A200B6A083 /* main.cpp:284 */,
+			EDDB8D20116E310800B6A083 /* main.cpp:284 */,
+			EDDB8D44116E32FB00B6A083 /* main.cpp:284 */,
+			EDDB8D57116E387E00B6A083 /* main.cpp:284 */,
 			ED5079D21173ACAB00883983 /* lexical_cast.hpp:521 */,
 			ED5079D41173ACB000883983 /* lexical_cast.hpp:520 */,
 			ED507A361173B0A300883983 /* sequencing.cpp:23 */,
-			ED507A5C1173B3A700883983 /* sequencing.cpp:147 */,
+			ED507A5C1173B3A700883983 /* sequencing.cpp:156 */,
+			EDCCF49C1174A92B000D83D5 /* sequencing.cpp:39 */,
+			EDCCF4A91174A999000D83D5 /* sequencing.cpp:26 */,
+			EDCCF4B41174AA25000D83D5 /* main.cpp:341 */,
+			EDCCF4CE1174C258000D83D5 /* sequencing.cpp:196 */,
+			EDCCF4D21174C2AB000D83D5 /* sequencing.cpp:52 */,
 		);
 		codeSenseManager = ED0035AC11644C4B00E19F3F /* Code sense */;
 		executables = (
@@ -42,11 +47,11 @@
 				);
 			};
 			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
-				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingDirectionKey = 1;
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					750,
+					760,
 					20,
 					48,
 					43,
@@ -262,6 +267,21 @@
 			EDCCF49611742B4C000D83D5 /* PBXTextBookmark */ = EDCCF49611742B4C000D83D5 /* PBXTextBookmark */;
 			EDCCF49711742B4C000D83D5 /* PBXTextBookmark */ = EDCCF49711742B4C000D83D5 /* PBXTextBookmark */;
 			EDCCF49811742B4C000D83D5 /* PBXTextBookmark */ = EDCCF49811742B4C000D83D5 /* PBXTextBookmark */;
+			EDCCF49B11742D40000D83D5 /* PBXTextBookmark */ = EDCCF49B11742D40000D83D5 /* PBXTextBookmark */;
+			EDCCF4A21174A951000D83D5 /* PBXTextBookmark */ = EDCCF4A21174A951000D83D5 /* PBXTextBookmark */;
+			EDCCF4A31174A951000D83D5 /* PBXTextBookmark */ = EDCCF4A31174A951000D83D5 /* PBXTextBookmark */;
+			EDCCF4A81174A984000D83D5 /* PBXTextBookmark */ = EDCCF4A81174A984000D83D5 /* PBXTextBookmark */;
+			EDCCF4B11174A9BF000D83D5 /* PBXTextBookmark */ = EDCCF4B11174A9BF000D83D5 /* PBXTextBookmark */;
+			EDCCF4B21174A9BF000D83D5 /* PBXTextBookmark */ = EDCCF4B21174A9BF000D83D5 /* PBXTextBookmark */;
+			EDCCF4C01174AA74000D83D5 /* PBXTextBookmark */ = EDCCF4C01174AA74000D83D5 /* PBXTextBookmark */;
+			EDCCF4C11174AA74000D83D5 /* PBXTextBookmark */ = EDCCF4C11174AA74000D83D5 /* PBXTextBookmark */;
+			EDCCF4C21174AA74000D83D5 /* PBXTextBookmark */ = EDCCF4C21174AA74000D83D5 /* PBXTextBookmark */;
+			EDCCF4D61174C2EA000D83D5 /* PBXTextBookmark */ = EDCCF4D61174C2EA000D83D5 /* PBXTextBookmark */;
+			EDCCF4D71174C2EA000D83D5 /* PBXTextBookmark */ = EDCCF4D71174C2EA000D83D5 /* PBXTextBookmark */;
+			EDCCF4D81174C2EA000D83D5 /* PBXTextBookmark */ = EDCCF4D81174C2EA000D83D5 /* PBXTextBookmark */;
+			EDCCF4D9117608FA000D83D5 /* PBXTextBookmark */ = EDCCF4D9117608FA000D83D5 /* PBXTextBookmark */;
+			EDCCF4DA117608FA000D83D5 /* XCBuildMessageTextBookmark */ = EDCCF4DA117608FA000D83D5 /* XCBuildMessageTextBookmark */;
+			EDCCF4DB117608FA000D83D5 /* PBXTextBookmark */ = EDCCF4DB117608FA000D83D5 /* PBXTextBookmark */;
 			EDDB8BD7116BE5A600B6A083 = EDDB8BD7116BE5A600B6A083 /* PBXTextBookmark */;
 			EDDB8C25116C46EA00B6A083 = EDDB8C25116C46EA00B6A083 /* PBXTextBookmark */;
 			EDDB8C62116E110E00B6A083 = EDDB8C62116E110E00B6A083 /* PBXTextBookmark */;
@@ -392,9 +412,9 @@
 	};
 	ED00383F116457DA00E19F3F /* common.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {928, 1222}}";
-			sepNavSelRange = "{1634, 36}";
-			sepNavVisRange = "{1410, 730}";
+			sepNavIntBoundsRect = "{{0, 0}, {938, 1261}}";
+			sepNavSelRange = "{2140, 0}";
+			sepNavVisRange = "{1429, 711}";
 		};
 	};
 	ED0038481164585E00E19F3F /* PBXTextBookmark */ = {
@@ -454,12 +474,12 @@
 	};
 	ED003B071164725100E19F3F /* main.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {928, 8320}}";
-			sepNavSelRange = "{7561, 0}";
-			sepNavVisRange = "{11579, 1018}";
+			sepNavIntBoundsRect = "{{0, 0}, {938, 7800}}";
+			sepNavSelRange = "{549, 0}";
+			sepNavVisRange = "{416, 669}";
 		};
 	};
-	ED003B1D116ABDE100E19F3F /* main.cpp:536 */ = {
+	ED003B1D116ABDE100E19F3F /* main.cpp:491 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -471,9 +491,9 @@
 		functionName = "driver(FILE* ref_gtf)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 536;
+		lineNumber = 491;
 		location = tuxsim;
-		modificationTime = 292825021.206323;
+		modificationTime = 292864734.82019;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -497,7 +517,7 @@
 		vrLen = 828;
 		vrLoc = 0;
 	};
-	ED003B37116ABE7400E19F3F /* main.cpp:532 */ = {
+	ED003B37116ABE7400E19F3F /* main.cpp:487 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -509,13 +529,13 @@
 		functionName = "driver(FILE* ref_gtf)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 532;
+		lineNumber = 487;
 		location = tuxsim;
-		modificationTime = 292825021.206685;
+		modificationTime = 292864734.82042;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
-	ED003B50116AC16A00E19F3F /* main.cpp:317 */ = {
+	ED003B50116AC16A00E19F3F /* main.cpp:272 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -527,9 +547,9 @@
 		functionName = "assign_abundances(const vector<Scaffold>& ref_mRNAs, const RankedBasedAbundancePolicy& rank_based, vector<double>& expr_rho)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 317;
+		lineNumber = 272;
 		location = tuxsim;
-		modificationTime = 292825021.206851;
+		modificationTime = 292864734.820517;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -548,7 +568,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 565";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 781;
 		vrLoc = 14001;
@@ -558,7 +578,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 586";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 655;
 		vrLoc = 14277;
@@ -578,7 +598,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 586";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 881;
 		vrLoc = 13768;
@@ -588,7 +608,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 549";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 937;
 		vrLoc = 13549;
@@ -598,7 +618,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 548";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 951;
 		vrLoc = 13642;
@@ -608,7 +628,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 568";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 1265;
 		vrLoc = 13667;
@@ -618,7 +638,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 550";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 487;
 		vrLoc = 14445;
@@ -695,7 +715,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 572";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 768;
 		vrLoc = 14164;
@@ -705,7 +725,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 574";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 768;
 		vrLoc = 14164;
@@ -725,7 +745,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 584";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 388;
 		vrLoc = 14544;
@@ -735,7 +755,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 587";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 388;
 		vrLoc = 14544;
@@ -745,7 +765,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 601";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 0;
 		vrLoc = 14932;
@@ -755,7 +775,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 605";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 0;
 		vrLoc = 14932;
@@ -765,7 +785,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 760";
 		rLen = 0;
-		rLoc = 11528;
+		rLoc = 10093;
 		rType = 0;
 		vrLen = 0;
 		vrLoc = 14932;
@@ -775,7 +795,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 777";
 		rLen = 0;
-		rLoc = 12596;
+		rLoc = 11161;
 		rType = 0;
 		vrLen = 0;
 		vrLoc = 14932;
@@ -785,7 +805,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 776";
 		rLen = 0;
-		rLoc = 12362;
+		rLoc = 10927;
 		rType = 0;
 		vrLen = 0;
 		vrLoc = 14932;
@@ -795,7 +815,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 763";
 		rLen = 0;
-		rLoc = 8873;
+		rLoc = 7438;
 		rType = 0;
 		vrLen = 0;
 		vrLoc = 14932;
@@ -837,9 +857,9 @@
 	};
 	ED5079831173A8EF00883983 /* sequencing.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {928, 2990}}";
-			sepNavSelRange = "{856, 0}";
-			sepNavVisRange = "{2404, 1027}";
+			sepNavIntBoundsRect = "{{0, 0}, {938, 3172}}";
+			sepNavSelRange = "{542, 0}";
+			sepNavVisRange = "{1293, 1101}";
 		};
 	};
 	ED5079981173AB3200883983 /* PBXTextBookmark */ = {
@@ -917,7 +937,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 113";
 		rLen = 0;
-		rLoc = 4050;
+		rLoc = 4374;
 		rType = 0;
 		vrLen = 1082;
 		vrLoc = 3022;
@@ -937,7 +957,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 324";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 771;
 		vrLoc = 1293;
@@ -947,7 +967,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 392";
 		rLen = 0;
-		rLoc = 11925;
+		rLoc = 10490;
 		rType = 0;
 		vrLen = 977;
 		vrLoc = 8937;
@@ -957,7 +977,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 392";
 		rLen = 0;
-		rLoc = 11925;
+		rLoc = 10490;
 		rType = 0;
 		vrLen = 977;
 		vrLoc = 8937;
@@ -967,7 +987,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 392";
 		rLen = 0;
-		rLoc = 11925;
+		rLoc = 10490;
 		rType = 0;
 		vrLen = 663;
 		vrLoc = 9251;
@@ -977,7 +997,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 109";
 		rLen = 0;
-		rLoc = 3911;
+		rLoc = 4235;
 		rType = 0;
 		vrLen = 626;
 		vrLoc = 3075;
@@ -987,7 +1007,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 109";
 		rLen = 0;
-		rLoc = 3911;
+		rLoc = 4235;
 		rType = 0;
 		vrLen = 631;
 		vrLoc = 3075;
@@ -997,7 +1017,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 392";
 		rLen = 0;
-		rLoc = 11925;
+		rLoc = 10490;
 		rType = 0;
 		vrLen = 1019;
 		vrLoc = 8937;
@@ -1007,7 +1027,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 107";
 		rLen = 0;
-		rLoc = 3863;
+		rLoc = 4187;
 		rType = 0;
 		vrLen = 1099;
 		vrLoc = 2919;
@@ -1017,7 +1037,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 392";
 		rLen = 0;
-		rLoc = 11925;
+		rLoc = 10490;
 		rType = 0;
 		vrLen = 1019;
 		vrLoc = 8937;
@@ -1027,7 +1047,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 107";
 		rLen = 0;
-		rLoc = 3863;
+		rLoc = 4187;
 		rType = 0;
 		vrLen = 1099;
 		vrLoc = 2919;
@@ -1037,7 +1057,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3884;
+		rLoc = 4208;
 		rType = 0;
 		vrLen = 964;
 		vrLoc = 2919;
@@ -1047,7 +1067,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3858;
+		rLoc = 4182;
 		rType = 0;
 		vrLen = 867;
 		vrLoc = 2919;
@@ -1057,7 +1077,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3858;
+		rLoc = 4182;
 		rType = 0;
 		vrLen = 902;
 		vrLoc = 2884;
@@ -1067,7 +1087,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3858;
+		rLoc = 4182;
 		rType = 0;
 		vrLen = 902;
 		vrLoc = 2884;
@@ -1172,7 +1192,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 521;
-		modificationTime = 292825021.208073;
+		modificationTime = 292864734.82126;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -1189,7 +1209,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 520;
-		modificationTime = 292825021.208181;
+		modificationTime = 292864734.821379;
 		originalNumberOfMultipleMatches = 1;
 		state = 0;
 	};
@@ -1198,7 +1218,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3785;
+		rLoc = 4109;
 		rType = 0;
 		vrLen = 1064;
 		vrLoc = 3016;
@@ -1225,7 +1245,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3785;
+		rLoc = 4109;
 		rType = 0;
 		vrLen = 626;
 		vrLoc = 3075;
@@ -1321,7 +1341,7 @@
 		isa = PBXTextBookmark;
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		rLen = 0;
-		rLoc = 126;
+		rLoc = 135;
 		rType = 1;
 	};
 	ED5079F31173AD9200883983 /* PBXTextBookmark */ = {
@@ -1329,7 +1349,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3785;
+		rLoc = 4109;
 		rType = 0;
 		vrLen = 901;
 		vrLoc = 2884;
@@ -1339,7 +1359,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 108";
 		rLen = 0;
-		rLoc = 3785;
+		rLoc = 4109;
 		rType = 0;
 		vrLen = 901;
 		vrLoc = 2884;
@@ -1349,7 +1369,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 111";
 		rLen = 0;
-		rLoc = 3785;
+		rLoc = 4109;
 		rType = 0;
 		vrLen = 973;
 		vrLoc = 2987;
@@ -1359,7 +1379,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 112";
 		rLen = 0;
-		rLoc = 3785;
+		rLoc = 4109;
 		rType = 0;
 		vrLen = 1024;
 		vrLoc = 2816;
@@ -1409,7 +1429,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 529";
 		rLen = 0;
-		rLoc = 15542;
+		rLoc = 14107;
 		rType = 0;
 		vrLen = 832;
 		vrLoc = 11928;
@@ -1499,7 +1519,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 111";
 		rLen = 0;
-		rLoc = 3831;
+		rLoc = 4155;
 		rType = 0;
 		vrLen = 821;
 		vrLoc = 2906;
@@ -1525,7 +1545,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 111";
 		rLen = 0;
-		rLoc = 3831;
+		rLoc = 4155;
 		rType = 0;
 		vrLen = 541;
 		vrLoc = 3097;
@@ -1534,7 +1554,7 @@
 		isa = PBXTextBookmark;
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		rLen = 0;
-		rLoc = 475;
+		rLoc = 430;
 		rType = 1;
 	};
 	ED507A351173B07C00883983 /* PBXTextBookmark */ = {
@@ -1542,7 +1562,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 393";
 		rLen = 0;
-		rLoc = 11768;
+		rLoc = 10333;
 		rType = 0;
 		vrLen = 668;
 		vrLoc = 9318;
@@ -1561,7 +1581,7 @@
 		ignoreCount = 0;
 		lineNumber = 23;
 		location = tuxsim;
-		modificationTime = 292825021.545986;
+		modificationTime = 292864735.174138;
 		originalNumberOfMultipleMatches = 1;
 		state = 1;
 	};
@@ -1580,7 +1600,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 111";
 		rLen = 0;
-		rLoc = 3831;
+		rLoc = 4155;
 		rType = 0;
 		vrLen = 930;
 		vrLoc = 33;
@@ -1610,7 +1630,7 @@
 		comments = "No matching function for call to 'NormalFragments::NormalFragments(int&, int&)'";
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		rLen = 1;
-		rLoc = 544;
+		rLoc = 499;
 		rType = 1;
 	};
 	ED507A471173B1C000883983 /* PBXTextBookmark */ = {
@@ -1618,7 +1638,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 411";
 		rLen = 0;
-		rLoc = 12860;
+		rLoc = 11425;
 		rType = 0;
 		vrLen = 753;
 		vrLoc = 10099;
@@ -1628,7 +1648,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 431";
 		rLen = 0;
-		rLoc = 13249;
+		rLoc = 11814;
 		rType = 0;
 		vrLen = 773;
 		vrLoc = 10182;
@@ -1638,7 +1658,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 431";
 		rLen = 0;
-		rLoc = 13249;
+		rLoc = 11814;
 		rType = 0;
 		vrLen = 773;
 		vrLoc = 10182;
@@ -1648,7 +1668,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 431";
 		rLen = 0;
-		rLoc = 13249;
+		rLoc = 11814;
 		rType = 0;
 		vrLen = 773;
 		vrLoc = 10182;
@@ -1658,7 +1678,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 431";
 		rLen = 0;
-		rLoc = 13249;
+		rLoc = 11814;
 		rType = 0;
 		vrLen = 440;
 		vrLoc = 10327;
@@ -1710,20 +1730,20 @@
 		isa = PBXTextBookmark;
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		rLen = 1;
-		rLoc = 35;
+		rLoc = 39;
 		rType = 1;
 	};
 	ED507A5B1173B38500883983 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 36";
-		rLen = 89;
+		rLen = 247;
 		rLoc = 874;
 		rType = 0;
 		vrLen = 771;
 		vrLoc = 543;
 	};
-	ED507A5C1173B3A700883983 /* sequencing.cpp:147 */ = {
+	ED507A5C1173B3A700883983 /* sequencing.cpp:156 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -1735,9 +1755,9 @@
 		functionName = "IlluminaChIPSeqPE::select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops, int start, int end, vector<AugmentedCuffOp>& out_ops)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 147;
+		lineNumber = 156;
 		location = tuxsim;
-		modificationTime = 292825021.208447;
+		modificationTime = 292864734.82172;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -1746,7 +1766,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 431";
 		rLen = 0;
-		rLoc = 13249;
+		rLoc = 11814;
 		rType = 0;
 		vrLen = 773;
 		vrLoc = 10182;
@@ -1756,7 +1776,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 48";
 		rLen = 0;
-		rLoc = 1309;
+		rLoc = 1633;
 		rType = 0;
 		vrLen = 1176;
 		vrLoc = 410;
@@ -1766,7 +1786,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 163";
 		rLen = 0;
-		rLoc = 5178;
+		rLoc = 5502;
 		rType = 0;
 		vrLen = 1119;
 		vrLoc = 4526;
@@ -1776,7 +1796,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 163";
 		rLen = 0;
-		rLoc = 5178;
+		rLoc = 5502;
 		rType = 0;
 		vrLen = 1119;
 		vrLoc = 4526;
@@ -1786,7 +1806,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 40";
 		rLen = 0;
-		rLoc = 999;
+		rLoc = 1157;
 		rType = 0;
 		vrLen = 728;
 		vrLoc = 759;
@@ -1796,7 +1816,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 161";
 		rLen = 0;
-		rLoc = 4953;
+		rLoc = 5277;
 		rType = 0;
 		vrLen = 797;
 		vrLoc = 4697;
@@ -1806,7 +1826,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 167";
 		rLen = 0;
-		rLoc = 5178;
+		rLoc = 5502;
 		rType = 0;
 		vrLen = 1091;
 		vrLoc = 4502;
@@ -1816,7 +1836,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 148";
 		rLen = 0;
-		rLoc = 4576;
+		rLoc = 4900;
 		rType = 0;
 		vrLen = 1089;
 		vrLoc = 4518;
@@ -1826,7 +1846,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 148";
 		rLen = 0;
-		rLoc = 4576;
+		rLoc = 4900;
 		rType = 0;
 		vrLen = 1089;
 		vrLoc = 4518;
@@ -1836,7 +1856,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 431";
 		rLen = 0;
-		rLoc = 13249;
+		rLoc = 11814;
 		rType = 0;
 		vrLen = 794;
 		vrLoc = 10180;
@@ -1846,7 +1866,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 522";
 		rLen = 0;
-		rLoc = 15269;
+		rLoc = 13834;
 		rType = 0;
 		vrLen = 832;
 		vrLoc = 12006;
@@ -1856,7 +1876,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 522";
 		rLen = 0;
-		rLoc = 15269;
+		rLoc = 13834;
 		rType = 0;
 		vrLen = 650;
 		vrLoc = 7661;
@@ -1866,7 +1886,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 148";
 		rLen = 0;
-		rLoc = 4576;
+		rLoc = 4900;
 		rType = 0;
 		vrLen = 1046;
 		vrLoc = 4518;
@@ -1876,7 +1896,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 129";
 		rLen = 0;
-		rLoc = 3979;
+		rLoc = 4303;
 		rType = 0;
 		vrLen = 950;
 		vrLoc = 3727;
@@ -1886,7 +1906,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 128";
 		rLen = 0;
-		rLoc = 3921;
+		rLoc = 4245;
 		rType = 0;
 		vrLen = 945;
 		vrLoc = 3421;
@@ -1906,7 +1926,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 393";
 		rLen = 0;
-		rLoc = 10216;
+		rLoc = 8781;
 		rType = 0;
 		vrLen = 885;
 		vrLoc = 9047;
@@ -1916,7 +1936,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 412";
 		rLen = 0;
-		rLoc = 10193;
+		rLoc = 8758;
 		rType = 0;
 		vrLen = 854;
 		vrLoc = 9648;
@@ -1926,7 +1946,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 412";
 		rLen = 0;
-		rLoc = 10191;
+		rLoc = 8756;
 		rType = 0;
 		vrLen = 843;
 		vrLoc = 9504;
@@ -1946,7 +1966,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 437";
 		rLen = 0;
-		rLoc = 11138;
+		rLoc = 9703;
 		rType = 0;
 		vrLen = 896;
 		vrLoc = 10333;
@@ -1956,7 +1976,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 472";
 		rLen = 0;
-		rLoc = 12303;
+		rLoc = 10868;
 		rType = 0;
 		vrLen = 890;
 		vrLoc = 10092;
@@ -1966,7 +1986,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 427";
 		rLen = 0;
-		rLoc = 10547;
+		rLoc = 9112;
 		rType = 0;
 		vrLen = 812;
 		vrLoc = 10017;
@@ -1976,7 +1996,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 203";
 		rLen = 0;
-		rLoc = 6362;
+		rLoc = 6685;
 		rType = 0;
 		vrLen = 948;
 		vrLoc = 6063;
@@ -2046,7 +2066,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 204";
 		rLen = 0;
-		rLoc = 6362;
+		rLoc = 6685;
 		rType = 0;
 		vrLen = 971;
 		vrLoc = 3506;
@@ -2056,7 +2076,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 433";
 		rLen = 0;
-		rLoc = 10736;
+		rLoc = 9301;
 		rType = 0;
 		vrLen = 869;
 		vrLoc = 10393;
@@ -2066,7 +2086,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 361";
 		rLen = 0;
-		rLoc = 8592;
+		rLoc = 7157;
 		rType = 0;
 		vrLen = 795;
 		vrLoc = 8434;
@@ -2076,7 +2096,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 204";
 		rLen = 0;
-		rLoc = 6362;
+		rLoc = 6685;
 		rType = 0;
 		vrLen = 973;
 		vrLoc = 6038;
@@ -2086,7 +2106,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 361";
 		rLen = 0;
-		rLoc = 8592;
+		rLoc = 7157;
 		rType = 0;
 		vrLen = 667;
 		vrLoc = 8152;
@@ -2096,7 +2116,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 482";
 		rLen = 0;
-		rLoc = 11979;
+		rLoc = 10544;
 		rType = 0;
 		vrLen = 1044;
 		vrLoc = 11368;
@@ -2106,7 +2126,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 482";
 		rLen = 0;
-		rLoc = 11979;
+		rLoc = 10544;
 		rType = 0;
 		vrLen = 642;
 		vrLoc = 12243;
@@ -2116,7 +2136,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 501";
 		rLen = 0;
-		rLoc = 12596;
+		rLoc = 11161;
 		rType = 0;
 		vrLen = 893;
 		vrLoc = 11880;
@@ -2126,7 +2146,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 501";
 		rLen = 0;
-		rLoc = 12596;
+		rLoc = 11161;
 		rType = 0;
 		vrLen = 893;
 		vrLoc = 11880;
@@ -2136,7 +2156,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 448";
 		rLen = 0;
-		rLoc = 11003;
+		rLoc = 9568;
 		rType = 0;
 		vrLen = 880;
 		vrLoc = 10380;
@@ -2146,7 +2166,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 448";
 		rLen = 0;
-		rLoc = 11003;
+		rLoc = 9568;
 		rType = 0;
 		vrLen = 880;
 		vrLoc = 10380;
@@ -2156,7 +2176,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 204";
 		rLen = 0;
-		rLoc = 6362;
+		rLoc = 6685;
 		rType = 0;
 		vrLen = 1123;
 		vrLoc = 186;
@@ -2166,7 +2186,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 448";
 		rLen = 0;
-		rLoc = 11003;
+		rLoc = 9568;
 		rType = 0;
 		vrLen = 851;
 		vrLoc = 10409;
@@ -2176,7 +2196,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 306";
 		rLen = 0;
-		rLoc = 7545;
+		rLoc = 6110;
 		rType = 0;
 		vrLen = 622;
 		vrLoc = 7117;
@@ -2186,7 +2206,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 123";
 		rLen = 0;
-		rLoc = 3698;
+		rLoc = 4022;
 		rType = 0;
 		vrLen = 841;
 		vrLoc = 2836;
@@ -2195,7 +2215,7 @@
 		isa = PBXTextBookmark;
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		rLen = 0;
-		rLoc = 306;
+		rLoc = 261;
 		rType = 1;
 	};
 	EDCCF46F11741FB8000D83D5 /* PBXTextBookmark */ = {
@@ -2203,7 +2223,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 306";
 		rLen = 0;
-		rLoc = 7541;
+		rLoc = 6106;
 		rType = 0;
 		vrLen = 671;
 		vrLoc = 7117;
@@ -2213,7 +2233,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 313";
 		rLen = 0;
-		rLoc = 7689;
+		rLoc = 6254;
 		rType = 0;
 		vrLen = 811;
 		vrLoc = 6618;
@@ -2223,7 +2243,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 123";
 		rLen = 0;
-		rLoc = 3698;
+		rLoc = 4022;
 		rType = 0;
 		vrLen = 883;
 		vrLoc = 2830;
@@ -2233,7 +2253,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 101";
 		rLen = 30;
-		rLoc = 3196;
+		rLoc = 3520;
 		rType = 0;
 		vrLen = 878;
 		vrLoc = 2830;
@@ -2243,7 +2263,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 65";
 		rLen = 0;
-		rLoc = 1659;
+		rLoc = 1983;
 		rType = 0;
 		vrLen = 996;
 		vrLoc = 1000;
@@ -2253,7 +2273,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 66";
 		rLen = 0;
-		rLoc = 1659;
+		rLoc = 1983;
 		rType = 0;
 		vrLen = 1035;
 		vrLoc = 1000;
@@ -2263,7 +2283,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 66";
 		rLen = 0;
-		rLoc = 1659;
+		rLoc = 1983;
 		rType = 0;
 		vrLen = 1035;
 		vrLoc = 1000;
@@ -2282,7 +2302,7 @@
 		isa = PBXTextBookmark;
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		rLen = 0;
-		rLoc = 57;
+		rLoc = 66;
 		rType = 1;
 	};
 	EDCCF4871174277E000D83D5 /* PBXTextBookmark */ = {
@@ -2290,7 +2310,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 58";
 		rLen = 0;
-		rLoc = 1658;
+		rLoc = 1982;
 		rType = 0;
 		vrLen = 554;
 		vrLoc = 1444;
@@ -2300,7 +2320,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 58";
 		rLen = 0;
-		rLoc = 1658;
+		rLoc = 1982;
 		rType = 0;
 		vrLen = 1055;
 		vrLoc = 1000;
@@ -2310,7 +2330,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 313";
 		rLen = 0;
-		rLoc = 7689;
+		rLoc = 6254;
 		rType = 0;
 		vrLen = 805;
 		vrLoc = 6624;
@@ -2320,7 +2340,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 307";
 		rLen = 0;
-		rLoc = 7561;
+		rLoc = 6126;
 		rType = 0;
 		vrLen = 733;
 		vrLoc = 6898;
@@ -2370,7 +2390,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 307";
 		rLen = 0;
-		rLoc = 7561;
+		rLoc = 6126;
 		rType = 0;
 		vrLen = 1018;
 		vrLoc = 11579;
@@ -2380,7 +2400,7 @@
 		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
 		name = "sequencing.cpp: 56";
 		rLen = 0;
-		rLoc = 1550;
+		rLoc = 1874;
 		rType = 0;
 		vrLen = 1074;
 		vrLoc = 330;
@@ -2395,6 +2415,242 @@
 		vrLen = 1027;
 		vrLoc = 2404;
 	};
+	EDCCF49B11742D40000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 35";
+		rLen = 0;
+		rLoc = 856;
+		rType = 0;
+		vrLen = 838;
+		vrLoc = 3386;
+	};
+	EDCCF49C1174A92B000D83D5 /* sequencing.cpp:39 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		functionName = "IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag, ReadsForFragment& reads)";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 39;
+		location = tuxsim;
+		modificationTime = 292864735.185032;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	EDCCF4A21174A951000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 40";
+		rLen = 0;
+		rLoc = 1114;
+		rType = 0;
+		vrLen = 1156;
+		vrLoc = 365;
+	};
+	EDCCF4A31174A951000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 54";
+		rLen = 0;
+		rLoc = 1617;
+		rType = 0;
+		vrLen = 1285;
+		vrLoc = 595;
+	};
+	EDCCF4A81174A984000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 50";
+		rLen = 0;
+		rLoc = 1519;
+		rType = 0;
+		vrLen = 1273;
+		vrLoc = 548;
+	};
+	EDCCF4A91174A999000D83D5 /* sequencing.cpp:26 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		functionName = "IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag, ReadsForFragment& reads)";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 26;
+		location = tuxsim;
+		modificationTime = 292864737.658085;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	EDCCF4B11174A9BF000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 30";
+		rLen = 0;
+		rLoc = 542;
+		rType = 0;
+		vrLen = 997;
+		vrLoc = 365;
+	};
+	EDCCF4B21174A9BF000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 28";
+		rLen = 0;
+		rLoc = 542;
+		rType = 0;
+		vrLen = 1109;
+		vrLoc = 943;
+	};
+	EDCCF4B41174AA25000D83D5 /* main.cpp:341 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = ED003B071164725100E19F3F /* main.cpp */;
+		functionName = "print_aligned_read(const ReadHit& read, RefSequenceTable& rt, FILE* sam_out)";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 341;
+		location = tuxsim;
+		modificationTime = 292864743.116963;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	EDCCF4C01174AA74000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED003B071164725100E19F3F /* main.cpp */;
+		name = "main.cpp: 390";
+		rLen = 0;
+		rLoc = 7897;
+		rType = 0;
+		vrLen = 769;
+		vrLoc = 9948;
+	};
+	EDCCF4C11174AA74000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 30";
+		rLen = 0;
+		rLoc = 542;
+		rType = 0;
+		vrLen = 930;
+		vrLoc = 260;
+	};
+	EDCCF4C21174AA74000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 28";
+		rLen = 0;
+		rLoc = 542;
+		rType = 0;
+		vrLen = 930;
+		vrLoc = 260;
+	};
+	EDCCF4CE1174C258000D83D5 /* sequencing.cpp:196 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		functionName = "IlluminaChIPSeqPE::select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops, int start, int end, vector<AugmentedCuffOp>& out_ops)";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 196;
+		location = tuxsim;
+		modificationTime = 292864734.822388;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	EDCCF4D21174C2AB000D83D5 /* sequencing.cpp:52 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		functionName = "IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag, ReadsForFragment& reads)";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 52;
+		location = tuxsim;
+		modificationTime = 292864735.310838;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	EDCCF4D61174C2EA000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 201";
+		rLen = 0;
+		rLoc = 6142;
+		rType = 0;
+		vrLen = 920;
+		vrLoc = 165;
+	};
+	EDCCF4D71174C2EA000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED003B071164725100E19F3F /* main.cpp */;
+		rLen = 0;
+		rLoc = 340;
+		rType = 1;
+	};
+	EDCCF4D81174C2EA000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED003B071164725100E19F3F /* main.cpp */;
+		name = "main.cpp: 390";
+		rLen = 0;
+		rLoc = 7897;
+		rType = 0;
+		vrLen = 891;
+		vrLoc = 8982;
+	};
+	EDCCF4D9117608FA000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED003B071164725100E19F3F /* main.cpp */;
+		name = "main.cpp: 386";
+		rLen = 0;
+		rLoc = 7897;
+		rType = 0;
+		vrLen = 821;
+		vrLoc = 9825;
+	};
+	EDCCF4DA117608FA000D83D5 /* XCBuildMessageTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "Unused variable 'a'";
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		fallbackIsa = XCBuildMessageTextBookmark;
+		rLen = 0;
+		rLoc = 25;
+		rType = 1;
+	};
+	EDCCF4DB117608FA000D83D5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED5079831173A8EF00883983 /* sequencing.cpp */;
+		name = "sequencing.cpp: 26";
+		rLen = 0;
+		rLoc = 542;
+		rType = 0;
+		vrLen = 1036;
+		vrLoc = 164;
+	};
 	EDDB8BD7116BE5A600B6A083 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = ED0035B71164509500E19F3F /* gff.h */;
@@ -2405,7 +2661,7 @@
 		vrLen = 1223;
 		vrLoc = 12124;
 	};
-	EDDB8BDD116BE5F600B6A083 /* main.cpp:307 */ = {
+	EDDB8BDD116BE5F600B6A083 /* main.cpp:262 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -2417,13 +2673,13 @@
 		functionName = "load_ref_rnas(FILE* ref_mRNA_file, RefSequenceTable& rt, vector<Scaffold>& ref_mRNAs)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 307;
+		lineNumber = 262;
 		location = tuxsim;
-		modificationTime = 292825021.207002;
+		modificationTime = 292864734.820613;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
-	EDDB8BDF116BE5F900B6A083 /* main.cpp:223 */ = {
+	EDDB8BDF116BE5F900B6A083 /* main.cpp:178 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -2435,9 +2691,9 @@
 		functionName = "load_ref_rnas(FILE* ref_mRNA_file, RefSequenceTable& rt, vector<Scaffold>& ref_mRNAs)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 223;
+		lineNumber = 178;
 		location = tuxsim;
-		modificationTime = 292825021.207173;
+		modificationTime = 292864734.82071;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -2451,7 +2707,7 @@
 		vrLen = 870;
 		vrLoc = 4813;
 	};
-	EDDB8C37116D33A200B6A083 /* main.cpp:329 */ = {
+	EDDB8C37116D33A200B6A083 /* main.cpp:284 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -2463,9 +2719,9 @@
 		functionName = "reads_for_fragment(const LibraryFragment& frag, ReadsForFragment& reads)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 329;
+		lineNumber = 284;
 		location = tuxsim;
-		modificationTime = 292825021.20733;
+		modificationTime = 292864734.820831;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -2516,7 +2772,7 @@
 		path = "/usr/local/include/boost-1_41/boost/random/linear_congruential.hpp";
 		sourceTree = "<absolute>";
 	};
-	EDDB8D20116E310800B6A083 /* main.cpp:329 */ = {
+	EDDB8D20116E310800B6A083 /* main.cpp:284 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -2528,9 +2784,9 @@
 		functionName = "select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops, int genomic_left, int genomic_right, vector<AugmentedCuffOp>& out_ops)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 329;
+		lineNumber = 284;
 		location = tuxsim;
-		modificationTime = 292825021.207537;
+		modificationTime = 292864734.820938;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -2544,7 +2800,7 @@
 		vrLen = 696;
 		vrLoc = 32;
 	};
-	EDDB8D44116E32FB00B6A083 /* main.cpp:329 */ = {
+	EDDB8D44116E32FB00B6A083 /* main.cpp:284 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -2556,13 +2812,13 @@
 		functionName = "reads_for_fragment(const LibraryFragment& frag, ReadsForFragment& reads)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 329;
+		lineNumber = 284;
 		location = tuxsim;
-		modificationTime = 292825021.20773;
+		modificationTime = 292864734.821047;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
-	EDDB8D57116E387E00B6A083 /* main.cpp:329 */ = {
+	EDDB8D57116E387E00B6A083 /* main.cpp:284 */ = {
 		isa = PBXFileBreakpoint;
 		actions = (
 		);
@@ -2574,9 +2830,9 @@
 		functionName = "reads_for_fragment(const LibraryFragment& frag, ReadsForFragment& reads)";
 		hitCount = 0;
 		ignoreCount = 0;
-		lineNumber = 329;
+		lineNumber = 284;
 		location = tuxsim;
-		modificationTime = 292825021.207895;
+		modificationTime = 292864734.821158;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -2585,7 +2841,7 @@
 		fRef = ED003B071164725100E19F3F /* main.cpp */;
 		name = "main.cpp: 565";
 		rLen = 0;
-		rLoc = 7895;
+		rLoc = 6460;
 		rType = 0;
 		vrLen = 745;
 		vrLoc = 14037;

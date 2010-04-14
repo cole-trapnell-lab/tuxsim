@@ -23,6 +23,7 @@
 		ED50796E1173A70500883983 /* abundances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED50796D1173A70500883983 /* abundances.cpp */; };
 		ED5079751173A7BA00883983 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
 		ED5079841173A8EF00883983 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
+		EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDCCF4DE117624E5000D83D5 /* options.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -73,6 +74,8 @@
 		ED5079741173A7BA00883983 /* fragments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fragments.cpp; path = src/fragments.cpp; sourceTree = "<group>"; };
 		ED5079821173A8EF00883983 /* sequencing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sequencing.h; path = src/sequencing.h; sourceTree = "<group>"; };
 		ED5079831173A8EF00883983 /* sequencing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sequencing.cpp; path = src/sequencing.cpp; sourceTree = "<group>"; };
+		EDCCF4DD117624E4000D83D5 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = src/options.h; sourceTree = "<group>"; };
+		EDCCF4DE117624E5000D83D5 /* options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options.cpp; path = src/options.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +134,8 @@
 				ED5079821173A8EF00883983 /* sequencing.h */,
 				ED5079831173A8EF00883983 /* sequencing.cpp */,
 				ED003B071164725100E19F3F /* main.cpp */,
+				EDCCF4DD117624E4000D83D5 /* options.h */,
+				EDCCF4DE117624E5000D83D5 /* options.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -209,6 +214,7 @@
 				ED50796E1173A70500883983 /* abundances.cpp in Sources */,
 				ED5079751173A7BA00883983 /* fragments.cpp in Sources */,
 				ED5079841173A8EF00883983 /* sequencing.cpp in Sources */,
+				EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
