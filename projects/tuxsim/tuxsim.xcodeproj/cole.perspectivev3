@@ -233,8 +233,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -272,6 +270,7 @@
 							<array>
 								<string>08FB7794FE84155DC02AAC07</string>
 								<string>08FB7795FE84155DC02AAC07</string>
+								<string>ED3445F111848D1500D68A78</string>
 								<string>1AB674ADFE9D54B511CA2CBB</string>
 								<string>1C37FBAC04509CD000000102</string>
 								<string>1C37FAAC04509CD000000102</string>
@@ -279,13 +278,14 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>37</integer>
+									<integer>5</integer>
+									<integer>3</integer>
 									<integer>2</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 41}, {418, 664}}</string>
+							<string>{{0, 201}, {418, 664}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -313,12 +313,14 @@
 					<key>Dock</key>
 					<array>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>ED0035A511644C4B00E19F3F</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>tuxsim.cpp</string>
+								<string>Makefile.am</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -326,11 +328,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>ED0035A611644C4B00E19F3F</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>tuxsim.cpp</string>
+										<string>Makefile.am</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>EDADF9051184931E0018CFB9</string>
+										<string>EDADFA7411849CA40018CFB9</string>
 										<key>history</key>
 										<array>
 											<string>ED0038481164585E00E19F3F</string>
@@ -366,15 +368,16 @@
 											<string>ED3445C6118487F600D68A78</string>
 											<string>ED3445E91184898400D68A78</string>
 											<string>ED34460311848F0200D68A78</string>
-											<string>EDADF8FC1184931E0018CFB9</string>
 											<string>EDADF8FD1184931E0018CFB9</string>
-											<string>EDADF8FE1184931E0018CFB9</string>
 											<string>EDADF8FF1184931E0018CFB9</string>
 											<string>EDADF9001184931E0018CFB9</string>
 											<string>EDADF9011184931E0018CFB9</string>
 											<string>EDADF9021184931E0018CFB9</string>
-											<string>EDADF9031184931E0018CFB9</string>
-											<string>EDADF9041184931E0018CFB9</string>
+											<string>EDADFA6711849B8B0018CFB9</string>
+											<string>EDADFA6811849B8B0018CFB9</string>
+											<string>EDADFA6911849B8B0018CFB9</string>
+											<string>EDADFA6A11849B8B0018CFB9</string>
+											<string>EDADFA6B11849B8B0018CFB9</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>

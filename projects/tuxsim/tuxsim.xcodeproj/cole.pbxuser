@@ -153,6 +153,14 @@
 			EDADF9031184931E0018CFB9 /* PBXTextBookmark */ = EDADF9031184931E0018CFB9 /* PBXTextBookmark */;
 			EDADF9041184931E0018CFB9 /* PBXTextBookmark */ = EDADF9041184931E0018CFB9 /* PBXTextBookmark */;
 			EDADF9051184931E0018CFB9 /* PBXTextBookmark */ = EDADF9051184931E0018CFB9 /* PBXTextBookmark */;
+			EDADFA6711849B8B0018CFB9 /* PBXTextBookmark */ = EDADFA6711849B8B0018CFB9 /* PBXTextBookmark */;
+			EDADFA6811849B8B0018CFB9 /* PBXTextBookmark */ = EDADFA6811849B8B0018CFB9 /* PBXTextBookmark */;
+			EDADFA6911849B8B0018CFB9 /* PBXTextBookmark */ = EDADFA6911849B8B0018CFB9 /* PBXTextBookmark */;
+			EDADFA6A11849B8B0018CFB9 /* PBXTextBookmark */ = EDADFA6A11849B8B0018CFB9 /* PBXTextBookmark */;
+			EDADFA6B11849B8B0018CFB9 /* PBXTextBookmark */ = EDADFA6B11849B8B0018CFB9 /* PBXTextBookmark */;
+			EDADFA6C11849B8B0018CFB9 /* PBXTextBookmark */ = EDADFA6C11849B8B0018CFB9 /* PBXTextBookmark */;
+			EDADFA6D11849BF20018CFB9 /* PBXTextBookmark */ = EDADFA6D11849BF20018CFB9 /* PBXTextBookmark */;
+			EDADFA7411849CA40018CFB9 /* PBXTextBookmark */ = EDADFA7411849CA40018CFB9 /* PBXTextBookmark */;
 			EDCCF43D1174184E000D83D5 = EDCCF43D1174184E000D83D5 /* PBXTextBookmark */;
 			EDCCF49311742B4C000D83D5 = EDCCF49311742B4C000D83D5 /* PBXTextBookmark */;
 			EDCCF64A11765BBB000D83D5 = EDCCF64A11765BBB000D83D5 /* PBXTextBookmark */;
@@ -669,9 +677,9 @@
 	};
 	ED3445FB11848EAF00D68A78 /* configure.ac */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {714, 1846}}";
+			sepNavIntBoundsRect = "{{0, 0}, {714, 1833}}";
 			sepNavSelRange = "{127, 0}";
-			sepNavVisRange = "{0, 733}";
+			sepNavVisRange = "{362, 657}";
 		};
 	};
 	ED3445FF11848EC400D68A78 /* aclocal.m4 */ = {
@@ -1016,9 +1024,9 @@
 	};
 	EDADF8F311848F6B0018CFB9 /* Makefile.am */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {714, 741}}";
-			sepNavSelRange = "{845, 0}";
-			sepNavVisRange = "{363, 599}";
+			sepNavIntBoundsRect = "{{0, 0}, {714, 702}}";
+			sepNavSelRange = "{361, 0}";
+			sepNavVisRange = "{287, 548}";
 		};
 	};
 	EDADF8F611848FC40018CFB9 /* ax_boost_program_options.m4 */ = {
@@ -1117,7 +1125,7 @@
 		fRef = EDADF8F311848F6B0018CFB9 /* Makefile.am */;
 		name = "Makefile.am: 29";
 		rLen = 0;
-		rLoc = 534;
+		rLoc = 536;
 		rType = 0;
 		vrLen = 587;
 		vrLoc = 0;
@@ -1141,6 +1149,86 @@
 		rType = 0;
 		vrLen = 528;
 		vrLoc = 0;
+	};
+	EDADFA6711849B8B0018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
+		name = "tuxsim.cpp: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 528;
+		vrLoc = 0;
+	};
+	EDADFA6811849B8B0018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED3445FF11848EC400D68A78 /* aclocal.m4 */;
+		name = "aclocal.m4: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1400;
+		vrLoc = 0;
+	};
+	EDADFA6911849B8B0018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED34460211848ECF00D68A78 /* version.m4 */;
+		name = "version.m4: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 37;
+		vrLoc = 0;
+	};
+	EDADFA6A11849B8B0018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = ED3445FB11848EAF00D68A78 /* configure.ac */;
+		name = "configure.ac: 5";
+		rLen = 0;
+		rLoc = 127;
+		rType = 0;
+		vrLen = 657;
+		vrLoc = 362;
+	};
+	EDADFA6B11849B8B0018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = EDADF8F311848F6B0018CFB9 /* Makefile.am */;
+		name = "Makefile.am: 52";
+		rLen = 0;
+		rLoc = 794;
+		rType = 0;
+		vrLen = 599;
+		vrLoc = 363;
+	};
+	EDADFA6C11849B8B0018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = EDADF8F311848F6B0018CFB9 /* Makefile.am */;
+		name = "Makefile.am: 42";
+		rLen = 0;
+		rLoc = 670;
+		rType = 0;
+		vrLen = 612;
+		vrLoc = 363;
+	};
+	EDADFA6D11849BF20018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = EDADF8F311848F6B0018CFB9 /* Makefile.am */;
+		name = "Makefile.am: 23";
+		rLen = 0;
+		rLoc = 361;
+		rType = 0;
+		vrLen = 548;
+		vrLoc = 287;
+	};
+	EDADFA7411849CA40018CFB9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = EDADF8F311848F6B0018CFB9 /* Makefile.am */;
+		name = "Makefile.am: 23";
+		rLen = 0;
+		rLoc = 361;
+		rType = 0;
+		vrLen = 548;
+		vrLoc = 287;
 	};
 	EDCCF43D1174184E000D83D5 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;

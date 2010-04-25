@@ -20,9 +20,9 @@ noinst_HEADERS = \
     GFaSeqGet.h \
     GFastaFile.h \
     gff.h \
-    GHash.h \
+    GHash.hh \
     GStr.h \
-    GList.h \
+    GList.hh \
     gtf_tracking.h \
     hits.h \
     options.h \
@@ -40,11 +40,8 @@ libtuxsim_a_SOURCES = \
     GBase.cpp \
     gdna.cpp \
     GFaSeqGet.cpp \
-    GFastaFile.cpp \
     gff.cpp \
-    GHash.cpp \
     GStr.cpp \
-    GList.cpp \
     gtf_tracking.cpp \
     hits.cpp \
     options.cpp \
