@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>TuxSim :: Center for Bioinformatics and Computational Biology</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+</head>
+<body>
+<div id="wrap">
+  <div id="top">
+    <div class="lefts">
+    <table width="100%" cellpadding="2">
+      <tr><td>
+        <a href="./index.html"><h1>TuxSim</h1></a>
+        <h2>Simulation of quantitative sequencing assays</h2>
+      </td><td align="right" valign="middle">
+        <h1><a href="http://www.cbcb.umd.edu/"><img border=0 src="images/cbcblogo.gif"></img></a>&nbsp;&nbsp;</h1>
+      </td></tr>
+    </table>
+    </div>
+  </div>
+  <div id="subheader">
+  <table width="100%"><tr>
+  <td>
+  		<strong>Please Note</strong> If you have questions 
+		  about how to use TuxSim or would like more information about 
+		  the software, please email <a href="mailto:cole@cs.umd.edu">Cole Trapnell</a>.
+	</td><td align=right valign=middle>
+  </td></tr>
+  </table>
+  </div>
+  <div id="main">
+    <div id="rightside">
+		<h2>Site Map</h2>
+		  <div class="box">
+		    <ul>
+		      <li><a href="manual.html">Manual</a></li>
+		    </ul>
+		  </div>
+		
+		  <h2><u>News and updates</u></h2>
+		  <div class="box">
+		    <ul>
+		      <table width="100%">
+				<tr><td>New releases and related tools will be announced through the <a href="https://lists.sourceforge.net/lists/listinfo/bowtie-bio-announce"><b>mailing list</b></a></td></tr>
+			  </table>
+		    </ul>
+		  </div>
+		
+		  <a href="./downloads"><h2><u>Releases</u></h2></a>
+		  <div class="box">
+		    <ul>
+		      <table width="100%">
+			  </table>
+		    </ul>
+		  </div>
+		
+		  <h2>Related Tools</h2>
+		  <div class="box">
+		    <ul>
+		      <li><a href="http://tophat.cbcb.umd.edu/">TopHat</a>: Alignment of short RNA-Seq reads</li>
+		      <li><a href="http://bowtie.cbcb.umd.edu">Bowtie</a>: Ultrafast short read alignment</li>
+		    </ul>
+		  </div>
+
+		  <h2>Contributors</h2>
+		  <div class="box">
+		    <ul>
+		      <li><a href="http://www.cs.umd.edu/~cole/">Cole Trapnell</a></li>
+		    </ul>
+		  </div>        
+          
+    </div> <!-- End of "rightside" -->
+    <div id="leftside">
+  	  <table><tr><td cellpadding=7>
+  	  <h1>Manual</h1><br/>
+      <div id="toc">
+  	    <ul>
+  	    <li><a href="#prer">Prerequisites</a></li>
+  	    <li><a href="#cufflinks">Running TuxSim</a></li>
+		<ul>
+  	      <li><a href="#cufflinks_input">Input Files</a></li>
+  	  	  <li><a href="#cufflinks_output">Output Files</a></li>
+ 	    </ul>
+  	    </ul><br/>
+  	  </div>
+  	  
+	  <h2 id="prer">Prerequisites</h2><br/>
+	  <p>
+	  TuxSim runs on intel-based computers running Linux or Mac OS X and 
+	  that have GCC 4.0 or greater installed.  You can install pre-compiled 
+	  binaries or build TuxSim from the source code.
+	  If you wish to build TuxSim yourself, you will need to install the
+	  <a href="http://www.boost.org">Boost C++ libraries</a>.   
+  	  </p>
+ 	  <br/>
+  	  <h2 id="tuxsim">Running TuxSim</h2><br/>
+		Run <tt>tuxsim</tt> from the command line as follows:
+	  <blockquote>
+ 	   Usage: tuxsim [options]* &lt;config_file&gt;
+	  </blockquote>
+	  <p>
+	  The following is a detailed description of the options used to control
+	  Cufflinks:
+	  </p><br/>
+
+	  <table CELLSPACING=15>
+	  <tr><td VALIGN=top>
+	  <b>Arguments:</b>
+	  </td><td VALIGN=top>
+	  </td></tr>
+	  <tr><td VALIGN=top nowrap>
+	  <tt>&lt;config_file&gt;</tt>
+	  </td><td VALIGN=top>
+	  Configure the simulation run with parameters stored in this file
+	  </td></tr>
+
+	  <tr><td VALIGN=top>
+	  <b>Options:</b>
+	  </td><td VALIGN=top>
+	  </td></tr>
+	  <tr><td VALIGN=top nowrap>
+	  <tt>-h/--help</tt>
+	  </td><td VALIGN=top>
+	  Prints the help message and exits   
+	  </td></tr> 
+	  <tr><td VALIGN=top nowrap>
+	  <tt>-A/--abundances &lt;file_name&gt;</tt>
+	  </td><td VALIGN=top>
+	  An abundance file.  When this option is specified, TuxSim skips assignment
+	  of abundances to sample molecules and proceeds directly to fragmentation.
+	  </td></tr>
+	  <tr><td VALIGN=top nowrap>
+	  <tt>-F/--fragments &lt;file_name&gt;</tt>
+	  </td><td VALIGN=top>
+	  A fragment output file from a previous simulator run.  When this option 
+	  is specified, TuxSim skips the fragmentation step, and simply performs
+	  read sequencing on the specified library.
+	  </td></tr>
+	  <tr><td VALIGN=top nowrap>
+	  </table><br/>
+	
+	  <h2 id="tuxsim_input">TuxSim Input</h2><br/>
+	  <p>
+		TuxSim takes as input a configuration file specifying what type of assay
+		to simulate along with the parameters that determine various parameters
+		of the assay such as sequencing platform and various protocol steps.
+	  </p>
+	  <p>
+		This file is in an INI-like format, where parameters are set with lines
+		of the form:
+	  </p>
+		<br/>
+		<blockquote>
+		a.config.group.param_name=value
+	    </blockquote>
+	   <p>
+	   These parameters can be grouped into sections:
+       </p>
+       <br/>
+		<blockquote>
+		[a.config.group] <br/>
+		param_name_1=value <br/>
+		param_name_2=value <br/>
+	    </blockquote>
+	  
+	
+	  <table CELLSPACING=15>
+	  <tr><td VALIGN=top nowrap>
+	  <b>Configuration options:</b>
+	  </td><td VALIGN=top>
+	  </td></tr>
+	  
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap>
+	  <b>Group</b></td>
+	  <td VALIGN=top nowrap>
+	  <b>Parameter</b>
+	  <td VALIGN=top nowrap>
+	  <b>Value Type</b>
+   	  <td VALIGN=top nowrap>
+	  <b>Default</b>
+	  </td><td VALIGN=top>
+	  <b>Description</b>
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap><tt>input</tt></td>
+   	  <td VALIGN=top nowrap><tt>fasta_dir</tt></td>
+	  <td VALIGN=top nowrap>Directory path</td>
+   	  <td VALIGN=top nowrap>&lt;none&gt;</td>
+	  <td VALIGN=top>
+	  Directory with FASTA files for source molecules
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap>
+	  <tt>source_pool</tt></td>
+	  <td VALIGN=top nowrap><tt>source_gtf</tt></td>
+	  <td VALIGN=top nowrap>File path</td>
+   	  <td VALIGN=top nowrap>&lt;none&gt;</td>
+	  <td VALIGN=top>
+	  GTF file of spliced molecules for sequencing.  If this is not set, the
+	  source fasta files themselves will be the pool sequences (i.e. resequencing)
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr id="frag_length"><td VALIGN=top nowrap>
+	  <tt>fragment_length</tt></td>
+	  <td VALIGN=top nowrap><tt>distribution</tt></td>
+	  <td VALIGN=top nowrap>String</td>
+   	  <td VALIGN=top nowrap>gaussian</td>
+	  <td VALIGN=top>
+	  The distribution to use for the lengths of the fragments sequenced during 
+	  the run.  Supported values are: "gaussian", "empirical".  For "gaussian" see
+	  <a href="#gaussian_frag_mean">fragment_length.mean</a> and 
+	  <a href="#gaussian_frag_std_dev">fragment_length.std_dev</a>. For 
+	  "empirical", see <a href="#empirical_dist_file">fragment_length.empirical_dist_file</a>
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr id="gaussian_frag_mean"><td VALIGN=top nowrap>
+	  <tt>fragment_length</tt></td>
+	  <td VALIGN=top nowrap><tt>mean</tt></td>
+	  <td VALIGN=top nowrap>Decimal</td>
+   	  <td VALIGN=top nowrap>200.0</td>
+	  <td VALIGN=top>
+	  Mean length of sequenced fragments. Used only for "gaussian" <a href="#frag_length">fragment length distributions</a>.
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr id="gaussian_frag_std_dev"><td VALIGN=top nowrap>
+	  <tt>fragment_length</tt></td>
+	  <td VALIGN=top nowrap><tt>std_dev</tt></td>
+	  <td VALIGN=top nowrap>Decimal</td>
+   	  <td VALIGN=top nowrap>40.0</td>
+	  <td VALIGN=top>
+	  Standard deviation of the length of sequenced fragments. Used only for "gaussian" <a href="#frag_length">fragment length distributions</a>.
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr id="empirical_dist_file"><td VALIGN=top nowrap>
+	  <tt>fragment_length</tt></td>
+	  <td VALIGN=top nowrap><tt>empirical_dist_file</tt></td>
+	  <td VALIGN=top nowrap>File path</td>
+   	  <td VALIGN=top nowrap>&lt;none&gt;</td>
+	  <td VALIGN=top>
+	  A tab-delimited file containing the probability of observing a fragment 
+	  of each length. NOT IMPLEMENTED
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap>
+	  <tt>sequencing</tt></td>
+	  <td VALIGN=top nowrap><tt>read_type</tt></td>
+	  <td VALIGN=top nowrap>String</td>
+   	  <td VALIGN=top nowrap>illumina_paired</td>
+	  <td VALIGN=top>
+	  Read configuration for the run.  Supported values are: "illumina_single", "illumina_paired".
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap>
+	  <tt>sequencing</tt></td>
+	  <td VALIGN=top nowrap><tt>read_length</tt></td>
+	  <td VALIGN=top nowrap>Integer</td>
+   	  <td VALIGN=top nowrap>76</td>
+	  <td VALIGN=top>
+	  The length of each read
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap>
+	  <tt>sequencing</tt></td>
+	  <td VALIGN=top nowrap><tt>num_fragments</tt></td>
+	  <td VALIGN=top nowrap>Integer</td>
+   	  <td VALIGN=top nowrap>20000000</td>
+	  <td VALIGN=top>
+	  The number of fragments to sequence in the run.
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr>
+		<td VALIGN=top nowrap><tt>output</tt></td>
+		<td VALIGN=top nowrap><tt>prefix</tt></td>
+		<td VALIGN=top nowrap>String</td>
+   	    <td VALIGN=top nowrap>&lt;sim&gt;</td>
+		<td VALIGN=top>
+	    All output files will share this prefix
+	    </td>
+	  </tr>
+      
+	  <tr><td VALIGN=top nowrap></td></tr>
+	  </table><br/>
+	
+      <br/>
+  <h2 id="tuxsim_output">TuxSim Output</h2><br/>
+	<p>
+      TuxSim produces several output files:
+	</p>
+	<br/>
+	<ol>
+	<h2 id="samout">prefix.sam</h2>
+	<p>
+		A SAM file of aligned reads
+	</p>
+	  <br/>
+	<h2 id="srcabundances">prefix.srcab</h2>
+	<p>
+		A table of source molecules and their relative abundances
+	</p>
+	<br/>
+	
+	<h2 id="geneexpr"> prefix_1/2.fq</h2>
+	<p>
+	FASTQ files of reads (two files are produced for paired end simulation runs).
+	</p>
+	<br/>
+	</ol>
+	
+		
+	</div>
+  </div>
+  <div id="footer">
+  	<table width="100%" cellspacing=15><tr><td>
+    This research was supported in part by NIH grants R01-LM06845 and R01-GM083873, NSF grant CCF-0347992 and the Miller Institute for Basic
+		Research in Science at UC Berkeley.
+    </td><td align=right>
+    Administrator: <a href="mailto:cole@cs.umd.edu">Cole Trapnell</a>. Design by <a href="http://www.free-css-templates.com" title="Design by David Herreman">David Herreman</a>
+    </td></tr></table>
+  </div>
+</div>
+
+<!-- Google analytics code -->
+<!-- <script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-6101038-2");
+pageTracker._trackPageview();
+} catch(err) {}</script> -->
+<!-- End Google analytics code -->
+</body>
+</html>
