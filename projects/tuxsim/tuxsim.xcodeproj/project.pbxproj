@@ -19,11 +19,11 @@
 		ED003840116457DA00E19F3F /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED00383F116457DA00E19F3F /* common.cpp */; };
 		ED00385B1164627900E19F3F /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
 		ED0038631164630200E19F3F /* scaffolds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038611164630200E19F3F /* scaffolds.cpp */; };
-		ED003B081164725100E19F3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED003B071164725100E19F3F /* main.cpp */; };
 		ED3445191183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */; };
 		ED50796E1173A70500883983 /* abundances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED50796D1173A70500883983 /* abundances.cpp */; };
 		ED5079751173A7BA00883983 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
 		ED5079841173A8EF00883983 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
+		EDADF8FB118493100018CFB9 /* tuxsim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */; };
 		EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDCCF4DE117624E5000D83D5 /* options.cpp */; };
 /* End PBXBuildFile section */
 
@@ -68,14 +68,25 @@
 		ED00385A1164627900E19F3F /* hits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hits.h; path = src/hits.h; sourceTree = "<group>"; };
 		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
 		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
-		ED003B071164725100E19F3F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
 		ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-xgcc40-mt-1_41.a"; path = "/usr/local/lib/libboost_program_options-xgcc40-mt-1_41.a"; sourceTree = "<absolute>"; };
+		ED3445FB11848EAF00D68A78 /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
+		ED3445FC11848EBA00D68A78 /* INSTALL */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };
+		ED3445FD11848EBA00D68A78 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		ED3445FE11848EBA00D68A78 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		ED3445FF11848EC400D68A78 /* aclocal.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aclocal.m4; sourceTree = "<group>"; };
+		ED34460011848EC400D68A78 /* ax_boost_base.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_boost_base.m4; sourceTree = "<group>"; };
+		ED34460111848EC400D68A78 /* ax_boost_thread.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_boost_thread.m4; sourceTree = "<group>"; };
+		ED34460211848ECF00D68A78 /* version.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = version.m4; sourceTree = "<group>"; };
 		ED50796C1173A70500883983 /* abundances.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = abundances.h; path = src/abundances.h; sourceTree = "<group>"; };
 		ED50796D1173A70500883983 /* abundances.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abundances.cpp; path = src/abundances.cpp; sourceTree = "<group>"; };
 		ED5079731173A7BA00883983 /* fragments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fragments.h; path = src/fragments.h; sourceTree = "<group>"; };
 		ED5079741173A7BA00883983 /* fragments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fragments.cpp; path = src/fragments.cpp; sourceTree = "<group>"; };
 		ED5079821173A8EF00883983 /* sequencing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sequencing.h; path = src/sequencing.h; sourceTree = "<group>"; };
 		ED5079831173A8EF00883983 /* sequencing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sequencing.cpp; path = src/sequencing.cpp; sourceTree = "<group>"; };
+		EDADF8F311848F6B0018CFB9 /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = src/Makefile.am; sourceTree = "<group>"; };
+		EDADF8F611848FC40018CFB9 /* ax_boost_program_options.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_boost_program_options.m4; sourceTree = "<group>"; };
+		EDADF8F9118492430018CFB9 /* tuxsim.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = tuxsim.mk; path = config/tuxsim.mk; sourceTree = "<group>"; };
+		EDADF8FA118493100018CFB9 /* tuxsim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tuxsim.cpp; path = src/tuxsim.cpp; sourceTree = "<group>"; };
 		EDCCF4DD117624E4000D83D5 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = src/options.h; sourceTree = "<group>"; };
 		EDCCF4DE117624E5000D83D5 /* options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options.cpp; path = src/options.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -106,6 +117,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				ED3445F111848D1500D68A78 /* Autotools */,
 				ED50796C1173A70500883983 /* abundances.h */,
 				ED50796D1173A70500883983 /* abundances.cpp */,
 				ED003839116457BD00E19F3F /* codons.cpp */,
@@ -139,7 +151,7 @@
 				ED0038621164630200E19F3F /* scaffolds.h */,
 				ED5079821173A8EF00883983 /* sequencing.h */,
 				ED5079831173A8EF00883983 /* sequencing.cpp */,
-				ED003B071164725100E19F3F /* main.cpp */,
+				EDADF8FA118493100018CFB9 /* tuxsim.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -158,6 +170,24 @@
 				C6859E8B029090EE04C91782 /* tuxsim.1 */,
 			);
 			name = Documentation;
+			sourceTree = "<group>";
+		};
+		ED3445F111848D1500D68A78 /* Autotools */ = {
+			isa = PBXGroup;
+			children = (
+				EDADF8F9118492430018CFB9 /* tuxsim.mk */,
+				EDADF8F311848F6B0018CFB9 /* Makefile.am */,
+				ED3445FB11848EAF00D68A78 /* configure.ac */,
+				ED34460211848ECF00D68A78 /* version.m4 */,
+				ED3445FF11848EC400D68A78 /* aclocal.m4 */,
+				ED34460011848EC400D68A78 /* ax_boost_base.m4 */,
+				ED34460111848EC400D68A78 /* ax_boost_thread.m4 */,
+				EDADF8F611848FC40018CFB9 /* ax_boost_program_options.m4 */,
+				ED3445FC11848EBA00D68A78 /* INSTALL */,
+				ED3445FD11848EBA00D68A78 /* LICENSE */,
+				ED3445FE11848EBA00D68A78 /* README */,
+			);
+			name = Autotools;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,11 +244,11 @@
 				ED003840116457DA00E19F3F /* common.cpp in Sources */,
 				ED00385B1164627900E19F3F /* hits.cpp in Sources */,
 				ED0038631164630200E19F3F /* scaffolds.cpp in Sources */,
-				ED003B081164725100E19F3F /* main.cpp in Sources */,
 				ED50796E1173A70500883983 /* abundances.cpp in Sources */,
 				ED5079751173A7BA00883983 /* fragments.cpp in Sources */,
 				ED5079841173A8EF00883983 /* sequencing.cpp in Sources */,
 				EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */,
+				EDADF8FB118493100018CFB9 /* tuxsim.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
