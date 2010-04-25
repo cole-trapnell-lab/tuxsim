@@ -41,8 +41,8 @@ char* getGSeqName(int gseq_id)
 
 char* getFastaFile(int gseq_id) 
 {
-	if (fastadir==NULL) return NULL;
-	GStr s(fastadir);
+	if (fastadir == "") return NULL;
+	GStr s(fastadir.c_str());
 	s.trimR('/');
 	s.appendfmt("/%s",getGSeqName(gseq_id));
 	GStr sbase=s;
@@ -495,12 +495,10 @@ void driver(FILE* ref_gtf,
 						 expr_rho,
 						 expr_alpha);
 	
-	int total_frags = 100;
-	
 	NormalFragments frag_policy(frag_length_mean, 
                                 frag_length_std_dev,
-                                75, 9999999);
-	IlluminaChIPSeqPE seq_policy(75, 75, false);
+                                read_length, 9999999);
+	IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
 	
 	AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy);
 	
@@ -508,7 +506,7 @@ void driver(FILE* ref_gtf,
                    ref_mRNAs,
 				   expr_alpha,
 				   sequencer,
-				   total_frags,
+				   num_fragments,
 				   sam_out,
 				   fastq_out);
 }
@@ -518,30 +516,6 @@ int main(int argc, char** argv)
 	int parse_ret = parse_options(argc,argv);
     if (parse_ret)
         return parse_ret;
-	
-	if(optind >= argc)
-    {
-        print_usage();
-        return 1;
-    }
-	
-    string ref_gtf_filename = argv[optind++];
-
-	if(optind >= argc)
-    {
-        print_usage();
-        return 1;
-    }
-	
-    fastadir = argv[optind++];
-	
-	if(optind >= argc)
-    {
-        print_usage();
-        return 1;
-    }
-	
-    string out_prefix = argv[optind++];
     	
 	// seed the random number generator 
 	//random_seed = time(NULL);
@@ -550,17 +524,15 @@ int main(int argc, char** argv)
 	srand(random_seed);
 	
 	FILE* ref_gtf = NULL;
-	if (ref_gtf_filename != "")
-	{
-		ref_gtf = fopen(ref_gtf_filename.c_str(), "r");
-		if (!ref_gtf)
-		{
-			fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
-					ref_gtf_filename.c_str());
-			exit(1);
-		}
-	}
-	
+
+    ref_gtf = fopen(source_gtf.c_str(), "r");
+    if (!ref_gtf)
+    {
+        fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
+                source_gtf.c_str());
+        exit(1);
+    }
+    
 	FILE* sam_out = NULL;
 	string out_sam_filename = out_prefix + ".sam";
 	sam_out = fopen(out_sam_filename.c_str(), "w");
@@ -594,6 +566,6 @@ int main(int argc, char** argv)
 	FastqOutfilePair fastq_out(left_fastq_out, right_fastq_out);
     
 	driver(ref_gtf, sam_out, fastq_out);
-	
+
 	return 0;
 }

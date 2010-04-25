@@ -13,12 +13,15 @@
 using namespace std;
 using namespace boost;
 
-extern int frag_length_mean;
-extern int frag_length_std_dev;
+extern double frag_length_mean;
+extern double frag_length_std_dev;
+extern int num_fragments;
+extern int read_length;
+extern int num_reads;
+extern string out_prefix;
 
-extern int max_intron_length;
-
-extern const char* fastadir;
+extern string fastadir;
+extern string source_gtf;
 
 extern int random_seed;
 

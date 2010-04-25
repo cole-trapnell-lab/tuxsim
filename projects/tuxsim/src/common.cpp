@@ -13,11 +13,14 @@
 #include <cstdlib>
 #include <iostream>
 
-int frag_length_mean = 200;
-int frag_length_std_dev = 50;
-int max_intron_length = 300000;
+double frag_length_mean = 200;
+double frag_length_std_dev = 40;
+int num_fragments = 20000000;
+int read_length = 76;
+string out_prefix;
 
-const char* fastadir=NULL;
+string fastadir;
+string source_gtf;
 
 int random_seed;
 

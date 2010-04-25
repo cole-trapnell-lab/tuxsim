@@ -20,6 +20,7 @@
 		ED00385B1164627900E19F3F /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
 		ED0038631164630200E19F3F /* scaffolds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038611164630200E19F3F /* scaffolds.cpp */; };
 		ED003B081164725100E19F3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED003B071164725100E19F3F /* main.cpp */; };
+		ED3445191183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */; };
 		ED50796E1173A70500883983 /* abundances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED50796D1173A70500883983 /* abundances.cpp */; };
 		ED5079751173A7BA00883983 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
 		ED5079841173A8EF00883983 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
@@ -68,6 +69,7 @@
 		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
 		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
 		ED003B071164725100E19F3F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-xgcc40-mt-1_41.a"; path = "/usr/local/lib/libboost_program_options-xgcc40-mt-1_41.a"; sourceTree = "<absolute>"; };
 		ED50796C1173A70500883983 /* abundances.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = abundances.h; path = src/abundances.h; sourceTree = "<group>"; };
 		ED50796D1173A70500883983 /* abundances.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = abundances.cpp; path = src/abundances.cpp; sourceTree = "<group>"; };
 		ED5079731173A7BA00883983 /* fragments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fragments.h; path = src/fragments.h; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED3445191183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +95,7 @@
 		08FB7794FE84155DC02AAC07 /* tuxsim */ = {
 			isa = PBXGroup;
 			children = (
+				ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -230,16 +234,19 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_GLIBCXX_DEBUG=1",
-					"_GLIBCXX_DEBUG_PEDANTIC=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
 					./src,
 					"/usr/local/include/boost-1_41",
 				);
 				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/libIntel64,
+				);
 				PRODUCT_NAME = tuxsim;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -249,8 +256,18 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					./src,
+					"/usr/local/include/boost-1_41",
+				);
 				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/libIntel64,
+				);
 				PRODUCT_NAME = tuxsim;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

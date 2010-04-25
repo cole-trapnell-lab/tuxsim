@@ -336,11 +336,6 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		{
 			opcode = REF_SKIP;
 			spliced_alignment = true;
-			if (length > (int)max_intron_length)
-			{
-				//fprintf(stderr, "Encounter REF_SKIP > max_gene_length, skipping\n");
-				return false;
-			}
 		}
 		else if (op_char == 'S') opcode = SOFT_CLIP;
 		else if (op_char == 'H') opcode = HARD_CLIP;
@@ -367,11 +362,6 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		if (!strcmp(mate_ref_name, "="))
 		{
 			mrnm = text_name;
-			if (abs((int)text_mate_pos - (int)text_offset) > max_intron_length)
-			{
-				//fprintf (stderr, "Mates are too distant, skipping\n");
-				return false;
-			}
 		}
 		else
 		{

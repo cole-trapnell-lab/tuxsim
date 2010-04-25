@@ -47,11 +47,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     vector<AugmentedCuffOp> right_read_ops;
     select_genomic_op_range(rna_ops, frag.end - _right_len, frag.end, right_read_ops);
     assert (!right_read_ops.empty());
-    if (right_read_ops.front().opcode == CUFF_INTRON)
+    if (right_read_ops.empty() || right_read_ops.front().opcode == CUFF_INTRON)
     {
         select_genomic_op_range(rna_ops, frag.end - _right_len, frag.end, right_read_ops);
     }
-    
     
     vector<CigarOp> right_read_cigar;
     cuff_op_to_cigar(right_read_ops, right_read_cigar);
@@ -173,7 +172,7 @@ void IlluminaChIPSeqPE::select_genomic_op_range(const vector<AugmentedCuffOp>& s
                 genomic_left = curr_op.genomic_offset + (start - rna_counter);
             }
             if (genomic_right == -1 &&
-                end < rna_counter + curr_op.genomic_length)
+                end <= rna_counter + curr_op.genomic_length)
             {
                 genomic_right = curr_op.genomic_offset + (end - rna_counter);
                 break;
