@@ -233,6 +233,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -278,14 +280,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>5</integer>
-									<integer>3</integer>
+									<integer>48</integer>
 									<integer>2</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 201}, {418, 664}}</string>
+							<string>{{0, 293}, {418, 664}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -313,14 +314,12 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>ED0035A511644C4B00E19F3F</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>Makefile.am</string>
+								<string>tuxsim.cpp</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -328,11 +327,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>ED0035A611644C4B00E19F3F</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>Makefile.am</string>
+										<string>tuxsim.cpp</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>EDADFA7411849CA40018CFB9</string>
+										<string>EDADFAC0118677CA0018CFB9</string>
 										<key>history</key>
 										<array>
 											<string>ED0038481164585E00E19F3F</string>
@@ -371,13 +370,17 @@
 											<string>EDADF8FD1184931E0018CFB9</string>
 											<string>EDADF8FF1184931E0018CFB9</string>
 											<string>EDADF9001184931E0018CFB9</string>
-											<string>EDADF9011184931E0018CFB9</string>
-											<string>EDADF9021184931E0018CFB9</string>
-											<string>EDADFA6711849B8B0018CFB9</string>
-											<string>EDADFA6811849B8B0018CFB9</string>
-											<string>EDADFA6911849B8B0018CFB9</string>
-											<string>EDADFA6A11849B8B0018CFB9</string>
-											<string>EDADFA6B11849B8B0018CFB9</string>
+											<string>EDADFA751184A2D80018CFB9</string>
+											<string>EDADFA761184A2D80018CFB9</string>
+											<string>EDADFA771184A2D80018CFB9</string>
+											<string>EDADFA781184A2D80018CFB9</string>
+											<string>EDADFA791184A2D80018CFB9</string>
+											<string>EDADFA7A1184A2D80018CFB9</string>
+											<string>EDADFA7B1184A2D80018CFB9</string>
+											<string>EDADFA7C1184A2D80018CFB9</string>
+											<string>EDADFA7D1184A2D80018CFB9</string>
+											<string>EDADFABE118677CA0018CFB9</string>
+											<string>EDADFABF118677CA0018CFB9</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>

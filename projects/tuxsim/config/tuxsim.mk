@@ -1,4 +1,4 @@
-##-- CUSTOM SPATS RULES --##
+##-- CUSTOM TUXSIM RULES --##
 
 ##-- install-exec-hook
 ##   execute this custom rule after the global install-exec rule
@@ -35,8 +35,8 @@ install-bin-scripts-hook: $(dist_bin_SCRIPTS) $(bin_SCRIPTS)
                 || exit 1; \
                 ;; \
               *.sh) \
-                echo " configuring shell '$$b', using #!$(SPATS_SHELL)"; \
-                echo '#!$(SPATS_SHELL)' > "$(DESTDIR)$(bindir)/$$b"; \
+                echo " configuring shell '$$b', using #!$(TUXSIM_SHELL)"; \
+                echo '#!$(TUXSIM_SHELL)' > "$(DESTDIR)$(bindir)/$$b"; \
                 sed -e '1 {s|^#!.*$$||;}' \
                     -e 's|BINDIR[[:space:]]*=.*|BINDIR=$(bindir)|' \
                     "$(DESTDIR)$(bindir)/$$f" >> "$(DESTDIR)$(bindir)/$$b" \
