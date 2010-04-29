@@ -165,6 +165,7 @@ int parse_options(int argc, char** argv)
             
             if (!ifs.good())
             {
+				fprintf(stderr, "Error: cannot load config file %s\n", cfg_file.c_str());
                 return 1;
             }
             

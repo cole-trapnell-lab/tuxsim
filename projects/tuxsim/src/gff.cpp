@@ -423,92 +423,94 @@ void GffObj::removeExon(int idx) {
 }
 
 GffObj::GffObj(GffReader *gfrd, GffLine* gffline, bool keepAttr, bool noExonAttr):
-     GSeg(0,0), exons(true,true,true) {
- xstart=0;
- xend=0;
- xstatus=0;
- partial=false;
- isCDS=false;
- uptr=NULL;
- ulink=NULL;
- udata=0;
- CDstart=0;
- CDend=0;
- gname=NULL;
- attrs=NULL;
- gffID=NULL;
- track_id=-1;
- gseq_id=-1;
- ftype_id=-1;
- subftype_id=-1;
- hasErrors=false;
- if (gfrd==NULL)
-    GError("Cannot use this GffObj constructor with a NULL GffReader!\n");
- gffnames_ref(names);
- if (gfrd->names==NULL) gfrd->names=names;
- qlen=0;qstart=0;qend=0;
- gscore=0;
- uscore=0;
- covlen=0;
- qcov=0;
- if (gffline->Parent!=NULL) {
-    //GTF style -- subfeature given directly
-    if (gffline->is_cds || gffline->is_exon)
-         ftype_id=gff_fid_mRNA;
-      else {
-        //group of other subfeatures of type ftype:
-        ftype_id=names->feats.addName(gffline->ftype);
+GSeg(0,0), exons(true,true,true) 
+{
+	xstart=0;
+	xend=0;
+	xstatus=0;
+	partial=false;
+	isCDS=false;
+	uptr=NULL;
+	ulink=NULL;
+	udata=0;
+	CDstart=0;
+	CDend=0;
+	CDphase=0;
+	gname=NULL;
+	attrs=NULL;
+	gffID=NULL;
+	track_id=-1;
+	gseq_id=-1;
+	ftype_id=-1;
+	subftype_id=-1;
+	hasErrors=false;
+	if (gfrd==NULL)
+		GError("Cannot use this GffObj constructor with a NULL GffReader!\n");
+	gffnames_ref(names);
+	if (gfrd->names==NULL) gfrd->names=names;
+	qlen=0;qstart=0;qend=0;
+	gscore=0;
+	uscore=0;
+	covlen=0;
+	qcov=0;
+	if (gffline->Parent!=NULL) {
+		//GTF style -- subfeature given directly
+		if (gffline->is_cds || gffline->is_exon)
+			ftype_id=gff_fid_mRNA;
+		else {
+			//group of other subfeatures of type ftype:
+			ftype_id=names->feats.addName(gffline->ftype);
         }
-    gffID=gffline->Parent;
-    gffline->Parent=NULL; //just take over
-    if (gffline->gname!=NULL) {
-        gname=gffline->gname;
-        gffline->gname=NULL;
+		gffID=gffline->Parent;
+		gffline->Parent=NULL; //just take over
+		if (gffline->gname!=NULL) {
+			gname=gffline->gname;
+			gffline->gname=NULL;
         }
-    gseq_id=names->gseqs.addName(gffline->gseqname);
-    track_id=names->tracks.addName(gffline->track);
-    strand=gffline->strand;
-    qlen=gffline->qlen;
-    start=gffline->fstart;
-    end=gffline->fend;
-    isCDS=gffline->is_cds; //for now
-    addExon(gffline, keepAttr);
-    if (keepAttr && noExonAttr) {
-      //simply move the attrs from this first exon
-      //to the transcript
-      attrs=exons.First()->attrs;
-      exons.First()->attrs=NULL;
-      }
+		gseq_id=names->gseqs.addName(gffline->gseqname);
+		track_id=names->tracks.addName(gffline->track);
+		strand=gffline->strand;
+		qlen=gffline->qlen;
+		start=gffline->fstart;
+		end=gffline->fend;
+		isCDS=gffline->is_cds; //for now
+		addExon(gffline, keepAttr);
+		if (keepAttr && noExonAttr) {
+			//simply move the attrs from this first exon
+			//to the transcript
+			attrs=exons.First()->attrs;
+			exons.First()->attrs=NULL;
+		}
     }
- else { //GffReader made sure this is a parent line (no parent)
-    //even for a mRNA with a Parent= line
-    gscore=gffline->score;
-    if (gffline->ID==NULL || gffline->ID[0]==0)
-       GError("Error: no ID found for GFF record start\n");
-    gffID=gffline->ID; //there must be an ID here
-    if (gffline->is_mrna) ftype_id=gff_fid_mRNA;
+	else { //GffReader made sure this is a parent line (no parent)
+		//even for a mRNA with a Parent= line
+		gscore=gffline->score;
+		if (gffline->ID==NULL || gffline->ID[0]==0)
+			GError("Error: no ID found for GFF record start\n");
+		gffID=gffline->ID; //there must be an ID here
+		if (gffline->is_mrna) ftype_id=gff_fid_mRNA;
         else ftype_id=names->feats.addName(gffline->ftype);
-    gffline->ID=NULL; //steal it
-    if (gffline->gname!=NULL) {
-        gname=gffline->gname;
-        gffline->gname=NULL;
+		gffline->ID=NULL; //steal it
+		if (gffline->gname!=NULL) {
+			gname=gffline->gname;
+			gffline->gname=NULL;
         }
-    start=gffline->fstart;
-    end=gffline->fend;
-    gseq_id=names->gseqs.addName(gffline->gseqname);
-    track_id=names->tracks.addName(gffline->track);
-    qlen=gffline->qlen;
-    qstart=gffline->qstart;
-    qend=gffline->qend;
-    strand=gffline->strand;
-    if (keepAttr) this->parseAttrs(attrs, gffline->info);
+		start=gffline->fstart;
+		end=gffline->fend;
+		gseq_id=names->gseqs.addName(gffline->gseqname);
+		track_id=names->tracks.addName(gffline->track);
+		qlen=gffline->qlen;
+		qstart=gffline->qstart;
+		qend=gffline->qend;
+		strand=gffline->strand;
+		if (keepAttr) this->parseAttrs(attrs, gffline->info);
     }
- GSeqStat* gsd=gfrd->gseqstats.AddIfNew(new GSeqStat(gseq_id,names->gseqs.lastNameUsed()),true);
- uptr=gsd;
- gsd->gflst.Add(this);
- if (start<gsd->mincoord) gsd->mincoord=start;
- if (end>gsd->maxcoord) gsd->maxcoord=end;
- gfrd->gfoAdd(gffID, gffline->gseqname, this);
+	GSeqStat* gsd=gfrd->gseqstats.AddIfNew(new GSeqStat(gseq_id,names->gseqs.lastNameUsed()),true);
+	uptr=gsd;
+	gsd->gflst.Add(this);
+	if (start<gsd->mincoord) gsd->mincoord=start;
+	if (end>gsd->maxcoord) gsd->maxcoord=end;
+	gfrd->gfoAdd(gffID, gffline->gseqname, this);
 }
 
 
