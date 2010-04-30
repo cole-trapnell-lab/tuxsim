@@ -18,5 +18,4 @@
 #include "common.h"
 
 int parse_options(int argc, char** argv);
-void print_usage();
 #endif
