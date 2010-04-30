@@ -100,6 +100,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 		for (int j = 0; j < ref_rnas.Count(); ++j) 
 		{    //ref data is grouped by genomic sequence
 			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->gseq_id);
+			
 			RefID ref_id = rt.get_id(name, NULL);
 			for (int i = 0; i < ref_rnas[j]->mrnas_f.Count(); ++i)
 			{	
@@ -270,6 +271,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 		ScaffoldSorter sorter(rt);
 		sort(ref_mRNAs.begin(), ref_mRNAs.end(), sorter);
 	}
+	delete faseq;
 }
 
 struct FastqOutfilePair
@@ -293,11 +295,15 @@ public:
 		_frag_impl(frag_impl), 
 		_seq_impl(seq_impl) {}
 	
-	void next_reads(const Scaffold& molecule, ReadsForFragment& reads)
+	bool next_reads(const Scaffold& molecule, ReadsForFragment& reads)
 	{
 		LibraryFragment frag;
-		_frag_impl.next_fragment(molecule, frag);
-		_seq_impl.reads_for_fragment(frag, reads);
+		
+		if (_frag_impl.next_fragment(molecule, frag))
+		{
+			return _seq_impl.reads_for_fragment(frag, reads);
+		}
+		return false;
 	}
 	
 private:
@@ -429,11 +435,19 @@ void generate_reads(RefSequenceTable& rt,
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 		{
 			ReadsForFragment reads;
-			sequencer->next_reads(ref_mRNAs[i], reads);
-            read_chunk.push_back(reads.front());
-            read_chunk.push_back(reads.back());
+			
+			if (sequencer->next_reads(ref_mRNAs[i], reads))
+			{
+				read_chunk.push_back(reads.front());
+				read_chunk.push_back(reads.back());
             
-            print_fastq_pair(reads, fastq_out);
+				print_fastq_pair(reads, fastq_out);
+			}
+			else
+			{
+				// TODO: each sequencer should gracefully produce garbage in 
+				// cases of bad fragments (i.e. fragment is too small)
+			}
 		}
         
         if (last_ref_id &&
@@ -457,6 +471,8 @@ void generate_reads(RefSequenceTable& rt,
         {
             rna_rightmost = max(rna_rightmost, ref_mRNAs[i].right());
         }
+		
+		last_ref_id = ref_mRNAs[i].ref_id();
 	}
     
     sort(read_chunk.begin(), read_chunk.end(), SortReads());
@@ -509,6 +525,8 @@ void driver(FILE* ref_gtf,
 				   num_fragments,
 				   sam_out,
 				   fastq_out);
+	
+	delete sequencer;
 }
 
 int main(int argc, char** argv)

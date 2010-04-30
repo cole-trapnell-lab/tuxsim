@@ -31,7 +31,7 @@ struct LibraryFragment
 class FragmentPolicy
 {
 public:
-	virtual void next_fragment(const Scaffold& molecule,
+	virtual bool next_fragment(const Scaffold& molecule,
 							   LibraryFragment& fragment) = 0;
 };
 
@@ -60,7 +60,7 @@ public:
 	{
 	}
 	
-	virtual void next_fragment(const Scaffold& molecule,
+	virtual bool next_fragment(const Scaffold& molecule,
 							   LibraryFragment& fragment);
 	
 private:

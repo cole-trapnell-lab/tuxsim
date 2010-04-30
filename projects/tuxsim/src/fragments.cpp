@@ -9,7 +9,7 @@
 
 #include "fragments.h"
 
-void NormalFragments::next_fragment(const Scaffold& molecule,
+bool NormalFragments::next_fragment(const Scaffold& molecule,
                                     LibraryFragment& fragment)
 {
     int frag_length;
@@ -29,4 +29,6 @@ void NormalFragments::next_fragment(const Scaffold& molecule,
     fragment.source_seq = &molecule;
     fragment.start = frag_start;
     fragment.end = frag_end;
+	
+	return true;
 }

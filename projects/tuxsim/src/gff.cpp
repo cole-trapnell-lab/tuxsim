@@ -1,4 +1,5 @@
 #include "gff.h"
+#include <cassert>
 
 //GffNames* GffReader::names=NULL;
 GffNames* GffObj::names=NULL;
@@ -848,7 +849,26 @@ char* GffObj::getSpliced(GFaSeqGet* faseq, bool CDSonly, int* rlen, uint* cds_st
         GError("Error getting subseq for %s (%d..%d)!\n", gffID, start, end);
         }
   char* spliced=NULL;
-  GMALLOC(spliced, covlen+1); //allocate more here
+	
+	int splicedlen = 0;
+	if (strand=='-') {
+		for (int x=exons.Count()-1;x>=0;x--) 
+		{
+			uint sgstart=exons[x]->start;
+			uint sgend=exons[x]->end;
+			splicedlen += sgend - sgstart + 1;
+		}
+	}
+	else {
+		for (int x=0;x<exons.Count();x++) 
+		{
+			uint sgstart=exons[x]->start;
+			uint sgend=exons[x]->end;
+			splicedlen += sgend - sgstart + 1;
+		}
+	}
+
+  GMALLOC(spliced, splicedlen+1); //allocate more here
   uint seqstart, seqend;
   int cdsadj=0;
   if (CDphase=='1' || CDphase=='2') {
@@ -924,6 +944,7 @@ char* GffObj::getSpliced(GFaSeqGet* faseq, bool CDSonly, int* rlen, uint* cds_st
         }//update local CDS coordinates
       } //for each exon
     } // + strand
+	assert(s <= splicedlen);
   spliced[s]=0;
   if (rlen!=NULL) *rlen=s;
   return spliced;
