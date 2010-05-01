@@ -142,6 +142,17 @@ bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
 	return false;
 }
 
+bool MateHit::operator<(const MateHit& other) const
+{
+    if (insert_id() != other.insert_id())
+        return insert_id() < other.insert_id();
+    else
+    {
+        return mate_hit_lt(*this, other);
+    }
+    return false;
+}
+
 
 ReadHit HitFactory::create_hit(const string& insert_name, 
 							   const string& ref_name,
@@ -359,7 +370,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 	string mrnm;
 	if (strcmp(mate_ref_name, "*"))
 	{
-		if (!strcmp(mate_ref_name, "="))
+		if (!strcmp(mate_ref_name, "=") || !strcmp(mate_ref_name, text_name))
 		{
 			mrnm = text_name;
 		}

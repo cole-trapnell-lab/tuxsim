@@ -502,6 +502,10 @@ public:
 						  char* name_tags = NULL);
 };
 
+
+
+bool hits_eq_mod_id(const ReadHit& lhs, const ReadHit& rhs);
+
 /*******************************************************************************
  MateHit is a class that encapsulates a paired-end alignment as a single object.
  MateHits can be "open" when one hit has been read from a stream of individual
@@ -646,6 +650,8 @@ public:
 		return edits;
 	}
 	
+    bool operator<(const MateHit& other) const;
+    
 	RefID _refid;
 	shared_ptr<ReadHit const> _left_alignment;
 	shared_ptr<ReadHit const> _right_alignment;
@@ -654,11 +660,13 @@ public:
 	//bool _closed;
 };
 
-bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs);
-
-bool hits_eq_mod_id(const ReadHit& lhs, const ReadHit& rhs);
 
 bool hits_equals(const MateHit& lhs, const MateHit& rhs);
+
+// Just compare the hits for structural equivalence, ignoring the insert_id
+bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs);
+
+
 
 // Assumes hits are sorted by mate_hit_lt
 void collapse_hits(const vector<MateHit>& hits,

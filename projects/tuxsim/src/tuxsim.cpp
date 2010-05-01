@@ -401,7 +401,7 @@ void print_aligned_read(const ReadHit& read,
     CuffStrand source_strand = read.source_strand();
     if (source_strand != CUFF_STRAND_UNKNOWN)
     {
-        tag_str += source_strand == CUFF_FWD ? "XS:A:+" : "XS:A:-";
+        tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
     }
     
     fprintf(sam_out,
