@@ -7,7 +7,8 @@ EXTRA_DIST = $(top_srcdir)/AUTHORS $(top_srcdir)/make_bin.sh
 AM_CXXFLAGS =
 
 bin_PROGRAMS = \
-	tuxsim
+	tuxsim \
+    samcmp
 
 noinst_HEADERS = \
 	abundances.h \
@@ -52,3 +53,7 @@ libtuxsim_a_SOURCES = \
 tuxsim_SOURCES = tuxsim.cpp  
 tuxsim_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
 tuxsim_LDFLAGS =  $(BOOST_LDFLAGS)
+
+samcmp_SOURCES = samcmp.cpp  
+samcmp_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
+samcmp_LDFLAGS =  $(BOOST_LDFLAGS)
