@@ -115,6 +115,9 @@ bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
 	
 	if (lhs_l && rhs_l)
 	{
+        if (lhs_l->antisense_align() != rhs_l->antisense_align())
+            return lhs_l->antisense_align() < rhs_l->antisense_align();
+        
 		if (lhs_l->cigar().size() != rhs_l->cigar().size())
 			return lhs_l->cigar().size() < rhs_l->cigar().size(); 
 		for (size_t i = 0; i < lhs_l->cigar().size(); ++i)
@@ -128,6 +131,9 @@ bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
 	
 	if (lhs_r && rhs_r)
 	{
+        if (lhs_r->antisense_align() != rhs_r->antisense_align())
+            return lhs_r->antisense_align() < rhs_r->antisense_align();
+        
 		if (lhs_r->cigar().size() != rhs_r->cigar().size())
 			return lhs_r->cigar().size() < rhs_r->cigar().size(); 
 		for (size_t i = 0; i < lhs_r->cigar().size(); ++i)

@@ -212,6 +212,10 @@ struct ReadHit
 	
     int sam_flag() const { return _sam_flag; }
     void sam_flag(int s) { _sam_flag = s; }
+    
+    void orig_hit_str(const string& sam_str) { _orig_hit_str = sam_str; }
+    const string& orig_hit_str() const { return _orig_hit_str; }
+    
 private:
 	
 	int get_right() const	
@@ -255,6 +259,8 @@ private:
 	string _name;
 	string _seq;
 	string _qual;
+    
+    string _orig_hit_str;
     
     int _sam_flag;
 };

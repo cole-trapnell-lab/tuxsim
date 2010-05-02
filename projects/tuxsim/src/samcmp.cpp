@@ -303,6 +303,8 @@ bool PositionBundleFactory::next_bundle(HitBundle& bundle_out)
 		{
 			continue;
 		}
+        
+        bh->orig_hit_str(bwt_buf);
 		
 		if (bh->ref_id() == 84696373) // corresponds to SAM "*" under FNV hash. unaligned read record  
 			continue;
@@ -373,7 +375,9 @@ struct AlignmentStats
 //    IntronTable fn_introns;
 };
 
-void register_missed_read_alignment(const ReadHit& hit, AlignmentStats& stats)
+void register_missed_read_alignment(const ReadHit& hit, 
+                                    AlignmentStats& stats,
+                                    FILE* fout)
 {
 //    vector<pair<int, int> > introns; 
 //    hit.gaps(introns);
@@ -386,48 +390,68 @@ void register_missed_read_alignment(const ReadHit& hit, AlignmentStats& stats)
     
     stats.ref_read_alignments++;
     stats.fn_read_alignments++;
+    
+    if (fout)
+    {
+        const string& buf = hit.orig_hit_str();
+        fprintf(fout, "%s\n", hit.orig_hit_str().c_str());
+    }
 }
 
-void register_missed_fragment_alignment(const MateHit& hit, AlignmentStats& stats)
+void register_missed_fragment_alignment(const MateHit& hit, 
+                                        AlignmentStats& stats,
+                                        FILE* fout)
 {
     if (hit.left_alignment())
     {
-        register_missed_read_alignment(*(hit.left_alignment()), stats);
+        register_missed_read_alignment(*(hit.left_alignment()), stats, fout);
     }
     if (hit.right_alignment())
     {
-        register_missed_read_alignment(*(hit.right_alignment()), stats);
+        register_missed_read_alignment(*(hit.right_alignment()), stats, fout);
     }
 }
 
 
-void register_false_read_alignment(const ReadHit& hit, AlignmentStats& stats)
+void register_false_read_alignment(const ReadHit& hit, 
+                                   AlignmentStats& stats,
+                                   FILE* fout)
 {
     stats.target_read_alignments++;
     stats.fp_read_alignments++;
+    
+    if (fout)
+    {
+        const string& buf = hit.orig_hit_str();
+        fprintf(fout, "%s\n", hit.orig_hit_str().c_str());
+    }
 }
 
 
-void register_false_fragment_alignment(const MateHit& hit, AlignmentStats& stats)
+void register_false_fragment_alignment(const MateHit& hit, 
+                                       AlignmentStats& stats,
+                                       FILE* fout)
 {
     if (hit.left_alignment())
     {
-        register_false_read_alignment(*(hit.left_alignment()), stats);
+        register_false_read_alignment(*(hit.left_alignment()), stats, fout);
     }
     if (hit.right_alignment())
     {
-        register_false_read_alignment(*(hit.right_alignment()), stats);
+        register_false_read_alignment(*(hit.right_alignment()), stats, fout);
     }
 }
 
-void register_true_read_alignment(const ReadHit& hit, AlignmentStats& stats)
+void register_true_read_alignment(const ReadHit& hit, 
+                                  AlignmentStats& stats)
 {
     stats.target_read_alignments++;
     stats.ref_read_alignments++;
     stats.tp_read_alignments++;
 }
 
-void register_true_fragment_alignment(const MateHit& hit, AlignmentStats& stats)
+void register_true_fragment_alignment(const MateHit& hit, 
+                                      AlignmentStats& stats)
 {
     if (hit.left_alignment())
     {
@@ -441,7 +465,9 @@ void register_true_fragment_alignment(const MateHit& hit, AlignmentStats& stats)
 
 void compare_bundles(const vector<MateHit>& ref_hits,
                      const vector<MateHit>& target_hits,
-                     AlignmentStats& alignment_stats)
+                     AlignmentStats& alignment_stats,
+                     FILE* fmissed_hits,
+                     FILE* ffalse_hits)
 {
     vector<MateHit> true_positives;
     vector<MateHit> missed_ref_hits;
@@ -469,11 +495,26 @@ void compare_bundles(const vector<MateHit>& ref_hits,
                    ref_hits.end(),
                    back_inserter(false_target_hits));
     
-    alignment_stats.ref_read_alignments += ref_hits.size();
-    alignment_stats.target_read_alignments += target_hits.size();
-    alignment_stats.tp_read_alignments += true_positives.size();
-    alignment_stats.fp_read_alignments += false_target_hits.size();
-    alignment_stats.fn_read_alignments += missed_ref_hits.size();
+    //alignment_stats.ref_read_alignments += ref_hits.size();
+    //alignment_stats.target_read_alignments += target_hits.size();
+    //alignment_stats.tp_read_alignments += true_positives.size();
+    //alignment_stats.fp_read_alignments += false_target_hits.size();
+    //alignment_stats.fn_read_alignments += missed_ref_hits.size();
+    
+    foreach (const MateHit& m, false_target_hits)
+    {
+        register_false_fragment_alignment(m, alignment_stats, ffalse_hits);
+    }
+    
+    foreach (const MateHit& m, missed_ref_hits)
+    {
+        register_missed_fragment_alignment(m, alignment_stats, fmissed_hits);
+    }
+    
+    foreach (const MateHit& m, true_positives)
+    {
+        register_true_fragment_alignment(m, alignment_stats);
+    }
 }
 
 void print_alignment_stats(FILE* fout, const AlignmentStats& stats)
@@ -488,7 +529,10 @@ void print_alignment_stats(FILE* fout, const AlignmentStats& stats)
     fprintf(fout, "Read alignment recall\t%lf\n", recall);
 }
 
-void driver(FILE* ref_sam, FILE* target_sam)
+void driver(FILE* ref_sam, 
+            FILE* target_sam, 
+            FILE* fmissed_hits, 
+            FILE* ffalse_hits)
 {
     RefSequenceTable rt(true, false);
     ReadTable it;
@@ -523,7 +567,9 @@ void driver(FILE* ref_sam, FILE* target_sam)
                 // need to advance the curr_ref_bundle
                 foreach (const MateHit& hit, curr_ref_bundle.hits())
                 {
-                    register_missed_fragment_alignment(hit, alignment_stats);
+                    register_missed_fragment_alignment(hit, 
+                                                       alignment_stats,
+                                                       fmissed_hits);
                 }
                 advance_ref = true;
                 curr_ref_bundle = HitBundle();
@@ -534,7 +580,9 @@ void driver(FILE* ref_sam, FILE* target_sam)
                 // are all false positives => drop in precision
                 foreach (const MateHit& hit, curr_target_bundle.hits())
                 {
-                    register_false_fragment_alignment(hit, alignment_stats);
+                    register_false_fragment_alignment(hit, 
+                                                      alignment_stats, 
+                                                      ffalse_hits);
                 }
                 advance_target = true;
                 curr_target_bundle = HitBundle();
@@ -544,7 +592,9 @@ void driver(FILE* ref_sam, FILE* target_sam)
                 //compare the reads in the two bundles
                 compare_bundles(curr_ref_bundle.hits(),
                                 curr_target_bundle.hits(),
-                                alignment_stats);
+                                alignment_stats,
+                                fmissed_hits,
+                                ffalse_hits);
                 advance_target = true;
                 advance_ref = true;
                 curr_target_bundle = HitBundle();
@@ -557,7 +607,9 @@ void driver(FILE* ref_sam, FILE* target_sam)
             // need to advance the curr_ref_bundle
             foreach (const MateHit& hit, curr_ref_bundle.hits())
             {
-                register_missed_fragment_alignment(hit, alignment_stats);
+                register_missed_fragment_alignment(hit, 
+                                                   alignment_stats,
+                                                   fmissed_hits);
             }
             curr_ref_bundle = HitBundle();
             advance_ref = true;
@@ -568,7 +620,9 @@ void driver(FILE* ref_sam, FILE* target_sam)
             // are all false positives, and thus this case hurts precision
             foreach (const MateHit& hit, curr_target_bundle.hits())
             {
-                register_false_fragment_alignment(hit, alignment_stats);
+                register_false_fragment_alignment(hit, 
+                                                  alignment_stats,
+                                                  ffalse_hits);
             }
             curr_target_bundle = HitBundle();
             advance_target = true;
@@ -594,12 +648,16 @@ void driver(FILE* ref_sam, FILE* target_sam)
     
     foreach (const MateHit& hit, curr_target_bundle.hits())
     {
-        register_false_fragment_alignment(hit, alignment_stats);
+        register_false_fragment_alignment(hit, 
+                                          alignment_stats,
+                                          ffalse_hits);
     }
     
     foreach (const MateHit& hit, curr_ref_bundle.hits())
     {
-        register_missed_fragment_alignment(hit, alignment_stats);
+        register_missed_fragment_alignment(hit, 
+                                           alignment_stats,
+                                           fmissed_hits);
     }
     
     print_alignment_stats(stderr, alignment_stats);
@@ -629,7 +687,24 @@ int main(int argc, char** argv)
 				target_sam_name.c_str());
 		exit(1);
 	}
+    
+    
+    FILE* fmissed_hits = fopen("missed.sam", "w");
+	if (!fmissed_hits)
+	{
+		fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
+				"missed.sam");
+		exit(1);
+	}
+    
+    FILE* ffalse_hits = fopen("false.sam", "w");
+	if (!ffalse_hits)
+	{
+		fprintf(stderr, "Error: cannot open SAM file %s for reading\n",
+				"false.sam");
+		exit(1);
+	}
 
-    driver(ref_sam, target_sam);
+    driver(ref_sam, target_sam, fmissed_hits, ffalse_hits);
 }
 
