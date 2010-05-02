@@ -140,8 +140,16 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     left_read->qual(string(left_read->seq().length(), 'I'));
     right_read->qual(string(right_read->seq().length(), 'I'));
     
-    reads.push_back(left_read);
-    reads.push_back(right_read);
+    if (left_read->left() <= right_read->left())
+    {
+        reads.push_back(left_read);
+        reads.push_back(right_read);
+    }
+    else
+    {
+        reads.push_back(right_read);
+        reads.push_back(left_read);   
+    }
     return true;
 }
 

@@ -404,6 +404,11 @@ void print_aligned_read(const ReadHit& read,
         tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
     }
     
+    if (ref_pos + 1 == 4350352)
+    {
+        int a =1;
+    }
+    
     fprintf(sam_out,
             "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s\n",
             read_name,
@@ -431,6 +436,20 @@ void generate_reads(RefSequenceTable& rt,
     vector<shared_ptr<ReadHit> > read_chunk; 
 	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
 	{
+        if (last_ref_id &&
+            (last_ref_id != ref_mRNAs[i].ref_id() ||
+             rna_rightmost <= ref_mRNAs[i].left()))
+        {
+            sort(read_chunk.begin(), read_chunk.end(), SortReads());
+            
+            for (size_t j = 0; j < read_chunk.size(); ++j)
+            {
+                print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+            }
+            
+            read_chunk.clear();
+        }
+        
 		int num_frags_for_mRNA = frag_abundances[i] * total_frags;
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 		{
@@ -450,19 +469,7 @@ void generate_reads(RefSequenceTable& rt,
 			}
 		}
         
-        if (last_ref_id &&
-            (last_ref_id != ref_mRNAs[i].ref_id() ||
-            rna_rightmost < ref_mRNAs[i].left()))
-        {
-            sort(read_chunk.begin(), read_chunk.end(), SortReads());
-            
-            for (size_t j = 0; j < read_chunk.size(); ++j)
-            {
-                print_aligned_read(*read_chunk[j], rt, sam_frag_out);
-            }
-            
-            read_chunk.clear();
-        }
+        
         if (last_ref_id != ref_mRNAs[i].ref_id())
         {
             rna_rightmost = ref_mRNAs[i].right();

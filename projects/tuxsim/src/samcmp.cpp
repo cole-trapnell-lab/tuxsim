@@ -312,7 +312,7 @@ bool PositionBundleFactory::next_bundle(HitBundle& bundle_out)
         {
             bundle.add_open_hit(bh);
         }
-        else if (last_ref_id_seen && (bh->left() < last_pos_seen))
+        else if (last_ref_id_seen == bh->ref_id() && (bh->left() < last_pos_seen))
         {
             fprintf(stderr, "Error: this SAM file doesn't appear to be correctly sorted!\n");
             fprintf(stderr, "\tcurrent hit is at %s:%d, last one was at %s:%d\n", 
