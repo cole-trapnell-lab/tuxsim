@@ -393,7 +393,7 @@ void register_missed_read_alignment(const ReadHit& hit,
     
     if (fout)
     {
-        const string& buf = hit.orig_hit_str();
+        //const string& buf = hit.orig_hit_str();
         fprintf(fout, "%s\n", hit.orig_hit_str().c_str());
     }
 }
@@ -422,7 +422,7 @@ void register_false_read_alignment(const ReadHit& hit,
     
     if (fout)
     {
-        const string& buf = hit.orig_hit_str();
+        //const string& buf = hit.orig_hit_str();
         fprintf(fout, "%s\n", hit.orig_hit_str().c_str());
     }
 }
@@ -443,23 +443,31 @@ void register_false_fragment_alignment(const MateHit& hit,
 }
 
 void register_true_read_alignment(const ReadHit& hit, 
-                                  AlignmentStats& stats)
+                                  AlignmentStats& stats,
+								  FILE* fout)
 {
     stats.target_read_alignments++;
     stats.ref_read_alignments++;
     stats.tp_read_alignments++;
+	
+	if (fout)
+    {
+        //const string& buf = hit.orig_hit_str();
+        fprintf(fout, "%s\n", hit.orig_hit_str().c_str());
+    }
 }
 
 void register_true_fragment_alignment(const MateHit& hit, 
-                                      AlignmentStats& stats)
+                                      AlignmentStats& stats,
+									  FILE* fout)
 {
     if (hit.left_alignment())
     {
-        register_true_read_alignment(*(hit.left_alignment()), stats);
+        register_true_read_alignment(*(hit.left_alignment()), stats, fout);
     }
     if (hit.right_alignment())
     {
-        register_true_read_alignment(*(hit.right_alignment()), stats);
+        register_true_read_alignment(*(hit.right_alignment()), stats, fout);
     }
 }
 
@@ -467,7 +475,8 @@ void compare_bundles(const vector<MateHit>& ref_hits,
                      const vector<MateHit>& target_hits,
                      AlignmentStats& alignment_stats,
                      FILE* fmissed_hits,
-                     FILE* ffalse_hits)
+                     FILE* ffalse_hits,
+					 FILE* fcorrect_hits)
 {
     vector<MateHit> true_positives;
     vector<MateHit> missed_ref_hits;
@@ -513,7 +522,7 @@ void compare_bundles(const vector<MateHit>& ref_hits,
     
     foreach (const MateHit& m, true_positives)
     {
-        register_true_fragment_alignment(m, alignment_stats);
+        register_true_fragment_alignment(m, alignment_stats, fcorrect_hits);
     }
 }
 
@@ -532,7 +541,8 @@ void print_alignment_stats(FILE* fout, const AlignmentStats& stats)
 void driver(FILE* ref_sam, 
             FILE* target_sam, 
             FILE* fmissed_hits, 
-            FILE* ffalse_hits)
+            FILE* ffalse_hits,
+			FILE* fcorrect_hits)
 {
     RefSequenceTable rt(true, false);
     ReadTable it;
@@ -594,7 +604,8 @@ void driver(FILE* ref_sam,
                                 curr_target_bundle.hits(),
                                 alignment_stats,
                                 fmissed_hits,
-                                ffalse_hits);
+                                ffalse_hits,
+								fcorrect_hits);
                 advance_target = true;
                 advance_ref = true;
                 curr_target_bundle = HitBundle();
@@ -700,11 +711,19 @@ int main(int argc, char** argv)
     FILE* ffalse_hits = fopen("false.sam", "w");
 	if (!ffalse_hits)
 	{
-		fprintf(stderr, "Error: cannot open SAM file %s for reading\n",
+		fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
 				"false.sam");
 		exit(1);
 	}
 
-    driver(ref_sam, target_sam, fmissed_hits, ffalse_hits);
+	FILE* fcorrect_hits = fopen("correct.sam", "w");
+	if (!fcorrect_hits)
+	{
+		fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
+				"false.sam");
+		exit(1);
+	}
+	
+    driver(ref_sam, target_sam, fmissed_hits, ffalse_hits, fcorrect_hits);
 }
 
