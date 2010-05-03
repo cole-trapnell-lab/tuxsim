@@ -29,6 +29,12 @@ using namespace std;
 string ref_sam_name;
 string target_sam_name;
 
+void print_usage()
+{
+    fprintf(stderr, "samcompare  [options] <ref.sam> <target.sam>\n");
+    fprintf(stderr, "--------------------------------------------\n");
+}
+
 int parse_options(int argc, char** argv)
 {
     try
@@ -66,11 +72,18 @@ int parse_options(int argc, char** argv)
             vector<string> args = vm["input-file"].as< vector<string> >();
             if (args.size() != 2)
             {
+                print_usage();
                 cerr << generic << endl;
                 exit(1);
             }
             ref_sam_name = args[0];
             target_sam_name = args[1];
+        }
+        else
+        {
+            print_usage();
+            cerr << generic << endl;
+            exit(1);
         }
     }
     catch(std::exception& e)

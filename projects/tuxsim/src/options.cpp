@@ -24,7 +24,8 @@ using namespace std;
 
 void print_usage()
 {
-
+    fprintf(stderr, "tuxsim <sim.cfg>\n");
+    fprintf(stderr, "--------------------------------------------\n");
 }
 
 // If supplied options are incomptabile, prints an error and exits(1)
@@ -112,6 +113,7 @@ int parse_options(int argc, char** argv)
             vector<string> cfg = vm["input-file"].as< vector<string> >();
             if (cfg.size() != 1)
             {
+                print_usage();
                 return 1;
             }
             string cfg_file = cfg[0];
@@ -128,6 +130,11 @@ int parse_options(int argc, char** argv)
             notify(vm);
             
             validate_options();
+        }
+        else
+        {
+            print_usage();
+            return 1;
         }
     }
     catch(std::exception& e)

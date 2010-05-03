@@ -39,11 +39,11 @@
 		ED6D62BB118B7BD900A682F4 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
 		ED6D62BF118B7BD900A682F4 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */; };
 		ED6D62C1118B7BD900A682F4 /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
-		ED6D62C7118B7BEB00A682F4 /* samcmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D62AB118B7BD400A682F4 /* samcmp.cpp */; };
 		ED6D6632118C8D7400A682F4 /* libcppunit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED6D6631118C8D7400A682F4 /* libcppunit.a */; };
 		ED6D6635118C8DD000A682F4 /* TestMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6634118C8DD000A682F4 /* TestMain.cpp */; };
 		ED6D6638118C8DF700A682F4 /* TestHits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6637118C8DF700A682F4 /* TestHits.cpp */; };
 		ED6D667A118CA39000A682F4 /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
+		ED6D6A59118F250500A682F4 /* samcompare.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6A58118F250500A682F4 /* samcompare.cpp */; };
 		EDADF8FB118493100018CFB9 /* tuxsim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */; };
 		EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDCCF4DE117624E5000D83D5 /* options.cpp */; };
 /* End PBXBuildFile section */
@@ -114,13 +114,13 @@
 		ED5079741173A7BA00883983 /* fragments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fragments.cpp; path = src/fragments.cpp; sourceTree = "<group>"; };
 		ED5079821173A8EF00883983 /* sequencing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sequencing.h; path = src/sequencing.h; sourceTree = "<group>"; };
 		ED5079831173A8EF00883983 /* sequencing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sequencing.cpp; path = src/sequencing.cpp; sourceTree = "<group>"; };
-		ED6D62AB118B7BD400A682F4 /* samcmp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = samcmp.cpp; path = src/samcmp.cpp; sourceTree = "<group>"; };
-		ED6D62C5118B7BD900A682F4 /* samcmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = samcmp; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED6D62C5118B7BD900A682F4 /* samcompare */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = samcompare; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED6D662C118C8D1B00A682F4 /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED6D6631118C8D7400A682F4 /* libcppunit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcppunit.a; path = /usr/local/lib/libcppunit.a; sourceTree = "<absolute>"; };
 		ED6D6634118C8DD000A682F4 /* TestMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestMain.cpp; path = tests/unit_tests/TestMain.cpp; sourceTree = "<group>"; };
 		ED6D6636118C8DF700A682F4 /* TestHits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestHits.h; path = tests/unit_tests/TestHits.h; sourceTree = "<group>"; };
 		ED6D6637118C8DF700A682F4 /* TestHits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestHits.cpp; path = tests/unit_tests/TestHits.cpp; sourceTree = "<group>"; };
+		ED6D6A58118F250500A682F4 /* samcompare.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = samcompare.cpp; path = src/samcompare.cpp; sourceTree = "<group>"; };
 		EDADF8F311848F6B0018CFB9 /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = src/Makefile.am; sourceTree = "<group>"; };
 		EDADF8F611848FC40018CFB9 /* ax_boost_program_options.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_boost_program_options.m4; sourceTree = "<group>"; };
 		EDADF8F9118492430018CFB9 /* tuxsim.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = tuxsim.mk; path = config/tuxsim.mk; sourceTree = "<group>"; };
@@ -208,7 +208,7 @@
 				ED5079821173A8EF00883983 /* sequencing.h */,
 				ED5079831173A8EF00883983 /* sequencing.cpp */,
 				EDADF8FA118493100018CFB9 /* tuxsim.cpp */,
-				ED6D62AB118B7BD400A682F4 /* samcmp.cpp */,
+				ED6D6A58118F250500A682F4 /* samcompare.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -217,7 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				8DD76F6C0486A84900D96B5E /* tuxsim */,
-				ED6D62C5118B7BD900A682F4 /* samcmp */,
+				ED6D62C5118B7BD900A682F4 /* samcompare */,
 				ED6D662C118C8D1B00A682F4 /* Tests */,
 			);
 			name = Products;
@@ -280,9 +280,9 @@
 			productReference = 8DD76F6C0486A84900D96B5E /* tuxsim */;
 			productType = "com.apple.product-type.tool";
 		};
-		ED6D62AC118B7BD900A682F4 /* samcmp */ = {
+		ED6D62AC118B7BD900A682F4 /* samcompare */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ED6D62C2118B7BD900A682F4 /* Build configuration list for PBXNativeTarget "samcmp" */;
+			buildConfigurationList = ED6D62C2118B7BD900A682F4 /* Build configuration list for PBXNativeTarget "samcompare" */;
 			buildPhases = (
 				ED6D62AD118B7BD900A682F4 /* Sources */,
 				ED6D62BE118B7BD900A682F4 /* Frameworks */,
@@ -292,10 +292,10 @@
 			);
 			dependencies = (
 			);
-			name = samcmp;
+			name = samcompare;
 			productInstallPath = "$(HOME)/bin";
 			productName = tuxsim;
-			productReference = ED6D62C5118B7BD900A682F4 /* samcmp */;
+			productReference = ED6D62C5118B7BD900A682F4 /* samcompare */;
 			productType = "com.apple.product-type.tool";
 		};
 		ED6D662B118C8D1B00A682F4 /* Tests */ = {
@@ -328,7 +328,7 @@
 			projectRoot = "";
 			targets = (
 				8DD76F620486A84900D96B5E /* tuxsim */,
-				ED6D62AC118B7BD900A682F4 /* samcmp */,
+				ED6D62AC118B7BD900A682F4 /* samcompare */,
 				ED6D662B118C8D1B00A682F4 /* Tests */,
 			);
 		};
@@ -392,7 +392,7 @@
 				ED6D62B9118B7BD900A682F4 /* abundances.cpp in Sources */,
 				ED6D62BA118B7BD900A682F4 /* fragments.cpp in Sources */,
 				ED6D62BB118B7BD900A682F4 /* sequencing.cpp in Sources */,
-				ED6D62C7118B7BEB00A682F4 /* samcmp.cpp in Sources */,
+				ED6D6A59118F250500A682F4 /* samcompare.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -503,7 +503,7 @@
 					"$(inherited)",
 					/usr/local/libIntel64,
 				);
-				PRODUCT_NAME = samcmp;
+				PRODUCT_NAME = samcompare;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
@@ -585,7 +585,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ED6D62C2118B7BD900A682F4 /* Build configuration list for PBXNativeTarget "samcmp" */ = {
+		ED6D62C2118B7BD900A682F4 /* Build configuration list for PBXNativeTarget "samcompare" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED6D62C3118B7BD900A682F4 /* Debug */,

@@ -8,7 +8,7 @@ AM_CXXFLAGS =
 
 bin_PROGRAMS = \
 	tuxsim \
-    samcmp
+    samcompare
 
 noinst_HEADERS = \
 	abundances.h \
@@ -54,6 +54,6 @@ tuxsim_SOURCES = tuxsim.cpp
 tuxsim_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
 tuxsim_LDFLAGS =  $(BOOST_LDFLAGS)
 
-samcmp_SOURCES = samcmp.cpp  
-samcmp_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
-samcmp_LDFLAGS =  $(BOOST_LDFLAGS)
+samcompare_SOURCES = samcompare.cpp  
+samcompare_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
+samcompare_LDFLAGS =  $(BOOST_LDFLAGS)
