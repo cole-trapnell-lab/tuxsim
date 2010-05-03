@@ -382,8 +382,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		}
 		else
 		{
-			//fprintf(stderr, "Trans-spliced mates are not currently supported, skipping\n");
-			return false;
+			mrnm = mate_ref_name;
 		}
 	}
 	else

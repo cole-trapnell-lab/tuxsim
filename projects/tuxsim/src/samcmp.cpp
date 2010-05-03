@@ -299,7 +299,8 @@ bool PositionBundleFactory::next_bundle(HitBundle& bundle_out)
 		
 		shared_ptr<ReadHit> bh(new ReadHit());
 		
-		if (!sam_hit_fac.get_hit_from_buf(_next_line_num, bwt_buf, *bh, false))
+		bool more_hits = sam_hit_fac.get_hit_from_buf(_next_line_num, bwt_buf, *bh, false);
+        if (!more_hits)
 		{
 			continue;
 		}
@@ -538,6 +539,34 @@ void print_alignment_stats(FILE* fout, const AlignmentStats& stats)
     fprintf(fout, "Read alignment recall\t%lf\n", recall);
 }
 
+void get_ref_names(FILE* sam_in, set<string>& ref_names)
+{
+    char bwt_buf[2048];
+	while(fgets(bwt_buf, 2048, sam_in))
+    {
+        // Are we still in the header region?
+        if (bwt_buf[0] == '@')
+            continue;
+        
+        const char* buf = bwt_buf;
+        const char* _name = strsep((char**)&buf,"\t");
+        if (!_name)
+            continue;
+        char name[2048];
+        strncpy(name, _name, 2047); 
+        
+        const char* sam_flag_str = strsep((char**)&buf,"\t");
+        if (!sam_flag_str)
+           continue;
+        
+        const char* text_name = strsep((char**)&buf,"\t");
+        if (!text_name)
+            continue;
+        ref_names.insert(text_name);
+    }
+    
+}
+
 void driver(FILE* ref_sam, 
             FILE* target_sam, 
             FILE* fmissed_hits, 
@@ -545,6 +574,18 @@ void driver(FILE* ref_sam,
 			FILE* fcorrect_hits)
 {
     RefSequenceTable rt(true, false);
+    
+    set<string> ref_names;
+    get_ref_names(ref_sam, ref_names);
+    get_ref_names(target_sam, ref_names);
+    foreach (const string& name, ref_names)
+    {
+        rt.get_id(name, NULL);
+    }
+    
+    rewind(ref_sam);
+    rewind(target_sam);
+    
     ReadTable it;
     SAMHitFactory hs(it, rt);
     PositionBundleFactory ref_sam_factory(hs, ref_sam);
@@ -657,18 +698,28 @@ void driver(FILE* ref_sam,
         }
     } 
     
-    foreach (const MateHit& hit, curr_target_bundle.hits())
+    while (valid_target)
     {
-        register_false_fragment_alignment(hit, 
-                                          alignment_stats,
-                                          ffalse_hits);
+        foreach (const MateHit& hit, curr_target_bundle.hits())
+        {
+            register_false_fragment_alignment(hit, 
+                                              alignment_stats,
+                                              ffalse_hits);
+        }
+        curr_target_bundle = HitBundle();
+        valid_target = ref_sam_factory.next_bundle(curr_target_bundle);
     }
     
-    foreach (const MateHit& hit, curr_ref_bundle.hits())
+    while (valid_ref)
     {
-        register_missed_fragment_alignment(hit, 
-                                           alignment_stats,
-                                           fmissed_hits);
+        foreach (const MateHit& hit, curr_ref_bundle.hits())
+        {
+            register_missed_fragment_alignment(hit, 
+                                               alignment_stats,
+                                               fmissed_hits);
+        }
+        curr_ref_bundle = HitBundle();
+        valid_ref = ref_sam_factory.next_bundle(curr_ref_bundle);
     }
     
     print_alignment_stats(stderr, alignment_stats);
