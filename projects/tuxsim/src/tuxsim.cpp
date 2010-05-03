@@ -177,8 +177,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				{
 					ref_scaff.annotated_tss_id(tss_id);
 				}
-				
-				ref_scaff.seq(rna_seq);
+                string rs = rna_seq;
+				std::transform(rs.begin(), rs.end(), rs.begin(), (int (*)(int))std::toupper);
+				ref_scaff.seq(rs);
 				GFREE(rna_seq);
 				
 				ref_mRNAs.push_back(ref_scaff); 
@@ -261,6 +262,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 					ref_scaff.annotated_tss_id(tss_id);
 				}
 				string rs = rna_seq;
+                std::transform(rs.begin(), rs.end(), rs.begin(), (int (*)(int))std::toupper);
                 reverse_complement(rs);
 				ref_scaff.seq(rs);
 				GFREE(rna_seq);
@@ -402,11 +404,6 @@ void print_aligned_read(const ReadHit& read,
     if (source_strand != CUFF_STRAND_UNKNOWN)
     {
         tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
-    }
-    
-    if (ref_pos + 1 == 4350352)
-    {
-        int a =1;
     }
     
     fprintf(sam_out,

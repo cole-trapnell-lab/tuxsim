@@ -92,7 +92,11 @@ void reverse_complement(string& seq)
             case 'T' : seq[i] = 'A'; break;
             case 'C' : seq[i] = 'G'; break;
             case 'G' : seq[i] = 'C'; break;
-            default: seq[i]   = 'N'; break;
+            default: 
+            {
+                int a = 5;
+                seq[i]   = 'N'; break;
+            }
         }
     }
     reverse(seq.begin(), seq.end());

@@ -275,11 +275,7 @@ public:
     // NOTE: sequences are always stored in forward strand space, they are NOT 
     // reverse complemented
 	const string& seq() const { return _seq; } 
-	void seq(const string& s) 
-	{
-		_seq = s; 
-		std::transform(_seq.begin(), _seq.end(), _seq.begin(), (int (*)(int))std::toupper);
-	} 
+	void seq(const string& s) {	_seq = s; } 
 	
 private: 
 	
