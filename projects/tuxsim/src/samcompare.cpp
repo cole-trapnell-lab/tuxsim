@@ -13,6 +13,7 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <fstream>
+#include <iterator>
 
 #include <list>
 #include <set>
@@ -364,46 +365,152 @@ struct AlignmentStats
 {
     AlignmentStats()
     {
-        target_read_alignments = 0;
-        ref_read_alignments = 0;
+        _target_read_alignments = 0;
+        _ref_read_alignments = 0;
         
-        fp_read_alignments = 0;
-        tp_read_alignments = 0;
-        fn_read_alignments = 0;
-        
-        //ref_introns = 0;
-        //target_introns = 0;
+        _fp_read_alignments = 0;
+        _tp_read_alignments = 0;
+        _fn_read_alignments = 0;
     }
     
-    int target_read_alignments;
-    int ref_read_alignments;
-    int fp_read_alignments;
-    int tp_read_alignments;
-    int fn_read_alignments;
+    void register_false_read(const ReadHit& hit)
+    {
+        _target_read_alignments++;
+        _fp_read_alignments++;
+        
+        
+        // For now, we'll add these gaps to FP introns, but some of them
+        // might actually be real, so we'll need to go through the list of TPs
+        // when the user asks for the current FP rate.
+        vector<pair<int, int> > introns; 
+        hit.gaps(introns);
+        
+        pair<IntronTable::iterator, bool> ret = 
+            _fp_introns.insert(make_pair(hit.ref_id(), IntronSet()));
+        IntronSet& s = ret.first->second;
+        
+        copy(introns.begin(), introns.end(), inserter(s, s.end()));
+    }
     
-//    int ref_introns;
-//    int target_introns;
-//    
-//    IntronTable fp_introns;
-//    IntronTable tp_introns;
-//    IntronTable fn_introns;
+    void register_missed_read(const ReadHit& hit)
+    {
+        _ref_read_alignments++;
+        _fn_read_alignments++;
+        
+        // For now, we'll add these gaps to FN introns, but some of them
+        // might actually be real, so we'll need to go through the list of TPs
+        // when the user asks for the current FN rate.
+        vector<pair<int, int> > introns; 
+        hit.gaps(introns);
+        
+        pair<IntronTable::iterator, bool> ret = 
+            _fn_introns.insert(make_pair(hit.ref_id(), IntronSet()));
+        IntronSet& s = ret.first->second;
+        
+        copy(introns.begin(), introns.end(), inserter(s, s.end()));  
+    }
+    
+    void register_true_read(const ReadHit& hit)
+    {
+        vector<pair<int, int> > introns; 
+        hit.gaps(introns);
+        
+        pair<IntronTable::iterator, bool> ret = 
+            _tp_introns.insert(make_pair(hit.ref_id(), IntronSet()));
+        IntronSet& s = ret.first->second;
+        
+        copy(introns.begin(), introns.end(), inserter(s, s.end())); 
+        
+        _target_read_alignments++;
+        _ref_read_alignments++;
+        _tp_read_alignments++;
+    }
+    
+    int target_read_alignments() const { return _target_read_alignments; }
+    int ref_read_alignments() const { return _ref_read_alignments; }
+    int fp_read_alignments() const { return _fp_read_alignments; }
+    int tp_read_alignments() const { return _tp_read_alignments; }
+    int fn_read_alignments() const { return _fn_read_alignments; }
+    
+    int fp_introns() const 
+    { 
+        int num_fp_introns = 0;
+        
+        IntronTable::const_iterator fp_itr = _fp_introns.begin();
+        while (fp_itr != _fp_introns.end())
+        {
+            const pair<RefID, IntronSet>& fps = *fp_itr;
+            IntronTable::const_iterator ref_itr;
+            ref_itr = _tp_introns.find(fps.first);
+            if (ref_itr != _tp_introns.end())
+            {
+                IntronSet genuine_fps;
+                set_difference(fps.second.begin(), 
+                               fps.second.end(), 
+                               ref_itr->second.begin(), 
+                               ref_itr->second.end(),
+                               inserter(genuine_fps, genuine_fps.begin()));
+                num_fp_introns += genuine_fps.size();
+            }
+            ++fp_itr;
+        }
+        
+        return num_fp_introns; 
+    }
+    
+    int tp_introns() const 
+    { 
+        return _tp_read_alignments; 
+    }
+    
+    int fn_introns() const 
+    { 
+        int num_fn_introns = 0;
+        
+        IntronTable::const_iterator fn_itr = _fn_introns.begin();
+        while (fn_itr != _fn_introns.end())
+        {
+            const pair<RefID, IntronSet>& fns = *fn_itr;
+            IntronTable::const_iterator ref_itr;
+            ref_itr = _tp_introns.find(fns.first);
+            if (ref_itr != _tp_introns.end())
+            {
+                IntronSet genuine_fns;
+                set_difference(fns.second.begin(), 
+                               fns.second.end(), 
+                               ref_itr->second.begin(), 
+                               ref_itr->second.end(),
+                               inserter(genuine_fns, genuine_fns.begin()));
+                num_fn_introns += genuine_fns.size();
+            }
+            ++fn_itr;
+        }
+        
+        return num_fn_introns; 
+    }
+    
+private:
+    int _target_read_alignments;
+    int _ref_read_alignments;
+    int _fp_read_alignments;
+    int _tp_read_alignments;
+    int _fn_read_alignments;
+    
+    int ref_introns;
+    int target_introns;
+    
+    IntronTable _fp_introns;
+    IntronTable _tp_introns;
+    IntronTable _fn_introns;
 };
 
 void register_missed_read_alignment(const ReadHit& hit, 
                                     AlignmentStats& stats,
                                     FILE* fout)
 {
-//    vector<pair<int, int> > introns; 
-//    hit.gaps(introns);
-//    
-//    pair<IntronTable::iterator, bool> ret = 
-//    stats.fn_introns.insert(make_pair(hit.ref_id(), IntronSet()));
-//    IntronSet& s = ret.first->second;
-//    
-//    copy(introns.begin(), introns.end(), inserter(s, s.end()));  
+
     
-    stats.ref_read_alignments++;
-    stats.fn_read_alignments++;
+    stats.register_missed_read(hit);
     
     if (fout)
     {
@@ -431,8 +538,8 @@ void register_false_read_alignment(const ReadHit& hit,
                                    AlignmentStats& stats,
                                    FILE* fout)
 {
-    stats.target_read_alignments++;
-    stats.fp_read_alignments++;
+
+    stats.register_missed_read(hit);
     
     if (fout)
     {
@@ -460,9 +567,8 @@ void register_true_read_alignment(const ReadHit& hit,
                                   AlignmentStats& stats,
 								  FILE* fout)
 {
-    stats.target_read_alignments++;
-    stats.ref_read_alignments++;
-    stats.tp_read_alignments++;
+
+    stats.register_true_read(hit);
 	
 	if (fout)
     {
@@ -502,10 +608,6 @@ void compare_bundles(const vector<MateHit>& ref_hits,
                      target_hits.end(),
                      back_inserter(true_positives));
     
-//    MateHitSorter m;
-//    bool lt1 = m(ref_hits.front(),target_hits.front());
-//    bool lt2 = m(target_hits.front(), ref_hits.front());
-    
     set_difference(ref_hits.begin(), 
                    ref_hits.end(), 
                    target_hits.begin(), 
@@ -518,11 +620,6 @@ void compare_bundles(const vector<MateHit>& ref_hits,
                    ref_hits.end(),
                    back_inserter(false_target_hits));
     
-    //alignment_stats.ref_read_alignments += ref_hits.size();
-    //alignment_stats.target_read_alignments += target_hits.size();
-    //alignment_stats.tp_read_alignments += true_positives.size();
-    //alignment_stats.fp_read_alignments += false_target_hits.size();
-    //alignment_stats.fn_read_alignments += missed_ref_hits.size();
     
     foreach (const MateHit& m, false_target_hits)
     {
@@ -542,14 +639,23 @@ void compare_bundles(const vector<MateHit>& ref_hits,
 
 void print_alignment_stats(FILE* fout, const AlignmentStats& stats)
 {
-    double positives = stats.tp_read_alignments + stats.fn_read_alignments;
-    double guesses = stats.tp_read_alignments + stats.fp_read_alignments;
+    double read_positives = stats.tp_read_alignments() + stats.fn_read_alignments();
+    double read_guesses = stats.tp_read_alignments() + stats.fp_read_alignments();
     
-    double recall = stats.tp_read_alignments / positives;
-    double precision = stats.tp_read_alignments / guesses;
+    double read_recall = stats.tp_read_alignments() / read_positives;
+    double read_precision = stats.tp_read_alignments() / read_guesses;
     
-    fprintf(fout, "Read alignment precision\t%lf\n", precision);
-    fprintf(fout, "Read alignment recall\t%lf\n", recall);
+    double intron_positives = stats.tp_introns() + stats.fn_introns();
+    double intron_guesses = stats.tp_introns() + stats.fp_introns();
+    
+    double intron_recall = stats.tp_introns() / intron_positives;
+    double intron_precision = stats.tp_introns() / intron_guesses;
+    
+    fprintf(fout, "Total read alignment precision\t%lf\n", read_precision);
+    fprintf(fout, "Total read alignment recall\t%lf\n", read_recall);
+    
+    fprintf(fout, "Intron precision\t%lf\n", intron_precision);
+    fprintf(fout, "Intron recall\t%lf\n", intron_recall);
 }
 
 void get_ref_names(FILE* sam_in, set<string>& ref_names)
