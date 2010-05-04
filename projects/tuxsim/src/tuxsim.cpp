@@ -23,6 +23,7 @@
 
 #include "GStr.h"
 #include "GFaSeqGet.h"
+#include "GFastaFile.h"
 
 #include "options.h"
 
@@ -339,9 +340,17 @@ void print_fastq_pair(const ReadsForFragment& reads,
                       FastqOutfilePair& fastq_out)
 {
     assert (reads.size() == 2);
-    print_fastq_read(*(reads.front()), fastq_out.left_out_file);
-    print_fastq_read(*(reads.back()), fastq_out.right_out_file);
-    
+	
+	if (reads.front()->sam_flag() & BAM_FREAD1)
+	{
+		print_fastq_read(*(reads.front()), fastq_out.left_out_file);
+		print_fastq_read(*(reads.back()), fastq_out.right_out_file);
+	}
+	else
+	{
+		print_fastq_read(*(reads.back()), fastq_out.left_out_file);
+		print_fastq_read(*(reads.front()), fastq_out.right_out_file);
+    }
 }
 
 void print_aligned_read(const ReadHit& read,
@@ -490,40 +499,98 @@ void generate_reads(RefSequenceTable& rt,
 
 }
 
-void driver(FILE* ref_gtf, 
-			FILE* sam_out,
+void load_contigs(const string& genome_fasta, 
+				  RefSequenceTable& rt, 
+				  vector<Scaffold>& source_molecules)
+{
+	GFastaFile genome(genome_fasta.c_str());
+	
+	bool last = false;
+	do 
+	{
+		FastaSeq contig;
+		genome.getFastaSeq(last, &contig);
+		string s = contig.getSeq();
+		std::transform(s.begin(), s.end(), s.begin(), (int (*)(int))std::toupper);
+		
+		vector<AugmentedCuffOp> cuffop(1, AugmentedCuffOp(CUFF_MATCH, 0, s.length()));
+		RefID contig_id = rt.get_id(contig.getName(), NULL);
+		source_molecules.push_back(Scaffold(contig_id, CUFF_FWD, cuffop));
+		source_molecules.back().seq(s);
+	}while(!last);
+}
+
+void driver(FILE* sam_out,
 			FastqOutfilePair& fastq_out)
 {
 	ReadTable it;
 	RefSequenceTable rt(true, false);
 	
-	vector<Scaffold> ref_mRNAs;
-	load_ref_rnas(ref_gtf, rt, ref_mRNAs);
-	if (ref_mRNAs.empty())
-		return;
+	vector<Scaffold> source_molecules;
+	
+	if (mrna_gtf != "")
+	{
+		FILE* ref_gtf = NULL;
+		
+		ref_gtf = fopen(mrna_gtf.c_str(), "r");
+		if (!ref_gtf)
+		{
+			fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
+					mrna_gtf.c_str());
+			exit(1);
+		}
+		
+		load_ref_rnas(ref_gtf, rt, source_molecules);
+		if (source_molecules.empty())
+		{
+			fprintf(stderr, "Error: GTF is empty!\n");
+			exit(1);
+		}
+	}
+	else if (genome_fasta != "")
+	{
+		load_contigs(genome_fasta, rt, source_molecules);
+		if (source_molecules.empty())
+		{
+			fprintf(stderr, "Error: FASTA files is empty!\n");
+			exit(1);
+		}
+	}
+	else
+	{
+		fprintf(stderr, "Error: No source_pool input files defined\n");
+		exit(1);
+	}
 	
 	FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
 	
-	vector<double> expr_rho(ref_mRNAs.size(), 0.0);
+	vector<double> expr_rho(source_molecules.size(), 0.0);
 	
-	assign_abundances(ref_mRNAs,
+	assign_abundances(source_molecules,
 					  flux_policy,
 					  expr_rho);
 	
-	vector<double> expr_alpha(ref_mRNAs.size(), 0.0);
-	calc_frag_abundances(ref_mRNAs,
+	vector<double> expr_alpha(source_molecules.size(), 0.0);
+	calc_frag_abundances(source_molecules,
 						 expr_rho,
 						 expr_alpha);
 	
 	NormalFragments frag_policy(frag_length_mean, 
                                 frag_length_std_dev,
                                 read_length, 9999999);
+	
+	if (priming_type == "three_prime")
+	{
+		shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
+		frag_policy.priming_policy(primer);
+	}
+	
 	IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
 	
 	AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy);
 	
 	generate_reads(rt, 
-                   ref_mRNAs,
+                   source_molecules,
 				   expr_alpha,
 				   sequencer,
 				   num_fragments,
@@ -544,16 +611,6 @@ int main(int argc, char** argv)
 	
 	random_seed = 1111111;
 	srand(random_seed);
-	
-	FILE* ref_gtf = NULL;
-
-    ref_gtf = fopen(source_gtf.c_str(), "r");
-    if (!ref_gtf)
-    {
-        fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
-                source_gtf.c_str());
-        exit(1);
-    }
     
 	FILE* sam_out = NULL;
 	string out_sam_filename = out_prefix + ".sam";
@@ -587,7 +644,7 @@ int main(int argc, char** argv)
 	
 	FastqOutfilePair fastq_out(left_fastq_out, right_fastq_out);
     
-	driver(ref_gtf, sam_out, fastq_out);
+	driver(sam_out, fastq_out);
 
 	return 0;
 }

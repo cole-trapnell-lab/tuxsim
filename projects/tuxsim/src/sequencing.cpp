@@ -102,32 +102,29 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     int base_flag = BAM_FPAIRED | BAM_FPROPER_PAIR;
     int left_flag = base_flag;
     int right_flag = base_flag;
-    
-    left_flag |= BAM_FREAD1;
-    right_flag |= BAM_FREAD2;
-    
-    if (reverse_strand_frag)
+
+	string right_seq_rc = right_seq;            
+	reverse_complement(right_seq_rc);
+	right_flag |= BAM_FREVERSE;
+	left_flag |= BAM_FMREVERSE;
+        
+	left_read->seq(left_seq);
+	right_read->seq(right_seq_rc);
+	
+	if (reverse_strand_frag)
     {
-        string left_seq_rc = left_seq;
-        reverse_complement(left_seq_rc);
-        
-        left_read->seq(left_seq_rc);
-        left_flag |= BAM_FREVERSE;
-        right_flag |= BAM_FMREVERSE;
-        
-        right_read->seq(right_seq);
+		left_flag |= BAM_FREAD2;
+		right_flag |= BAM_FREAD1;
     }
     else
     {
-        string right_seq_rc = right_seq;            
-        reverse_complement(right_seq_rc);
-        right_flag |= BAM_FREVERSE;
-        left_flag |= BAM_FMREVERSE;
-        
-        left_read->seq(left_seq);
-        right_read->seq(right_seq_rc);
+		left_flag |= BAM_FREAD1;
+		right_flag |= BAM_FREAD2;
     }
     
+	reads.push_back(left_read);
+	reads.push_back(right_read);
+	
     left_read->sam_flag(left_flag);
     right_read->sam_flag(right_flag);
     
@@ -139,17 +136,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     
     left_read->qual(string(left_read->seq().length(), 'I'));
     right_read->qual(string(right_read->seq().length(), 'I'));
-    
-    if (left_read->left() <= right_read->left())
-    {
-        reads.push_back(left_read);
-        reads.push_back(right_read);
-    }
-    else
-    {
-        reads.push_back(right_read);
-        reads.push_back(left_read);   
-    }
+
+
     return true;
 }
 

@@ -196,17 +196,28 @@
 	  <!--  -->
 	  <tr><td VALIGN=top nowrap>
 	  <tt>source_pool</tt></td>
-	  <td VALIGN=top nowrap><tt>source_gtf</tt></td>
+	  <td VALIGN=top nowrap><tt>mrna_gtf</tt></td>
 	  <td VALIGN=top nowrap>File path</td>
    	  <td VALIGN=top nowrap>&lt;none&gt;</td>
 	  <td VALIGN=top>
 	  GTF file of spliced molecules for sequencing.  If this is not set, the
-	  source fasta files themselves will be the pool sequences (i.e. resequencing)
+	  source fasta files themselves will be the pool sequences (i.e. resequencing),
+	  provided that source
+	  </td></tr>
+	
+	  <!--  -->
+	  <tr><td VALIGN=top nowrap>
+	  <tt>source_pool</tt></td>
+	  <td VALIGN=top nowrap><tt>genome_fasta</tt></td>
+	  <td VALIGN=top nowrap>File path</td>
+   	  <td VALIGN=top nowrap>&lt;none&gt;</td>
+	  <td VALIGN=top>
+	  FASTA file of chromosome sequences for.  
 	  </td></tr>
 	
 	  <!--  -->
 	  <tr id="frag_length"><td VALIGN=top nowrap>
-	  <tt>fragment_length</tt></td>
+	  <tt>fragment.length</tt></td>
 	  <td VALIGN=top nowrap><tt>distribution</tt></td>
 	  <td VALIGN=top nowrap>String</td>
    	  <td VALIGN=top nowrap>gaussian</td>
@@ -220,7 +231,7 @@
 	
 	  <!--  -->
 	  <tr id="gaussian_frag_mean"><td VALIGN=top nowrap>
-	  <tt>fragment_length</tt></td>
+	  <tt>fragment.length</tt></td>
 	  <td VALIGN=top nowrap><tt>mean</tt></td>
 	  <td VALIGN=top nowrap>Decimal</td>
    	  <td VALIGN=top nowrap>200.0</td>

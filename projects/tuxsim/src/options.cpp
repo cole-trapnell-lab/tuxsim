@@ -33,28 +33,42 @@ void validate_options()
 {
     bool invalid = false;
     
-    if (fastadir == "")
+    if (mrna_gtf != "" && fastadir == "")
     {
         fprintf(stderr, "Error: input.fastadir must be set\n");
         invalid = true;
     }
     
-    // For now, a GTF is required to use TuxSim, which only does RNA-Seq
-    if (source_gtf == "")
-    {
-        fprintf(stderr, "source_pool.source_gtf must be set\n");
-        invalid = true;
-    }
+//    // For now, a GTF is required to use TuxSim, which only does RNA-Seq
+//    if (mrna_gtf == "")
+//    {
+//        fprintf(stderr, "source_pool.mrna_gtf must be set\n");
+//        invalid = true;
+//    }
     
+	if (priming_type == "uniform_random")
+	{
+		
+	}
+	else if (priming_type == "three_prime")
+	{
+		
+	}
+	else
+	{
+		fprintf(stderr, "Error: fragment.priming must be one of [uniform_random,three_prime]\n");
+		exit(1);
+	}
+	
     if (num_fragments <=0)
     {
-        fprintf(stderr, "sequencing.num_fragments must be a positive integer\n");
+		fprintf(stderr, "Error: sequencing.num_fragments must be a positive integer\n");
         invalid = true;
     }
     
     if (read_length <= 0)
     {
-        fprintf(stderr, "sequencing.num_fragments must be a positive integer\n");
+        fprintf(stderr, "Error: sequencing.num_fragments must be a positive integer\n");
         invalid = true;
     }
     
@@ -74,11 +88,13 @@ int parse_options(int argc, char** argv)
         options_description config_file_options("Configuration file options");
         config_file_options.add_options()
             ("input.fasta_dir", value(&fastadir), "")
-            ("source_pool.source_gtf", value(&source_gtf), "")
-            ("fragment_length.mean", value<double>(&frag_length_mean)->default_value(200), "")
-            ("fragment_length.std_dev", value<double>(&frag_length_std_dev)->default_value(40), "")
+            ("source_pool.mrna_gtf", value(&mrna_gtf)->default_value(""), "")
+			("source_pool.genome_fasta", value(&genome_fasta)->default_value(""), "")
+			("fragment.priming", value(&priming_type)->default_value("uniform_random"), "")
+            ("fragment.length.mean", value<double>(&frag_length_mean)->default_value(200), "")
+            ("fragment.length.std_dev", value<double>(&frag_length_std_dev)->default_value(40), "")
             //("sequencing.read_type", value(&read_type), "")
-            ("sequencing.read_length", value<int>(&read_length)->default_value(76), "")
+            ("sequencing.read_length", value<int>(&read_length)->default_value(75), "")
             ("sequencing.num_fragments", value<int>(&num_fragments)->default_value(20000000), "")
             ("output.prefix", value(&out_prefix), "")
             //("fragment_length.distribution", value(&frag_dist), "")
@@ -141,34 +157,6 @@ int parse_options(int argc, char** argv)
     {
         cerr << e.what() << endl;
     }
-    
-//    string ofile;
-//    string macrofile, libmakfile;
-//    bool t_given = false;
-//    bool b_given = false;
-//    string mainpackage;
-//    string depends = "deps_file";
-//    string sources = "src_file";
-//    string root = ".";
-//    
-//    options_description desc("Allowed options");
-//    desc.add_options()
-//    // First parameter describes option name/short name
-//    // The second is parameter to option
-//    // The third is description
-//    ("help,h", "print usage message")
-//    ("output,o", value(&ofile), "pathname for output")
-//    ("macrofile,m", value(&macrofile), "full pathname of macro.h")
-//    ("two,t", bool_switch(&t_given), "preprocess both header and body")
-//    ("body,b", bool_switch(&b_given), "preprocess body in the header context")
-//    ("libmakfile,l", value(&libmakfile), 
-//     "write include makefile for library")
-//    ("mainpackage,p", value(&mainpackage), 
-//     "output dependency information")
-//    ("depends,d", value(&depends), 
-//     "write dependencies to <pathname>")
-//    ("sources,s", value(&sources), "write source package list to <pathname>")
-//    ("root,r", value(&root), "treat <dirname> as project root directory")
-//    ;
+
     return 0;
 }

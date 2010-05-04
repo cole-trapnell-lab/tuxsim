@@ -17,6 +17,7 @@
 using namespace std;
 using namespace boost;
 
+extern string priming_type;
 extern double frag_length_mean;
 extern double frag_length_std_dev;
 extern int num_fragments;
@@ -24,8 +25,11 @@ extern int read_length;
 extern int num_reads;
 extern string out_prefix;
 
+extern string genome_fasta;
+
+// Both fastadir and mrna_gtf must be set, pending resolution of #169
 extern string fastadir;
-extern string source_gtf;
+extern string mrna_gtf;
 
 extern int random_seed;
 

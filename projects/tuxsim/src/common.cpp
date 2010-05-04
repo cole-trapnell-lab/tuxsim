@@ -13,14 +13,17 @@
 #include <cstdlib>
 #include <iostream>
 
+string priming_type = "uniform_random";
 double frag_length_mean = 200;
 double frag_length_std_dev = 40;
 int num_fragments = 20000000;
-int read_length = 76;
+int read_length = 75;
 string out_prefix;
 
+string genome_fasta;
+
 string fastadir;
-string source_gtf;
+string mrna_gtf;
 
 int random_seed;
 
