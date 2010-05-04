@@ -290,7 +290,7 @@
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 350}, {306, 1064}}</string>
+							<string>{{0, 0}, {306, 1064}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -337,7 +337,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>ED6D6AC61190985E00A682F4</string>
+										<string>ED6D6ADB11909A0000A682F4</string>
 										<key>history</key>
 										<array>
 											<string>ED0038481164585E00E19F3F</string>
@@ -353,7 +353,6 @@
 											<string>ED5079CB1173AC7700883983</string>
 											<string>ED5079F01173AD9200883983</string>
 											<string>ED507A551173B38500883983</string>
-											<string>EDCCF43D1174184E000D83D5</string>
 											<string>EDCCF49311742B4C000D83D5</string>
 											<string>ED34433A1183A6EE00D68A78</string>
 											<string>ED34433E1183A6EE00D68A78</string>
@@ -384,17 +383,18 @@
 											<string>ED6D69F3118E781F00A682F4</string>
 											<string>ED6D6A04118E7B7F00A682F4</string>
 											<string>ED6D6A05118E7B7F00A682F4</string>
-											<string>ED6D6A28118E805500A682F4</string>
 											<string>ED6D6A29118E805500A682F4</string>
 											<string>ED6D6A2B118E805500A682F4</string>
-											<string>ED6D6A2E118E805500A682F4</string>
 											<string>ED6D6A41118E812100A682F4</string>
 											<string>ED6D6A5D118F254500A682F4</string>
 											<string>ED6D6A61118F25B500A682F4</string>
-											<string>ED6D6A66118F266F00A682F4</string>
-											<string>ED6D6AA21190901A00A682F4</string>
-											<string>ED6D6AA31190901A00A682F4</string>
-											<string>ED6D6AC51190985E00A682F4</string>
+											<string>ED6D6ACA1190992800A682F4</string>
+											<string>ED6D6ACB1190992800A682F4</string>
+											<string>ED6D6ACE1190993300A682F4</string>
+											<string>ED6D6AD11190994500A682F4</string>
+											<string>ED6D6AD811909A0000A682F4</string>
+											<string>ED6D6AD911909A0000A682F4</string>
+											<string>ED6D6ADA11909A0000A682F4</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>

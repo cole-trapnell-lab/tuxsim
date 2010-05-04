@@ -35,6 +35,7 @@ struct LibraryFragment
 class PrimingPolicy
 {
 public:
+    virtual ~PrimingPolicy() {}
 	virtual bool next_priming_site(const Scaffold& molecule,
 								   int& priming_site) = 0;
 };
@@ -67,6 +68,7 @@ class ThreePrimeEndPriming : public PrimingPolicy
 class FragmentPolicy
 {
 public:
+    virtual ~FragmentPolicy() {}
 	virtual bool next_fragment(const Scaffold& molecule,
 							   LibraryFragment& fragment) = 0;
 };

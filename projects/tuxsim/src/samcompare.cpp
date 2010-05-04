@@ -460,7 +460,7 @@ struct AlignmentStats
     
     int tp_introns() const 
     { 
-        return _tp_read_alignments; 
+        return (int)_tp_introns.size(); 
     }
     
     int fn_introns() const 
@@ -508,8 +508,6 @@ void register_missed_read_alignment(const ReadHit& hit,
                                     AlignmentStats& stats,
                                     FILE* fout)
 {
-
-    
     stats.register_missed_read(hit);
     
     if (fout)
@@ -538,8 +536,7 @@ void register_false_read_alignment(const ReadHit& hit,
                                    AlignmentStats& stats,
                                    FILE* fout)
 {
-
-    stats.register_missed_read(hit);
+    stats.register_false_read(hit);
     
     if (fout)
     {

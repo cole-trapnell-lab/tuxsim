@@ -17,6 +17,7 @@ typedef vector<shared_ptr<ReadHit> > ReadsForFragment;
 class SequencingPolicy
 {
 public:
+    virtual ~SequencingPolicy() {}
 	virtual bool reads_for_fragment(const LibraryFragment& frag, 
 									ReadsForFragment& reads) = 0;
 };
