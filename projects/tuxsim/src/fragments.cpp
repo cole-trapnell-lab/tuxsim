@@ -26,14 +26,12 @@ bool ThreePrimeEndPriming::next_priming_site(const Scaffold& molecule,
 	return true;
 }
 
-
-
 bool NormalFragments::next_fragment(const Scaffold& molecule,
                                     LibraryFragment& fragment)
 {
     int frag_length;
 	
-	if (_min_frag_length > molecule.length())
+	if (_min_frag_length >= molecule.length())
 	{
 		return false;
 	}
