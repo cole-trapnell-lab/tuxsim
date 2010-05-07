@@ -687,6 +687,7 @@ public:
    void mRNA_CDS_coords(uint& cds_start, uint& cds_end);
    char* getSpliced(GFaSeqGet* faseq, bool CDSonly=false, int* rlen=NULL,
            uint* cds_start=NULL, uint* cds_end=NULL, GList<GSeg>* seglst=NULL);
+    char* getUnspliced(GFaSeqGet* faseq, int* rlen, GList<GSeg>* seglst);
    char* getSplicedTr(GFaSeqGet* faseq, bool CDSonly=true, int* rlen=NULL);
    //bool validCDS(GFaSeqGet* faseq); //has In-Frame Stop Codon ?
    bool empty() { return (start==0); }

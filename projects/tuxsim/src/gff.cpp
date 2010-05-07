@@ -834,6 +834,58 @@ void GffObj::mRNA_CDS_coords(uint& cds_mstart, uint& cds_mend) {
   //return spliced;
 }
 
+char* GffObj::getUnspliced(GFaSeqGet* faseq, int* rlen, GList<GSeg>* seglst) 
+{
+    if (faseq==NULL) { GMessage("Warning: getUnspliced(NULL,.. ) called!\n");
+        return NULL;
+    }
+    //restore normal coordinates:
+    unxcoord();
+    if (exons.Count()==0) return NULL;
+    int fspan=end-start+1;
+    const char* gsubseq=faseq->subseq(start, fspan);
+    if (gsubseq==NULL) {
+        GError("Error getting subseq for %s (%d..%d)!\n", gffID, start, end);
+    }
+    char* unspliced=NULL;
+	
+    int seqstart=exons.First()->start;
+    int seqend=exons.Last()->end;
+    
+	int unsplicedlen = 0;
+
+    unsplicedlen += seqend - seqstart + 1;
+
+    GMALLOC(unspliced, unsplicedlen+1); //allocate more here
+    //uint seqstart, seqend;
+
+    int s = 0; //resulting nucleotide counter
+    if (strand=='-') 
+    {
+        if (seglst!=NULL)
+            seglst->Add(new GSeg(s+1,s+1+seqend-seqstart));
+        for (uint i=seqend;i>=seqstart;i--) 
+        {
+            unspliced[s] = ntComplement(gsubseq[i-start]);
+            s++;
+        }//for each nt
+    } // - strand
+    else 
+    { // + strand
+        if (seglst!=NULL)
+            seglst->Add(new GSeg(s+1,s+1+seqend-seqstart));
+        for (uint i=seqstart;i<=seqend;i++) 
+        {
+            unspliced[s]=gsubseq[i-start];
+            s++;
+        }//for each nt
+    } // + strand
+	assert(s <= unsplicedlen);
+    unspliced[s]=0;
+    if (rlen!=NULL) *rlen=s;
+    return unspliced;
+}
+
 char* GffObj::getSpliced(GFaSeqGet* faseq, bool CDSonly, int* rlen, uint* cds_start, uint* cds_end,
           GList<GSeg>* seglst) {
   if (CDSonly && CDstart==0) return NULL;
