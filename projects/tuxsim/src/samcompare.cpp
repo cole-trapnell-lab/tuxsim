@@ -371,6 +371,13 @@ struct AlignmentStats
         _fp_read_alignments = 0;
         _tp_read_alignments = 0;
         _fn_read_alignments = 0;
+        
+        _target_spliced_read_alignments = 0;
+        _ref_spliced_read_alignments = 0;
+        
+        _fp_spliced_read_alignments = 0;
+        _tp_spliced_read_alignments = 0;
+        _fn_spliced_read_alignments = 0;
     }
     
     void register_false_read(const ReadHit& hit)
@@ -387,6 +394,9 @@ struct AlignmentStats
             IntronSet& s = ret.first->second;
             
             copy(introns.begin(), introns.end(), inserter(s, s.end()));
+            
+            _target_spliced_read_alignments++;
+            _fp_spliced_read_alignments++;
         }
         _target_read_alignments++;
         _fp_read_alignments++;
@@ -407,6 +417,9 @@ struct AlignmentStats
             IntronSet& s = ret.first->second;
             
             copy(introns.begin(), introns.end(), inserter(s, s.end()));  
+            
+            _ref_spliced_read_alignments++;
+            _fn_spliced_read_alignments++;
         }
         
         _ref_read_alignments++;
@@ -425,6 +438,10 @@ struct AlignmentStats
             IntronSet& s = ret.first->second;
             
             copy(introns.begin(), introns.end(), inserter(s, s.begin())); 
+            
+            _target_spliced_read_alignments++;
+            _ref_spliced_read_alignments++;
+            _tp_spliced_read_alignments++;
         }
         
         _target_read_alignments++;
@@ -437,6 +454,12 @@ struct AlignmentStats
     int fp_read_alignments() const { return _fp_read_alignments; }
     int tp_read_alignments() const { return _tp_read_alignments; }
     int fn_read_alignments() const { return _fn_read_alignments; }
+    
+    int target_spliced_read_alignments() const { return _target_spliced_read_alignments; }
+    int ref_spliced_read_alignments() const { return _ref_spliced_read_alignments; }
+    int fp_spliced_read_alignments() const { return _fp_spliced_read_alignments; }
+    int tp_spliced_read_alignments() const { return _tp_spliced_read_alignments; }
+    int fn_spliced_read_alignments() const { return _fn_spliced_read_alignments; }
     
     int fp_introns() const 
     { 
@@ -509,6 +532,12 @@ private:
     int _tp_read_alignments;
     int _fn_read_alignments;
     
+    int _target_spliced_read_alignments;
+    int _ref_spliced_read_alignments;
+    int _fp_spliced_read_alignments;
+    int _tp_spliced_read_alignments;
+    int _fn_spliced_read_alignments;
+    
     int ref_introns;
     int target_introns;
     
@@ -577,7 +606,6 @@ void register_true_read_alignment(const ReadHit& hit,
                                   AlignmentStats& stats,
 								  FILE* fout)
 {
-
     stats.register_true_read(hit);
 	
 	if (fout)
@@ -655,14 +683,23 @@ void print_alignment_stats(FILE* fout, const AlignmentStats& stats)
     double read_recall = stats.tp_read_alignments() / read_positives;
     double read_precision = stats.tp_read_alignments() / read_guesses;
     
+    fprintf(fout, "Total read alignment precision\t%lf\n", read_precision);
+    fprintf(fout, "Total read alignment recall\t%lf\n", read_recall);
+    
+    double spliced_read_positives = stats.tp_spliced_read_alignments() + stats.fn_spliced_read_alignments();
+    double spliced_read_guesses = stats.tp_spliced_read_alignments() + stats.fp_spliced_read_alignments();
+    
+    double spliced_read_recall = stats.tp_spliced_read_alignments() / spliced_read_positives;
+    double spliced_read_precision = stats.tp_spliced_read_alignments() / spliced_read_guesses;
+    
+    fprintf(fout, "Spliced read alignment precision\t%lf\n", spliced_read_precision);
+    fprintf(fout, "Spliced read alignment recall\t%lf\n", spliced_read_recall);
+    
     double intron_positives = stats.tp_introns() + stats.fn_introns();
     double intron_guesses = stats.tp_introns() + stats.fp_introns();
     
     double intron_recall = stats.tp_introns() / intron_positives;
     double intron_precision = stats.tp_introns() / intron_guesses;
-    
-    fprintf(fout, "Total read alignment precision\t%lf\n", read_precision);
-    fprintf(fout, "Total read alignment recall\t%lf\n", read_recall);
     
     fprintf(fout, "Intron precision\t%lf\n", intron_precision);
     fprintf(fout, "Intron recall\t%lf\n", intron_recall);

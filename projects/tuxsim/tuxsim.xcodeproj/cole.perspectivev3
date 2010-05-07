@@ -328,7 +328,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>ED9B80571193BCFE00C9F9A2</string>
+										<string>ED9B80651193C45200C9F9A2</string>
 										<key>history</key>
 										<array>
 											<string>ED0038481164585E00E19F3F</string>
@@ -385,7 +385,7 @@
 											<string>ED6D6AD11190994500A682F4</string>
 											<string>ED6D6AD811909A0000A682F4</string>
 											<string>ED6D6AD911909A0000A682F4</string>
-											<string>ED9B800D1193B8F900C9F9A2</string>
+											<string>ED9B805E1193C25000C9F9A2</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -725,7 +725,6 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>ED9B80581193BCFE00C9F9A2</string>
 		<string>ED9B7FEF1193B27900C9F9A2</string>
 		<string>ED9B7FF01193B27900C9F9A2</string>
 		<string>/Users/cole/Data/Documents/CBCB/sr_mapping/RNA-seq/tuxsim/tuxsim.xcodeproj</string>
