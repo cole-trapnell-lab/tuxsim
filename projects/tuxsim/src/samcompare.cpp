@@ -375,39 +375,42 @@ struct AlignmentStats
     
     void register_false_read(const ReadHit& hit)
     {
-        _target_read_alignments++;
-        _fp_read_alignments++;
-        
-        
         // For now, we'll add these gaps to FP introns, but some of them
         // might actually be real, so we'll need to go through the list of TPs
         // when the user asks for the current FP rate.
         vector<pair<int, int> > introns; 
         hit.gaps(introns);
-        
-        pair<IntronTable::iterator, bool> ret = 
-            _fp_introns.insert(make_pair(hit.ref_id(), IntronSet()));
-        IntronSet& s = ret.first->second;
-        
-        copy(introns.begin(), introns.end(), inserter(s, s.end()));
+        if (!introns.empty())
+        {       
+            pair<IntronTable::iterator, bool> ret = 
+                _fp_introns.insert(make_pair(hit.ref_id(), IntronSet()));
+            IntronSet& s = ret.first->second;
+            
+            copy(introns.begin(), introns.end(), inserter(s, s.end()));
+        }
+        _target_read_alignments++;
+        _fp_read_alignments++;
     }
     
     void register_missed_read(const ReadHit& hit)
-    {
-        _ref_read_alignments++;
-        _fn_read_alignments++;
-        
+    {        
         // For now, we'll add these gaps to FN introns, but some of them
         // might actually be real, so we'll need to go through the list of TPs
         // when the user asks for the current FN rate.
         vector<pair<int, int> > introns; 
         hit.gaps(introns);
         
-        pair<IntronTable::iterator, bool> ret = 
-            _fn_introns.insert(make_pair(hit.ref_id(), IntronSet()));
-        IntronSet& s = ret.first->second;
+        if (!introns.empty())
+        {            
+            pair<IntronTable::iterator, bool> ret = 
+                _fn_introns.insert(make_pair(hit.ref_id(), IntronSet()));
+            IntronSet& s = ret.first->second;
+            
+            copy(introns.begin(), introns.end(), inserter(s, s.end()));  
+        }
         
-        copy(introns.begin(), introns.end(), inserter(s, s.end()));  
+        _ref_read_alignments++;
+        _fn_read_alignments++;
     }
     
     void register_true_read(const ReadHit& hit)
@@ -415,11 +418,14 @@ struct AlignmentStats
         vector<pair<int, int> > introns; 
         hit.gaps(introns);
         
-        pair<IntronTable::iterator, bool> ret = 
-            _tp_introns.insert(make_pair(hit.ref_id(), IntronSet()));
-        IntronSet& s = ret.first->second;
-        
-        copy(introns.begin(), introns.end(), inserter(s, s.end())); 
+        if (!introns.empty())
+        {
+            pair<IntronTable::iterator, bool> ret = 
+                _tp_introns.insert(make_pair(hit.ref_id(), IntronSet()));
+            IntronSet& s = ret.first->second;
+            
+            copy(introns.begin(), introns.end(), inserter(s, s.begin())); 
+        }
         
         _target_read_alignments++;
         _ref_read_alignments++;
@@ -460,7 +466,14 @@ struct AlignmentStats
     
     int tp_introns() const 
     { 
-        return (int)_tp_introns.size(); 
+        size_t tpi = 0;
+        for (IntronTable::const_iterator  p = _tp_introns.begin();
+             p != _tp_introns.end();
+             ++p)
+        {
+            tpi += p->second.size();
+        }
+        return (int)tpi; 
     }
     
     int fn_introns() const 
