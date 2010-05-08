@@ -578,8 +578,6 @@ void driver(FILE* sam_out,
 	
 	assign_abundances(flux_policy, source_molecules);
 	
-	
-	
 	calc_frag_abundances(source_molecules);
 	
 	NormalFragments frag_policy(frag_length_mean, 
@@ -653,11 +651,11 @@ int main(int argc, char** argv)
 	FastqOutfilePair fastq_out(left_fastq_out, right_fastq_out);
     
 	FILE* expr_out = NULL;
-	string out_expr_filename = out_prefix + ".expr";
+	string out_expr_filename = out_prefix + ".simexpr";
 	expr_out = fopen(out_expr_filename.c_str(), "w");
 	if (!sam_out)
 	{
-		fprintf(stderr, "Error: cannot open .expr file %s for writing\n",
+		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
 				out_expr_filename.c_str());
 		exit(1);
 	}
