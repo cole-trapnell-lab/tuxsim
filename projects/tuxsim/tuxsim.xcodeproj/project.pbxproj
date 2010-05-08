@@ -99,7 +99,7 @@
 		ED00385A1164627900E19F3F /* hits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hits.h; path = src/hits.h; sourceTree = "<group>"; };
 		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
 		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
-		ED0E0B901190B3C6003D6DE9 /* samcompare */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = samcompare; path = build/Debug/samcompare; sourceTree = "<group>"; };
+		ED0E0B901190B3C6003D6DE9 /* samcompare */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = samcompare; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-xgcc40-mt-1_41.a"; path = "/usr/local/lib/libboost_program_options-xgcc40-mt-1_41.a"; sourceTree = "<absolute>"; };
 		ED3445FB11848EAF00D68A78 /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
 		ED3445FC11848EBA00D68A78 /* INSTALL */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };

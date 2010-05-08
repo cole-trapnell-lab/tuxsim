@@ -431,7 +431,6 @@ void print_aligned_read(const ReadHit& read,
 
 void generate_reads(RefSequenceTable& rt,
                     const vector<Scaffold>& ref_mRNAs, 
-					const vector<double>& frag_abundances,
 					AssayProtocol* sequencer,
 					int total_frags,
 					FILE* sam_frag_out,
@@ -460,7 +459,7 @@ void generate_reads(RefSequenceTable& rt,
             read_chunk.clear();
         }
         
-		int num_frags_for_mRNA = frag_abundances[i] * total_frags;
+		int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 		{
 			ReadsForFragment reads;
@@ -481,12 +480,12 @@ void generate_reads(RefSequenceTable& rt,
         
 		fprintf(expr_out, 
 				"%s\t%s\t%g\t%g\t%g\t%g\n", 
-				ref_mRNAs[i].annotated_gene_id(),
-				ref_mRNAs[i].annotated_transcript_id(),
-				num_frags_for_mRNA / (ref_mRNAs[i].length() / 1000) / (total_frags / 1000000), 
+				ref_mRNAs[i].annotated_gene_id().c_str(),
+				ref_mRNAs[i].annotated_trans_id().c_str(),
+				num_frags_for_mRNA / (ref_mRNAs[i].length() / 1000.0) / (total_frags / 1000000.0), 
 				ref_mRNAs[i].rho(),
-				0,
-				num_frags_for_mRNA / ref_mRNAs[i].length());
+				0.0,
+				num_frags_for_mRNA / (double)ref_mRNAs[i].length());
 		
         if (last_ref_id != ref_mRNAs[i].ref_id())
         {
@@ -534,7 +533,7 @@ void load_contigs(const string& genome_fasta,
 
 void driver(FILE* sam_out,
 			FastqOutfilePair& fastq_out,
-			FILE* expr_file)
+			FILE* expr_out)
 {
 	ReadTable it;
 	RefSequenceTable rt(true, false);
@@ -600,7 +599,6 @@ void driver(FILE* sam_out,
 	
 	generate_reads(rt, 
                    source_molecules,
-				   expr_alpha,
 				   sequencer,
 				   num_fragments,
 				   sam_out,
