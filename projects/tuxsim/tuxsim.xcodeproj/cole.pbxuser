@@ -2,8 +2,8 @@
 {
 	08FB7793FE84155DC02AAC07 /* Project object */ = {
 		activeBuildConfigurationName = Debug;
-		activeExecutable = ED0E0B911190B3C6003D6DE9 /* samcompare */;
-		activeTarget = ED6D62AC118B7BD900A682F4 /* samcompare */;
+		activeExecutable = ED0035A011644C4800E19F3F /* tuxsim */;
+		activeTarget = 8DD76F620486A84900D96B5E /* tuxsim */;
 		addToTargets = (
 			ED6D62AC118B7BD900A682F4 /* samcompare */,
 		);
@@ -775,9 +775,9 @@
 	};
 	ED0038621164630200E19F3F /* scaffolds.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1141, 4420}}";
-			sepNavSelRange = "{6978, 0}";
-			sepNavVisRange = "{6498, 783}";
+			sepNavIntBoundsRect = "{{0, 0}, {864, 4433}}";
+			sepNavSelRange = "{3354, 0}";
+			sepNavVisRange = "{2714, 1322}";
 		};
 	};
 	ED00387E1164696400E19F3F /* PBXTextBookmark */ = {
@@ -1296,16 +1296,16 @@
 	};
 	ED50796C1173A70500883983 /* abundances.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {928, 910}}";
-			sepNavSelRange = "{42, 0}";
-			sepNavVisRange = "{0, 822}";
+			sepNavIntBoundsRect = "{{0, 0}, {864, 936}}";
+			sepNavSelRange = "{62, 0}";
+			sepNavVisRange = "{0, 1349}";
 		};
 	};
 	ED50796D1173A70500883983 /* abundances.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {928, 572}}";
-			sepNavSelRange = "{165, 104}";
-			sepNavVisRange = "{0, 725}";
+			sepNavIntBoundsRect = "{{0, 0}, {864, 767}}";
+			sepNavSelRange = "{552, 0}";
+			sepNavVisRange = "{0, 894}";
 		};
 	};
 	ED5079731173A7BA00883983 /* fragments.h */ = {
@@ -1331,9 +1331,9 @@
 	};
 	ED5079831173A8EF00883983 /* sequencing.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {877, 3068}}";
+			sepNavIntBoundsRect = "{{0, 0}, {864, 3081}}";
 			sepNavSelRange = "{3580, 18}";
-			sepNavVisRange = "{2531, 2055}";
+			sepNavVisRange = "{2704, 1614}";
 		};
 	};
 	ED5079981173AB3200883983 /* PBXTextBookmark */ = {
@@ -1846,8 +1846,8 @@
 		isa = PBXTextBookmark;
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 556";
-		rLen = 177;
-		rLoc = 13441;
+		rLen = 138;
+		rLoc = 13859;
 		rType = 0;
 		vrLen = 1231;
 		vrLoc = 12863;
@@ -2319,8 +2319,8 @@
 		isa = PBXTextBookmark;
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 556";
-		rLen = 177;
-		rLoc = 13441;
+		rLen = 138;
+		rLoc = 13859;
 		rType = 0;
 		vrLen = 1219;
 		vrLoc = 12863;
@@ -4232,7 +4232,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 460";
 		rLen = 0;
-		rLoc = 11389;
+		rLoc = 11493;
 		rType = 0;
 		vrLen = 708;
 		vrLoc = 10303;
@@ -4242,7 +4242,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 451";
 		rLen = 0;
-		rLoc = 10874;
+		rLoc = 10978;
 		rType = 0;
 		vrLen = 1135;
 		vrLoc = 10092;
@@ -4252,7 +4252,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 450";
 		rLen = 0;
-		rLoc = 10864;
+		rLoc = 10968;
 		rType = 0;
 		vrLen = 919;
 		vrLoc = 10670;
@@ -4262,7 +4262,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 450";
 		rLen = 0;
-		rLoc = 10864;
+		rLoc = 10968;
 		rType = 0;
 		vrLen = 919;
 		vrLoc = 10670;
@@ -4272,7 +4272,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 450";
 		rLen = 0;
-		rLoc = 10864;
+		rLoc = 10968;
 		rType = 0;
 		vrLen = 919;
 		vrLoc = 10670;
@@ -4282,7 +4282,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 469";
 		rLen = 0;
-		rLoc = 11365;
+		rLoc = 11469;
 		rType = 0;
 		vrLen = 605;
 		vrLoc = 11044;
@@ -4292,7 +4292,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 469";
 		rLen = 0;
-		rLoc = 11365;
+		rLoc = 11469;
 		rType = 0;
 		vrLen = 921;
 		vrLoc = 10863;
@@ -4372,7 +4372,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 469";
 		rLen = 0;
-		rLoc = 11365;
+		rLoc = 11469;
 		rType = 0;
 		vrLen = 605;
 		vrLoc = 11044;
@@ -5070,7 +5070,7 @@
 		fRef = ED0038621164630200E19F3F /* scaffolds.h */;
 		name = "scaffolds.h: 280";
 		rLen = 9;
-		rLoc = 6968;
+		rLoc = 7029;
 		rType = 0;
 		vrLen = 1314;
 		vrLoc = 6011;
@@ -5186,7 +5186,7 @@
 		isa = PBXTextBookmark;
 		fRef = ED0038621164630200E19F3F /* scaffolds.h */;
 		rLen = 1;
-		rLoc = 276;
+		rLoc = 280;
 		rType = 1;
 	};
 	ED6D6A3D118E810500A682F4 /* PBXTextBookmark */ = {
@@ -5194,7 +5194,7 @@
 		fRef = ED0038621164630200E19F3F /* scaffolds.h */;
 		name = "scaffolds.h: 278";
 		rLen = 0;
-		rLoc = 6978;
+		rLoc = 7039;
 		rType = 0;
 		vrLen = 783;
 		vrLoc = 6498;
@@ -5214,7 +5214,7 @@
 		fRef = ED0038621164630200E19F3F /* scaffolds.h */;
 		name = "scaffolds.h: 278";
 		rLen = 0;
-		rLoc = 6978;
+		rLoc = 7039;
 		rType = 0;
 		vrLen = 1094;
 		vrLoc = 6384;
@@ -5657,7 +5657,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 651";
 		rLen = 0;
-		rLoc = 15692;
+		rLoc = 16296;
 		rType = 0;
 		vrLen = 1680;
 		vrLoc = 14012;
@@ -5667,7 +5667,7 @@
 		fRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */;
 		name = "tuxsim.cpp: 651";
 		rLen = 0;
-		rLoc = 15692;
+		rLoc = 16296;
 		rType = 0;
 		vrLen = 1680;
 		vrLoc = 14012;
@@ -5755,9 +5755,9 @@
 	};
 	EDADF8FA118493100018CFB9 /* tuxsim.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {877, 8554}}";
-			sepNavSelRange = "{15692, 0}";
-			sepNavVisRange = "{14012, 1680}";
+			sepNavIntBoundsRect = "{{0, 0}, {864, 8450}}";
+			sepNavSelRange = "{13579, 0}";
+			sepNavVisRange = "{13072, 1331}";
 		};
 	};
 	EDADF8FD1184931E0018CFB9 /* PBXTextBookmark */ = {
@@ -5949,7 +5949,7 @@
 		fRef = ED0038621164630200E19F3F /* scaffolds.h */;
 		name = "scaffolds.h: 276";
 		rLen = 0;
-		rLoc = 6893;
+		rLoc = 6954;
 		rType = 0;
 		vrLen = 695;
 		vrLoc = 6380;

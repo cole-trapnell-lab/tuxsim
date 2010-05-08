@@ -435,11 +435,15 @@ void generate_reads(RefSequenceTable& rt,
 					AssayProtocol* sequencer,
 					int total_frags,
 					FILE* sam_frag_out,
-					FastqOutfilePair& fastq_out)
+					FastqOutfilePair& fastq_out,
+					FILE* expr_out)
 {
     RefID last_ref_id = 0;
     int rna_rightmost = 0;
     vector<shared_ptr<ReadHit> > read_chunk; 
+	
+	fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\n");
+	
 	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
 	{
         if (last_ref_id &&
@@ -475,7 +479,15 @@ void generate_reads(RefSequenceTable& rt,
 			}
 		}
         
-        
+		fprintf(expr_out, 
+				"%s\t%s\t%g\t%g\t%g\t%g\n", 
+				ref_mRNAs[i].annotated_gene_id(),
+				ref_mRNAs[i].annotated_transcript_id(),
+				num_frags_for_mRNA / (ref_mRNAs[i].length() / 1000) / (total_frags / 1000000), 
+				ref_mRNAs[i].rho(),
+				0,
+				num_frags_for_mRNA / ref_mRNAs[i].length());
+		
         if (last_ref_id != ref_mRNAs[i].ref_id())
         {
             rna_rightmost = ref_mRNAs[i].right();
@@ -521,7 +533,8 @@ void load_contigs(const string& genome_fasta,
 }
 
 void driver(FILE* sam_out,
-			FastqOutfilePair& fastq_out)
+			FastqOutfilePair& fastq_out,
+			FILE* expr_file)
 {
 	ReadTable it;
 	RefSequenceTable rt(true, false);
@@ -566,12 +579,15 @@ void driver(FILE* sam_out,
 	
 	assign_abundances(flux_policy, source_molecules);
 	
+	
+	
 	calc_frag_abundances(source_molecules);
 	
 	NormalFragments frag_policy(frag_length_mean, 
                                 frag_length_std_dev,
                                 read_length, 9999999);
 	
+	// Set the fragment priming policy, default is uniform random priming.
 	if (priming_type == "three_prime")
 	{
 		shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
@@ -588,7 +604,8 @@ void driver(FILE* sam_out,
 				   sequencer,
 				   num_fragments,
 				   sam_out,
-				   fastq_out);
+				   fastq_out,
+				   expr_out);
 	
 	delete sequencer;
 }
@@ -637,7 +654,17 @@ int main(int argc, char** argv)
 	
 	FastqOutfilePair fastq_out(left_fastq_out, right_fastq_out);
     
-	driver(sam_out, fastq_out);
+	FILE* expr_out = NULL;
+	string out_expr_filename = out_prefix + ".expr";
+	expr_out = fopen(out_expr_filename.c_str(), "w");
+	if (!sam_out)
+	{
+		fprintf(stderr, "Error: cannot open .expr file %s for writing\n",
+				out_expr_filename.c_str());
+		exit(1);
+	}
+	
+	driver(sam_out, fastq_out, expr_out);
 
 	return 0;
 }
