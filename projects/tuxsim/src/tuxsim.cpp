@@ -564,16 +564,9 @@ void driver(FILE* sam_out,
 	
 	FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
 	
-	vector<double> expr_rho(source_molecules.size(), 0.0);
+	assign_abundances(flux_policy, source_molecules);
 	
-	assign_abundances(source_molecules,
-					  flux_policy,
-					  expr_rho);
-	
-	vector<double> expr_alpha(source_molecules.size(), 0.0);
-	calc_frag_abundances(source_molecules,
-						 expr_rho,
-						 expr_alpha);
+	calc_frag_abundances(source_molecules);
 	
 	NormalFragments frag_policy(frag_length_mean, 
                                 frag_length_std_dev,

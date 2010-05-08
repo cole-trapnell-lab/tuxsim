@@ -151,7 +151,9 @@ public:
 	Scaffold() :
 		_ref_id(0), 
 		_strand(CUFF_STRAND_UNKNOWN), 
-		_classcode(0) {}
+		_classcode(0),	  
+		_rho(0.0),
+		_alpha(0.0) {}
 	
 	// For manually constructing scaffolds, for example when a reference is 
 	// available
@@ -159,7 +161,9 @@ public:
 	: _ref_id(ref_id), 
 	  _augmented_ops(ops), 
 	  _strand(strand),
-	  _classcode(0)
+	  _classcode(0),
+	  _rho(0.0),
+	  _alpha(0.0)
 	{
 		_right = _augmented_ops.back().g_right();
 		_left = _augmented_ops.front().g_left();
@@ -277,6 +281,12 @@ public:
 	const string& seq() const { return _seq; } 
 	void seq(const string& s) {	_seq = s; } 
 	
+	double rho() const { return _rho; }
+	void rho(double r) { _rho = r; }
+	
+	double alpha() const { return _alpha; }
+	void alpha(double a) { _alpha = a; }
+
 private: 
 	
 	static bool has_intron(const Scaffold& scaff)
@@ -311,6 +321,9 @@ private:
 	string _annotated_tss_id;
 	string _nearest_ref_id;
 	char _classcode;
+	
+	double _rho;
+	double _alpha;
 };
 
 bool scaff_lt(const Scaffold& lhs, const Scaffold& rhs);

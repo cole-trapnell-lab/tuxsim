@@ -473,12 +473,12 @@ struct AlignmentStats
             ref_itr = _tp_introns.find(fps.first);
             if (ref_itr != _tp_introns.end())
             {
-                IntronSet genuine_fps;
+                vector<pair<int,int> > genuine_fps;
                 set_difference(fps.second.begin(), 
                                fps.second.end(), 
                                ref_itr->second.begin(), 
                                ref_itr->second.end(),
-                               inserter(genuine_fps, genuine_fps.begin()));
+                               back_inserter(genuine_fps));
                 num_fp_introns += genuine_fps.size();
             }
             ++fp_itr;
@@ -511,12 +511,12 @@ struct AlignmentStats
             ref_itr = _tp_introns.find(fns.first);
             if (ref_itr != _tp_introns.end())
             {
-                IntronSet genuine_fns;
+                vector<pair<int,int> > genuine_fns;
                 set_difference(fns.second.begin(), 
                                fns.second.end(), 
                                ref_itr->second.begin(), 
                                ref_itr->second.end(),
-                               inserter(genuine_fns, genuine_fns.begin()));
+                               back_inserter(genuine_fns));
                 num_fn_introns += genuine_fns.size();
             }
             ++fn_itr;

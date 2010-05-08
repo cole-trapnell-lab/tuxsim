@@ -99,6 +99,7 @@
 		ED00385A1164627900E19F3F /* hits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hits.h; path = src/hits.h; sourceTree = "<group>"; };
 		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
 		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
+		ED0E0B901190B3C6003D6DE9 /* samcompare */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = samcompare; path = build/Debug/samcompare; sourceTree = "<group>"; };
 		ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-xgcc40-mt-1_41.a"; path = "/usr/local/lib/libboost_program_options-xgcc40-mt-1_41.a"; sourceTree = "<absolute>"; };
 		ED3445FB11848EAF00D68A78 /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
 		ED3445FC11848EBA00D68A78 /* INSTALL */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };
@@ -120,7 +121,6 @@
 		ED6D6636118C8DF700A682F4 /* TestHits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestHits.h; path = tests/unit_tests/TestHits.h; sourceTree = "<group>"; };
 		ED6D6637118C8DF700A682F4 /* TestHits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestHits.cpp; path = tests/unit_tests/TestHits.cpp; sourceTree = "<group>"; };
 		ED6D6A58118F250500A682F4 /* samcompare.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = samcompare.cpp; path = src/samcompare.cpp; sourceTree = "<group>"; };
-		ED9B7FA91193B21E00C9F9A2 /* samcompare */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = samcompare; path = build/Debug/samcompare; sourceTree = "<group>"; };
 		EDADF8F311848F6B0018CFB9 /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.am; path = src/Makefile.am; sourceTree = "<group>"; };
 		EDADF8F611848FC40018CFB9 /* ax_boost_program_options.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_boost_program_options.m4; sourceTree = "<group>"; };
 		EDADF8F9118492430018CFB9 /* tuxsim.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = tuxsim.mk; path = config/tuxsim.mk; sourceTree = "<group>"; };
@@ -218,7 +218,7 @@
 			children = (
 				8DD76F6C0486A84900D96B5E /* tuxsim */,
 				ED6D662C118C8D1B00A682F4 /* Tests */,
-				ED9B7FA91193B21E00C9F9A2 /* samcompare */,
+				ED0E0B901190B3C6003D6DE9 /* samcompare */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -295,7 +295,7 @@
 			name = samcompare;
 			productInstallPath = "$(HOME)/bin";
 			productName = tuxsim;
-			productReference = ED9B7FA91193B21E00C9F9A2 /* samcompare */;
+			productReference = ED0E0B901190B3C6003D6DE9 /* samcompare */;
 			productType = "com.apple.product-type.tool";
 		};
 		ED6D662B118C8D1B00A682F4 /* Tests */ = {

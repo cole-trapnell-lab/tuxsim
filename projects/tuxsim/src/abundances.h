@@ -19,18 +19,18 @@ void assign_expression_ranks(const vector<Scaffold>& ref_mRNAs,
 
 // Assigns the transcriptome wide relative abundances
 template<class RankedBasedAbundancePolicy>
-void assign_abundances(const vector<Scaffold>& ref_mRNAs,
-					   const RankedBasedAbundancePolicy& rank_based,
-					   vector<double>& expr_rho)
+void assign_abundances(const RankedBasedAbundancePolicy& rank_based,
+					   vector<Scaffold>& source_molecules)
 {
-	vector<unsigned int> expr_rank(ref_mRNAs.size(), 0);
+	vector<unsigned int> expr_rank(source_molecules.size(), 0);
+	vector<double> expr_rho(source_molecules.size(), 0.0);
 	
 	assert(expr_rho.size() == expr_rank.size());
 	
-	assign_expression_ranks(ref_mRNAs, expr_rank);
+	assign_expression_ranks(source_molecules, expr_rank);
 	
 	double total_mols = 0.0;
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{
 		int rank = expr_rank[i];
 		double rho = rank_based.rho(rank);
@@ -40,15 +40,14 @@ void assign_abundances(const vector<Scaffold>& ref_mRNAs,
 	
 	assert (total_mols > 0.0);
 	
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{
 		expr_rho[i] /= total_mols;
+		source_molecules[i].rho(expr_rho[i]);
 	}
 }
 
-void calc_frag_abundances(const vector<Scaffold>& ref_mRNAs,
-						  const vector<double>& expr_rho,
-						  vector<double>& expr_alpha);
+void calc_frag_abundances(vector<Scaffold>& source_molecules);
 
 
 struct FluxRankAbundancePolicy

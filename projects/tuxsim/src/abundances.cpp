@@ -20,25 +20,19 @@ void assign_expression_ranks(const vector<Scaffold>& ref_mRNAs,
 	random_shuffle(expr_rank.begin(), expr_rank.end());
 }
 
-
 // FIXME: should use effective length
-void calc_frag_abundances(const vector<Scaffold>& ref_mRNAs,
-						  const vector<double>& expr_rho,
-						  vector<double>& expr_alpha)
+void calc_frag_abundances(vector<Scaffold>& source_molecules)
 {
 	double fragment_pool_size = 0.0;
 	
-	assert (expr_alpha.size() == ref_mRNAs.size() &&
-			expr_alpha.size() == expr_rho.size());
-	
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{
-		fragment_pool_size += ref_mRNAs[i].length() * expr_rho[i];
+		fragment_pool_size += source_molecules[i].length() * source_molecules[i].rho();
 	}
 	
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{
-		double frag_n = ref_mRNAs[i].length() * expr_rho[i];
-		expr_alpha[i] = frag_n / fragment_pool_size;
+		double frag_n = source_molecules[i].length() * source_molecules[i].rho();
+		source_molecules[i].alpha(frag_n / fragment_pool_size);
 	}
 }
