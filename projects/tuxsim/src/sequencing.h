@@ -52,15 +52,16 @@ private:
 	InsertID _next_fragment_id;
 	base_generator_type _base_generator;
 	bool_generator_type _bool_generator;
-	
-	// Selects a list of (clipped) cuff_ops from an RNA, given an interval
-	// in RNA coordinates	
-	void select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
-								 int start,
-								 int end,
-								 vector<AugmentedCuffOp>& out_ops) const;
-    
-    void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
-						  vector<CigarOp>& cigar) const;
+
 };
+
+// Selects a list of (clipped) cuff_ops from an RNA, given an interval
+// in RNA coordinates	
+void select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
+                             int start,
+                             int end,
+                             vector<AugmentedCuffOp>& out_ops);
+
+void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
+                      vector<CigarOp>& cigar);
 #endif

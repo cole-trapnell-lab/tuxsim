@@ -80,7 +80,9 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                          frag.source_seq->ref_id(),
                          right_read_ops.front().g_left(),
                          0,
-                         0);
+                         0,
+                         0, //mRNA.annotated_trans_id()
+                         frag.start);
     
     *right_read = ReadHit(frag.source_seq->ref_id(),
                           _next_fragment_id,
@@ -91,7 +93,9 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                           frag.source_seq->ref_id(),
                           left_read_ops.front().g_left(),
                           0,
-                          0);
+                          0,
+                          0, //mRNA.annotated_trans_id()
+                          frag.end - _right_len);
     
     if (_strand_specific || left_read->has_intron() || right_read->has_intron())
     {
@@ -141,10 +145,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     return true;
 }
 
-void IlluminaChIPSeqPE::select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
-                                                int start,
-                                                int end,
-                                                vector<AugmentedCuffOp>& out_ops) const
+void select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
+                             int start,
+                             int end,
+                             vector<AugmentedCuffOp>& out_ops)
 {
     out_ops.clear();
     if (src_ops.empty())
@@ -209,8 +213,8 @@ void IlluminaChIPSeqPE::select_genomic_op_range(const vector<AugmentedCuffOp>& s
     out_ops.front().genomic_offset = genomic_left;
 }
 
-void IlluminaChIPSeqPE::cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
-                                         vector<CigarOp>& cigar) const
+void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
+                      vector<CigarOp>& cigar)
 {
     cigar.clear();
     for (size_t i = 0; i < cuff_ops.size(); ++i)

@@ -65,7 +65,9 @@ struct ReadHit
 			RefID partner_ref,
 			int partner_pos,
 			double error_prob,
-			unsigned int edit_dist) :
+			unsigned int edit_dist,
+            RefID src_transcript_id,
+            unsigned int src_transcript_offset) :
 		_ref_id(ref_id),
 		_insert_id(insert_id), 
 		_left(left), 
@@ -76,6 +78,8 @@ struct ReadHit
 		_antisense_aln(antisense),
 		_error_prob(error_prob),
 		_edit_dist(edit_dist),
+        _src_transcript_id(src_transcript_id),
+        _src_transcript_offset(src_transcript_offset),
         _sam_flag(0)
 	{
 		assert(_cigar.capacity() == _cigar.size());
@@ -91,7 +95,9 @@ struct ReadHit
 			RefID partner_ref,
 			int partner_pos, 
 			double error_prob,
-			unsigned int  edit_dist) : 
+			unsigned int  edit_dist,
+            RefID src_transcript_id,
+            unsigned int src_transcript_offset) : 
 		_ref_id(ref_id),
 		_insert_id(insert_id), 	
 		_left(left),
@@ -101,7 +107,9 @@ struct ReadHit
 		_source_strand(source_strand),
 		_antisense_aln(antisense_aln),
 		_error_prob(error_prob),
-		_edit_dist(edit_dist),
+        _edit_dist(edit_dist),
+        _src_transcript_id(src_transcript_id),
+        _src_transcript_offset(src_transcript_offset),
         _sam_flag(0)
 	{
 		assert(_cigar.capacity() == _cigar.size());
@@ -151,6 +159,13 @@ struct ReadHit
 	
     CuffStrand source_strand()	const	{ return _source_strand;    }
     void source_strand(CuffStrand s)	{ _source_strand = s;       }
+    
+    RefID source_transcript_id() const	{ return _src_transcript_id;}
+    void source_transcript_id(RefID sid){  _src_transcript_id = sid;}
+
+    unsigned int source_transcript_offset() const	{ return _src_transcript_offset;}
+    void source_transcript_offset(unsigned int soff){ _src_transcript_offset = soff;}
+
     
     bool has_intron() const 
     { 
@@ -254,6 +269,8 @@ private:
 	bool _antisense_aln;       // Whether the alignment is to the reverse strand
 	double _error_prob;		   // Probability that this alignment is incorrect
 	unsigned int  _edit_dist;            // Number of mismatches
+    RefID   _src_transcript_id; //transcript_id from which the read originated
+    unsigned int _src_transcript_offset; // offset within the transcript, in transcript coords
 	string _hitfile_rec; // Points to the buffer for the record from which this hit came
 	
 	string _name;
@@ -463,7 +480,9 @@ public:
 					   const string& partner_ref,
 					   int partner_pos,
 					   double error_prob,
-					   unsigned int  edit_dist);
+					   unsigned int  edit_dist,
+                       RefID source_transcript_id,
+                       unsigned int source_transcript_offset);
 	
 	ReadHit create_hit(const string& insert_name, 
 					   const string& ref_name,
@@ -474,7 +493,9 @@ public:
 					   const string& partner_ref,
 					   int partner_pos,
 					   double error_prob,
-					   unsigned int  edit_dist);
+					   unsigned int  edit_dist,
+                       RefID source_transcript_id,
+                       unsigned int source_transcript_offset);
 	
 	virtual bool get_hit_from_buf(int line_num, 
 								  const char* bwt_buf, 

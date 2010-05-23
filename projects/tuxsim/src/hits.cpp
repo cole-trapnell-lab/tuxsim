@@ -169,7 +169,9 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   const string& partner_ref,
 							   int partner_pos, 
 							   double error_prob,
-							   unsigned int edit_dist)
+							   unsigned int edit_dist,
+                               RefID source_transcript_id,
+                               unsigned int source_transcript_offset)
 {
 	uint64_t insert_id = _insert_table.get_id(insert_name);
 	uint32_t reference_id = _ref_table.get_id(ref_name, NULL);
@@ -184,7 +186,9 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   partner_ref_id,
 				   partner_pos,
 				   error_prob,
-				   edit_dist);	
+				   edit_dist,
+                   source_transcript_id,
+                   source_transcript_offset);	
 }
 
 ReadHit HitFactory::create_hit(const string& insert_name, 
@@ -196,7 +200,9 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   const string& partner_ref,
 							   int partner_pos,
 							   double error_prob,
-							   unsigned int edit_dist)
+							   unsigned int edit_dist,
+                               RefID source_transcript_id,
+                               unsigned int source_transcript_offset)
 {
 	uint64_t insert_id = _insert_table.get_id(insert_name);
 	uint32_t reference_id = _ref_table.get_id(ref_name, NULL);
@@ -211,7 +217,9 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   partner_ref_id,
 				   partner_pos,
 				   error_prob,
-				   edit_dist);	
+				   edit_dist,
+                   source_transcript_id,
+                   source_transcript_offset);	
 }
 
 int anchor_mismatch = 0;
@@ -323,7 +331,9 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 						"*",
 						0,
 						1.0,
-						0);
+						0,
+                        0,
+                        0);
 		return true;
 	}
 	// Mostly pilfered direct from the SAM tools:
@@ -443,7 +453,9 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 						mrnm,
 						text_mate_pos - 1,
 						error_prob,
-						num_mismatches);
+						num_mismatches,
+                        0,
+                        0);
 		return true;
 		
 	}
@@ -463,7 +475,9 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 						mrnm,
 						text_mate_pos - 1,
 						error_prob,
-						num_mismatches);
+						num_mismatches,
+                        0,
+                        0);
 		return true;
 	}
 	return false;

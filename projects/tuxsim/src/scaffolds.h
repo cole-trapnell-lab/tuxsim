@@ -339,4 +339,9 @@ struct StructurallyEqualScaffolds
 	}
 };
 
+void get_scaffold_gtf_records(const RefSequenceTable& rt, 
+                              const Scaffold& scaffold,
+                              const string& gene_id,
+                              const string& transfrag_id,
+                              vector<string>& gtf_recs);
 #endif

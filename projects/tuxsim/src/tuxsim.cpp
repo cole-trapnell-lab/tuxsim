@@ -435,7 +435,8 @@ void generate_reads(RefSequenceTable& rt,
 					int total_frags,
 					FILE* sam_frag_out,
 					FastqOutfilePair& fastq_out,
-					FILE* expr_out)
+					FILE* expr_out,
+                    FILE* gtf_out)
 {
     RefID last_ref_id = 0;
     int rna_rightmost = 0;
@@ -460,16 +461,29 @@ void generate_reads(RefSequenceTable& rt,
         }
         
 		int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+        vector<bool> covered_by_read(ref_mRNAs[i].length(), false);
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 		{
 			ReadsForFragment reads;
 			
 			if (sequencer->next_reads(ref_mRNAs[i], reads))
 			{
+                const ReadHit& left = *(reads.front()); 
+                const ReadHit& right = *(reads.back()); 
 				read_chunk.push_back(reads.front());
 				read_chunk.push_back(reads.back());
-            
+                
 				print_fastq_pair(reads, fastq_out);
+                
+                for (size_t k = 0; k < left.read_len(); ++k)
+                {
+                    covered_by_read[k + left.source_transcript_offset()] = true;
+                }
+                
+                for (size_t k = 0; k < right.read_len(); ++k)
+                {
+                    covered_by_read[k + right.source_transcript_offset()] = true;
+                }
 			}
 			else
 			{
@@ -477,6 +491,40 @@ void generate_reads(RefSequenceTable& rt,
 				// cases of bad fragments (i.e. fragment is too small)
 			}
 		}
+        
+        int left_cov = -1;
+        int transfrag_id = 1;
+        for (size_t k = 0; k < covered_by_read.size(); ++k)
+        {
+            if (covered_by_read[k] && left_cov == -1)
+            {
+                left_cov = k;
+            }
+            if (!covered_by_read[k] && left_cov != -1)
+            {
+                vector<AugmentedCuffOp> transfrag_ops;
+                select_genomic_op_range(ref_mRNAs[i].augmented_ops(),
+                                        left_cov,
+                                        k,
+                                        transfrag_ops);
+                Scaffold transfrag(ref_mRNAs[i].ref_id(),
+                                   ref_mRNAs[i].strand(),
+                                   transfrag_ops);
+                                   
+                string gene_id = ref_mRNAs[i].annotated_gene_id();
+                char buf[2048];
+                sprintf(buf, "%s_%d", ref_mRNAs[i].annotated_trans_id().c_str(), transfrag_id); 
+                vector<string> gtf_recs;
+                
+                get_scaffold_gtf_records(rt, transfrag, gene_id, buf, gtf_recs);
+                foreach (const string& s, gtf_recs)
+                {
+                    fprintf(gtf_out, "%s\n", s.c_str());
+                }
+                left_cov = -1;
+                transfrag_id++;
+            }
+        }
         
 		fprintf(expr_out, 
 				"%s\t%s\t%g\t%g\t%g\t%g\n", 
@@ -533,7 +581,8 @@ void load_contigs(const string& genome_fasta,
 
 void driver(FILE* sam_out,
 			FastqOutfilePair& fastq_out,
-			FILE* expr_out)
+			FILE* expr_out,
+            FILE* gtf_out)
 {
 	ReadTable it;
 	RefSequenceTable rt(true, false);
@@ -601,7 +650,8 @@ void driver(FILE* sam_out,
 				   num_fragments,
 				   sam_out,
 				   fastq_out,
-				   expr_out);
+				   expr_out,
+                   gtf_out);
 	
 	delete sequencer;
 }
@@ -653,14 +703,24 @@ int main(int argc, char** argv)
 	FILE* expr_out = NULL;
 	string out_expr_filename = out_prefix + ".simexpr";
 	expr_out = fopen(out_expr_filename.c_str(), "w");
-	if (!sam_out)
+	if (!expr_out)
 	{
 		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
 				out_expr_filename.c_str());
 		exit(1);
 	}
+    
+    FILE* frag_gtf_out = NULL;
+	string out_gtf_filename = out_prefix + ".transfrags.gtf";
+	frag_gtf_out = fopen(out_gtf_filename.c_str(), "w");
+	if (!frag_gtf_out)
+	{
+		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
+				out_gtf_filename.c_str());
+		exit(1);
+	}
 	
-	driver(sam_out, fastq_out, expr_out);
+	driver(sam_out, fastq_out, expr_out, frag_gtf_out);
 
 	return 0;
 }

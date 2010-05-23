@@ -189,3 +189,62 @@ bool Scaffold::add_hit(const MateHit* hit)
 	}
 	return true;	
 }
+
+void get_scaffold_gtf_records(const RefSequenceTable& rt, 
+                              const Scaffold& scaffold,
+                              const string& gene_id,
+                              const string& transfrag_id,
+                              vector<string>& gtf_recs)
+{
+ 	const char* ref_name = rt.get_name(scaffold.ref_id());
+	
+	const char* strand_str = NULL;
+	if (scaffold.strand() == CUFF_STRAND_UNKNOWN)
+		strand_str = ".";
+	else if (scaffold.strand() == CUFF_FWD)
+		strand_str = "+";
+	else
+		strand_str = "-";
+	
+    int score = 1000;
+	
+	char buf[2048];	
+    
+	sprintf(buf, 
+			"%s\tCufflinks\ttranscript\t%d\t%d\t%d\t%s\t.\tgene_id \"%s\"; transcript_id \"%s\";\n",
+			ref_name,
+			scaffold.left() + 1,
+			scaffold.right(), // GTF intervals are inclusive on both ends, but ours are half-open
+			score,
+			strand_str,
+			gene_id.c_str(),
+			transfrag_id.c_str());
+	gtf_recs.push_back(buf);
+	
+	int exon_num = 1;
+	for (size_t op_id = 0; op_id < scaffold.augmented_ops().size(); ++op_id)
+	{
+		const AugmentedCuffOp& op = scaffold.augmented_ops()[op_id];
+		if (op.opcode == CUFF_MATCH || op.opcode == CUFF_UNKNOWN)
+		{
+			const char* type = op.opcode == CUFF_MATCH ? "exon" : "missing_data";
+			
+			sprintf(buf, 
+					"%s\tCufflinks\t\%s\t%d\t%d\t%d\t%s\t.\tgene_id \"%s\"; transcript_id \"%s\";\n",
+					ref_name,
+					type,
+					op.g_left() + 1,
+					op.g_right(), // GTF intervals are inclusive on both ends, but ours are half-open
+					score,
+					strand_str,
+					gene_id.c_str(),
+					transfrag_id.c_str());
+			gtf_recs.push_back(buf);
+			
+			exon_num++;
+		}
+		//gff_recs.push_back(buf);
+	}
+    
+}
+
