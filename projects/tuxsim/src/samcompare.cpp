@@ -19,6 +19,10 @@
 #include <set>
 #include <map>
 
+#include <sys/stat.h>
+#include <errno.h>
+
+
 #include "common.h"
 
 #include "hits.h"
@@ -29,6 +33,10 @@ using namespace std;
 
 string ref_sam_name;
 string target_sam_name;
+string out_dir;
+
+bool report_sam = false;
+
 
 void print_usage()
 {
@@ -43,6 +51,8 @@ int parse_options(int argc, char** argv)
         options_description generic("Command line options");
         generic.add_options()
         ("help,h", "print usage message")
+        ("output-dir", value(&out_dir)->default_value(""), "Directory to send output files")
+        ("report-sam", "Report correct, false, and missed alignments in SAM format")
         ;
          
         // Hidden options, will be allowed both on command line and
@@ -66,6 +76,16 @@ int parse_options(int argc, char** argv)
         if (vm.count("help")) {  
             cout << cmdline_options << "\n";
             return 0;
+        }
+        
+        if (vm.count("report-sam")) 
+        {  
+            report_sam = true;
+        }
+        
+        if (vm.count("output-dir")) 
+        {  
+            out_dir += "/";
         }
         
         if (vm.count("input-file"))
@@ -734,7 +754,8 @@ void get_ref_names(FILE* sam_in, set<string>& ref_names)
 }
 
 void driver(FILE* ref_sam, 
-            FILE* target_sam, 
+            FILE* target_sam,
+            FILE* fstats,
             FILE* fmissed_hits, 
             FILE* ffalse_hits,
 			FILE* fcorrect_hits)
@@ -888,7 +909,7 @@ void driver(FILE* ref_sam,
         valid_ref = ref_sam_factory.next_bundle(curr_ref_bundle);
     }
     
-    print_alignment_stats(stderr, alignment_stats);
+    print_alignment_stats(fstats, alignment_stats);
     
 }
 
@@ -916,31 +937,64 @@ int main(int argc, char** argv)
 		exit(1);
 	}
     
+    FILE* fmissed_hits = NULL;
+    FILE* fcorrect_hits = NULL;
+    FILE* ffalse_hits = NULL;
     
-    FILE* fmissed_hits = fopen("missed.sam", "w");
-	if (!fmissed_hits)
-	{
-		fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
-				"missed.sam");
-		exit(1);
-	}
+    if (out_dir != "")
+    {
+        int retcode = mkdir(out_dir.c_str(), 0777);
+        if (retcode == -1)
+        {
+            if (errno != EEXIST)
+            {
+                fprintf (stderr, 
+                         "Error: cannot create directory %s\n", 
+                         out_dir.c_str());
+                exit(1);
+            }
+        }
+    }
     
-    FILE* ffalse_hits = fopen("false.sam", "w");
-	if (!ffalse_hits)
-	{
-		fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
-				"false.sam");
-		exit(1);
-	}
+    if (report_sam)
+    {
+        string missed_filename = out_dir + "missed.sam";
+        fmissed_hits = fopen(missed_filename.c_str(), "w");
+        if (!fmissed_hits)
+        {
+            fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
+                    missed_filename.c_str());
+            exit(1);
+        }
+        
+        string false_filename = out_dir + "false.sam";
+        ffalse_hits = fopen(false_filename.c_str(), "w");
+        if (!ffalse_hits)
+        {
+            fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
+                    false_filename.c_str());
+            exit(1);
+        }
 
-	FILE* fcorrect_hits = fopen("correct.sam", "w");
-	if (!fcorrect_hits)
-	{
-		fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
-				"false.sam");
-		exit(1);
-	}
+        string correct_filename = out_dir + "correct.sam";
+        fcorrect_hits = fopen(correct_filename.c_str(), "w");
+        if (!fcorrect_hits)
+        {
+            fprintf(stderr, "Error: cannot open SAM file %s for writing\n",
+                    "false.sam");
+            exit(1);
+        }
+    }
 	
-    driver(ref_sam, target_sam, fmissed_hits, ffalse_hits, fcorrect_hits);
+    string stats_filename = out_dir + "diff_stats.txt";
+    FILE* fstats = fopen(stats_filename.c_str(), "w");
+    if (!fstats)
+    {
+        fprintf(fstats, "Error: cannot open SAM file %s for writing\n",
+                stats_filename.c_str());
+        exit(1);
+    }
+    
+    driver(ref_sam, target_sam, fstats, fmissed_hits, ffalse_hits, fcorrect_hits);
 }
 
