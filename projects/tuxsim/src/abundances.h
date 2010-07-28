@@ -47,6 +47,8 @@ void assign_abundances(const RankedBasedAbundancePolicy& rank_based,
 	}
 }
 
+void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules);
+
 void calc_frag_abundances(vector<Scaffold>& source_molecules);
 
 

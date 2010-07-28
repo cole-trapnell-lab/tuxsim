@@ -127,6 +127,8 @@
 		EDADF8FA118493100018CFB9 /* tuxsim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tuxsim.cpp; path = src/tuxsim.cpp; sourceTree = "<group>"; };
 		EDCCF4DD117624E4000D83D5 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = options.h; path = src/options.h; sourceTree = "<group>"; };
 		EDCCF4DE117624E5000D83D5 /* options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options.cpp; path = src/options.cpp; sourceTree = "<group>"; };
+		EDE1082C11E384E3005F1F4B /* ax_check_zlib.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_check_zlib.m4; sourceTree = "<group>"; };
+		EDE1082D11E384E3005F1F4B /* ax_bam.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_bam.m4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,6 +236,8 @@
 		ED3445F111848D1500D68A78 /* Autotools */ = {
 			isa = PBXGroup;
 			children = (
+				EDE1082C11E384E3005F1F4B /* ax_check_zlib.m4 */,
+				EDE1082D11E384E3005F1F4B /* ax_bam.m4 */,
 				EDADF8F9118492430018CFB9 /* tuxsim.mk */,
 				EDADF8F311848F6B0018CFB9 /* Makefile.am */,
 				ED3445FB11848EAF00D68A78 /* configure.ac */,
@@ -495,13 +499,14 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
 					./src,
 					"/usr/local/include/boost-1_41",
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/usr/local/libIntel64,
+					/usr/local/lib,
 				);
 				PRODUCT_NAME = samcompare;
 				VALID_ARCHS = "i386 x86_64";

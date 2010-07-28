@@ -7,7 +7,70 @@
  *
  */
 
+#include <stdlib.h>
+
 #include "abundances.h"
+
+void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
+{
+	//vector<unsigned int> expr_rank(source_molecules.size(), 0);
+	vector<double> expr_rho(source_molecules.size(), 0.0);
+    
+    char buf[2048];
+    map<string, double> rhos;
+    
+    double total_rho = 0.0;
+    while (fgets(buf, 2048, expr_in))
+	{
+	
+        const char* buf = buf;
+        const char* _gene_name = strsep((char**)&buf,"\t");
+            
+        if (!_gene_name)
+            return;
+        char gene_name[2048];
+        strncpy(gene_name, _gene_name, 2047); 
+        
+        const char* rna_name = strsep((char**)&buf,"\t");
+        if (!rna_name)
+            return;
+        
+        const char* FPKM = strsep((char**)&buf,"\t");
+        if (!FPKM)
+            return;
+        
+        const char* _rho = strsep((char**)&buf,"\t");
+        if (!_rho)
+            return;
+        
+        const char* read_cov =  strsep((char**)&buf,"\t");
+        if (!read_cov)
+            return;
+        
+        const char* phys_cov = strsep((char**)&buf,"\t");
+        if (!phys_cov)
+            return;
+
+        double rho = strtod(_rho, NULL); 
+        rhos[rna_name] = rho;
+        
+        total_rho += rho;
+    }
+    
+	for (size_t i = 0; i < source_molecules.size(); ++i)
+	{
+        const string& name = source_molecules[i].annotated_trans_id();
+        map<string, double>::const_iterator ci = rhos.find(name);
+        if (ci == rhos.end() || total_rho == 0.0)
+        {
+            source_molecules[i].rho(0.0);
+        }
+        else 
+        {
+            source_molecules[i].rho(ci->second / total_rho);
+        }
+	}
+}
 
 void assign_expression_ranks(const vector<Scaffold>& ref_mRNAs,
 							 vector<unsigned int>& expr_rank)

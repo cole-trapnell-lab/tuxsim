@@ -26,6 +26,7 @@ extern int num_reads;
 extern string out_prefix;
 
 extern string genome_fasta;
+extern string expr_filename;
 
 // Both fastadir and mrna_gtf must be set, pending resolution of #169
 extern string fastadir;

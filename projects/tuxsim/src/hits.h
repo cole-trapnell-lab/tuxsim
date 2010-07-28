@@ -321,13 +321,17 @@ public:
 	{
 		SequenceInfo(uint32_t _order, 
 					 char* _name, 
-					 Sequence* _seq) :
-		observation_order(_order),
-		name(_name),
-		seq(_seq) {}
+					 Sequence* _seq, 
+                     uint32_t _len) :
+        observation_order(_order),
+        name(_name),
+        seq(_seq),
+        len(_len) {}
+        
 		uint32_t observation_order;
 		char* name;
 		Sequence* seq;
+        uint32_t len;
 	};
 	
 	typedef map<string, RefID> IDTable;
@@ -350,13 +354,14 @@ public:
 	}
 	
 	RefID get_id(const string& name,
-				 Sequence* seq)
+				 Sequence* seq,
+                 uint32_t len)
 	{
 		if (name.empty())
 			return 0;
 		uint32_t _id = hash_string(name.c_str());
 		pair<InvertedIDTable::iterator, bool> ret = 
-		_by_id.insert(make_pair(_id, SequenceInfo(_next_id, NULL, NULL)));
+		_by_id.insert(make_pair(_id, SequenceInfo(_next_id, NULL, NULL, 0)));
 		if (ret.second == true)
 		{			
 			char* _name = NULL;
@@ -364,6 +369,7 @@ public:
 				_name = strdup(name.c_str());
 			ret.first->second.name = _name;
 			ret.first->second.seq	= seq;
+            ret.first->second.len   = len;
 			++_next_id;
 		}
 		assert (_id);
@@ -378,6 +384,15 @@ public:
 			return itr->second.name;
 		else
 			return NULL;
+	}
+    
+    uint32_t get_len(uint32_t ID) const
+	{
+		InvertedIDTable::const_iterator itr = _by_id.find(ID);
+		if (itr != _by_id.end())
+			return itr->second.len;
+		else
+			return 0;
 	}
 	
 	Sequence* get_seq(RefID ID) const

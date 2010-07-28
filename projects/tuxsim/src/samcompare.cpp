@@ -762,12 +762,15 @@ void driver(FILE* ref_sam,
 {
     RefSequenceTable rt(true, false);
     
+    // FIXME: we really should be loading this stuff from the SAM/BAM headers
+    // instead of scanning the files.  
+    
     set<string> ref_names;
     get_ref_names(ref_sam, ref_names);
     get_ref_names(target_sam, ref_names);
     foreach (const string& name, ref_names)
     {
-        rt.get_id(name, NULL);
+        rt.get_id(name, NULL, 0);
     }
     
     rewind(ref_sam);

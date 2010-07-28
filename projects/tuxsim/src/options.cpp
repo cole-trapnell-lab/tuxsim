@@ -83,6 +83,7 @@ int parse_options(int argc, char** argv)
         options_description generic("Command line options");
         generic.add_options()
             ("help,h", "print usage message")
+            ("expression,e", value(&expr_filename), "Load mRNA expression values from input file instead of generating them")
         ;
         
         options_description config_file_options("Configuration file options");

@@ -24,6 +24,7 @@ string genome_fasta;
 
 string fastadir;
 string mrna_gtf;
+string expr_filename;
 
 int random_seed;
 
@@ -97,7 +98,6 @@ void reverse_complement(string& seq)
             case 'G' : seq[i] = 'C'; break;
             default: 
             {
-                int a = 5;
                 seq[i]   = 'N'; break;
             }
         }

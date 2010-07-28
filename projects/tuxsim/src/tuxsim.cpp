@@ -63,17 +63,19 @@ struct ScaffoldSorter
 	ScaffoldSorter(RefSequenceTable& _rt) : rt(_rt) {} 
 	bool operator()(const Scaffold& lhs, const Scaffold& rhs)
 	{
-		const char* lhs_name = rt.get_name(lhs.ref_id());
-		const char* rhs_name = rt.get_name(rhs.ref_id());
-		int c = strcmp(lhs_name, rhs_name);
-		if (c != 0)
-		{
-			return c < 0;
-		}
-		else
-		{
-			return lhs.left() < rhs.left();
-		}
+        uint32_t l_id = lhs.ref_id();
+        uint32_t r_id = rhs.ref_id();
+        
+        //uint32_t l_len = rt.get_len(lhs.ref_id());
+        //uint32_t r_len = rt.get_len(rhs.ref_id());
+        if (l_id != r_id)
+        {
+            //if (l_len != 0 && r_len != 0)
+            //    return l_len > r_len;
+            //else 
+            return (strcmp(rt.get_name(lhs.ref_id()), rt.get_name(rhs.ref_id())) < 0);
+        }
+        return lhs.left() < rhs.left();
 	}
 	
 	RefSequenceTable& rt;
@@ -92,6 +94,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 		//read_mRNAs(ref_mRNA_file, false, ref_rnas, ref_rnas, NULL, -1, false);
 		read_mRNAs(ref_mRNA_file, ref_rnas);
 	}
+    
+    sort(ref_mRNAs.begin(), ref_mRNAs.end(), ScaffoldSorter(rt));
 	
 	int last_gseq_id = -1;
 	GFaSeqGet* faseq = NULL;
@@ -102,7 +106,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 		{    //ref data is grouped by genomic sequence
 			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->gseq_id);
 			
-			RefID ref_id = rt.get_id(name, NULL);
+			RefID ref_id = rt.get_id(name, NULL, 0);
 			for (int i = 0; i < ref_rnas[j]->mrnas_f.Count(); ++i)
 			{	
 				GffObj& rna = *(ref_rnas[j]->mrnas_f[i]);
@@ -322,9 +326,32 @@ struct SortReads
     }
 };
 
-void print_sam_header(FILE* sam_out)
+void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
 {
+    fprintf(sam_out, "@HD\tVN:1.0\tSO:sorted\n");
+    map<string, uint32_t> seq_dict;
+    for (RefSequenceTable::const_iterator itr = rt.begin();
+         itr != rt.end();
+         ++itr)
+    {
+//        fprintf(sam_out, 
+//                "@SQ\tSN:%s\tLN:%u\n", 
+//                itr->second.name, 
+//                itr->second.len);
+        seq_dict[itr->second.name] = itr->second.len;
+    }
     
+    for (map<string, uint32_t>::const_iterator itr = seq_dict.begin();
+         itr != seq_dict.end();
+         ++itr)
+    {
+        fprintf(sam_out, 
+                "@SQ\tSN:%s\tLN:%u\n", 
+                itr->first.c_str(), 
+                itr->second);
+    }
+    
+    fprintf(sam_out, "@PG\tID:TuxSim\tVN:%s", PACKAGE_VERSION);
 }
 
 void print_fastq_read(const ReadHit& read,
@@ -443,7 +470,8 @@ void generate_reads(RefSequenceTable& rt,
     vector<shared_ptr<ReadHit> > read_chunk; 
 	
 	fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\n");
-	
+	print_sam_header(sam_frag_out, rt);
+    
 	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
 	{
         if (last_ref_id &&
@@ -573,7 +601,7 @@ void load_contigs(const string& genome_fasta,
 		std::transform(s.begin(), s.end(), s.begin(), (int (*)(int))std::toupper);
 		
 		vector<AugmentedCuffOp> cuffop(1, AugmentedCuffOp(CUFF_MATCH, 0, s.length()));
-		RefID contig_id = rt.get_id(contig.getName(), NULL);
+		RefID contig_id = rt.get_id(contig.getName(), NULL, s.length());
 		source_molecules.push_back(Scaffold(contig_id, CUFF_FWD, cuffop));
 		source_molecules.back().seq(s);
 	}while(!last);
@@ -582,7 +610,8 @@ void load_contigs(const string& genome_fasta,
 void driver(FILE* sam_out,
 			FastqOutfilePair& fastq_out,
 			FILE* expr_out,
-            FILE* gtf_out)
+            FILE* gtf_out,
+            FILE* expr_in)
 {
 	ReadTable it;
 	RefSequenceTable rt(true, false);
@@ -590,7 +619,7 @@ void driver(FILE* sam_out,
 	vector<Scaffold> source_molecules;
 	
 	if (mrna_gtf != "")
-	{
+	{        
 		FILE* ref_gtf = NULL;
 		
 		ref_gtf = fopen(mrna_gtf.c_str(), "r");
@@ -625,7 +654,16 @@ void driver(FILE* sam_out,
 	
 	FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
 	
-	assign_abundances(flux_policy, source_molecules);
+    if (expr_in != NULL)
+    {
+        load_abundances(expr_in, source_molecules);
+    }
+    else 
+    {
+        assign_abundances(flux_policy, source_molecules);
+    }
+
+	
 	
 	calc_frag_abundances(source_molecules);
 	
@@ -663,9 +701,9 @@ int main(int argc, char** argv)
         return parse_ret;
     	
 	// seed the random number generator 
-	//random_seed = time(NULL);
+	random_seed = time(NULL);
 	
-	random_seed = 1111111;
+	//random_seed = 1111111;
 	srand(random_seed);
     
 	FILE* sam_out = NULL;
@@ -719,8 +757,20 @@ int main(int argc, char** argv)
 				out_gtf_filename.c_str());
 		exit(1);
 	}
+    
+    FILE* expr_in = NULL;
 	
-	driver(sam_out, fastq_out, expr_out, frag_gtf_out);
+    if (expr_filename != "")
+    {
+        expr_in = fopen(expr_filename.c_str(), "r");
+        if (!expr_in)
+        {
+            fprintf(stderr, "Error: cannot open expression file %s for reading\n",
+                    expr_filename.c_str());
+            exit(1);
+        }
+	}
+	driver(sam_out, fastq_out, expr_out, frag_gtf_out, expr_in);
 
 	return 0;
 }
