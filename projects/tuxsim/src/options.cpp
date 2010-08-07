@@ -83,12 +83,14 @@ int parse_options(int argc, char** argv)
         options_description generic("Command line options");
         generic.add_options()
             ("help,h", "print usage message")
+            ("output.prefix", value(&out_prefix), "")
             ("expression,e", value(&expr_filename), "Load mRNA expression values from input file instead of generating them")
         ;
         
         options_description config_file_options("Configuration file options");
         config_file_options.add_options()
             ("input.fasta_dir", value(&fastadir), "")
+            ("output.prefix", value(&out_prefix), "")
             ("source_pool.mrna_gtf", value(&mrna_gtf)->default_value(""), "")
 			("source_pool.genome_fasta", value(&genome_fasta)->default_value(""), "")
 			("fragment.priming", value(&priming_type)->default_value("uniform_random"), "")
@@ -97,7 +99,6 @@ int parse_options(int argc, char** argv)
             //("sequencing.read_type", value(&read_type), "")
             ("sequencing.read_length", value<int>(&read_length)->default_value(75), "")
             ("sequencing.num_fragments", value<int>(&num_fragments)->default_value(20000000), "")
-            ("output.prefix", value(&out_prefix), "")
             //("fragment_length.distribution", value(&frag_dist), "")
         ;
         
@@ -126,7 +127,7 @@ int parse_options(int argc, char** argv)
         
         if (vm.count("input-file"))
         {
-            int cnt = vm.count("input-file");
+            vm.count("input-file");
             vector<string> cfg = vm["input-file"].as< vector<string> >();
             if (cfg.size() != 1)
             {

@@ -16,20 +16,22 @@ void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
 	//vector<unsigned int> expr_rank(source_molecules.size(), 0);
 	vector<double> expr_rho(source_molecules.size(), 0.0);
     
-    char buf[2048];
+    char orig_buf[2048];
     map<string, double> rhos;
     
     double total_rho = 0.0;
-    while (fgets(buf, 2048, expr_in))
+    while (fgets(orig_buf, 2048, expr_in))
 	{
-	
-        const char* buf = buf;
+        const char* buf = orig_buf;
         const char* _gene_name = strsep((char**)&buf,"\t");
             
         if (!_gene_name)
             return;
         char gene_name[2048];
         strncpy(gene_name, _gene_name, 2047); 
+        
+        if (!strcmp(gene_name, "gene_id"))
+            continue;
         
         const char* rna_name = strsep((char**)&buf,"\t");
         if (!rna_name)
@@ -56,6 +58,9 @@ void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
         
         total_rho += rho;
     }
+    
+    if (total_rho == 0.0)
+        return;
     
 	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{

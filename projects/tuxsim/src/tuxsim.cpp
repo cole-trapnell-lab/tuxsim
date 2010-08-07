@@ -469,7 +469,11 @@ void generate_reads(RefSequenceTable& rt,
     int rna_rightmost = 0;
     vector<shared_ptr<ReadHit> > read_chunk; 
 	
-	fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\n");
+    if (expr_out)
+    {
+        fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\n");
+    }
+    
 	print_sam_header(sam_frag_out, rt);
     
 	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
@@ -554,15 +558,19 @@ void generate_reads(RefSequenceTable& rt,
             }
         }
         
-		fprintf(expr_out, 
-				"%s\t%s\t%g\t%g\t%g\t%g\n", 
-				ref_mRNAs[i].annotated_gene_id().c_str(),
-				ref_mRNAs[i].annotated_trans_id().c_str(),
-				num_frags_for_mRNA / (ref_mRNAs[i].length() / 1000.0) / (total_frags / 1000000.0), 
-				ref_mRNAs[i].rho(),
-				0.0,
-				num_frags_for_mRNA / (double)ref_mRNAs[i].length());
-		
+        if (expr_out)
+        {
+            fprintf(expr_out, 
+                    "%s\t%s\t%g\t%g\t%g\t%g\t%d\n", 
+                    ref_mRNAs[i].annotated_gene_id().c_str(),
+                    ref_mRNAs[i].annotated_trans_id().c_str(),
+                    num_frags_for_mRNA / (ref_mRNAs[i].length() / 1000.0) / (total_frags / 1000000.0), 
+                    ref_mRNAs[i].rho(),
+                    0.0,
+                    num_frags_for_mRNA / (double)ref_mRNAs[i].length(),
+                    ref_mRNAs[i].length());
+		}
+        
         if (last_ref_id != ref_mRNAs[i].ref_id())
         {
             rna_rightmost = ref_mRNAs[i].right();
@@ -739,27 +747,8 @@ int main(int argc, char** argv)
 	FastqOutfilePair fastq_out(left_fastq_out, right_fastq_out);
     
 	FILE* expr_out = NULL;
-	string out_expr_filename = out_prefix + ".simexpr";
-	expr_out = fopen(out_expr_filename.c_str(), "w");
-	if (!expr_out)
-	{
-		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
-				out_expr_filename.c_str());
-		exit(1);
-	}
-    
-    FILE* frag_gtf_out = NULL;
-	string out_gtf_filename = out_prefix + ".transfrags.gtf";
-	frag_gtf_out = fopen(out_gtf_filename.c_str(), "w");
-	if (!frag_gtf_out)
-	{
-		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
-				out_gtf_filename.c_str());
-		exit(1);
-	}
-    
     FILE* expr_in = NULL;
-	
+    
     if (expr_filename != "")
     {
         expr_in = fopen(expr_filename.c_str(), "r");
@@ -770,6 +759,31 @@ int main(int argc, char** argv)
             exit(1);
         }
 	}
+    else 
+    {
+        string out_expr_filename = out_prefix + ".simexpr";
+        expr_out = fopen(out_expr_filename.c_str(), "w");
+        if (!expr_out)
+        {
+            fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
+                    out_expr_filename.c_str());
+            exit(1);
+        }
+    }
+
+	
+
+    FILE* frag_gtf_out = NULL;
+	string out_gtf_filename = out_prefix + ".transfrags.gtf";
+	frag_gtf_out = fopen(out_gtf_filename.c_str(), "w");
+	if (!frag_gtf_out)
+	{
+		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
+				out_gtf_filename.c_str());
+		exit(1);
+	}
+    
+
 	driver(sam_out, fastq_out, expr_out, frag_gtf_out, expr_in);
 
 	return 0;
