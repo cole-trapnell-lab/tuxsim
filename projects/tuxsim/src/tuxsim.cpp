@@ -312,6 +312,9 @@ public:
 		}
 		return false;
 	}
+    
+    const FragmentPolicy& fragment_policy() const { return _frag_impl; }
+    const SequencingPolicy& sequencing_policy() const { return _seq_impl; }
 	
 private:
 	FragmentPolicy& _frag_impl;
@@ -476,6 +479,8 @@ void generate_reads(RefSequenceTable& rt,
     
 	print_sam_header(sam_frag_out, rt);
     
+    const FragmentPolicy& frag_policy = sequencer->fragment_policy();
+    
 	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
 	{
         if (last_ref_id &&
@@ -493,6 +498,7 @@ void generate_reads(RefSequenceTable& rt,
         }
         
 		int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+        
         vector<bool> covered_by_read(ref_mRNAs[i].length(), false);
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 		{
@@ -560,15 +566,23 @@ void generate_reads(RefSequenceTable& rt,
         
         if (expr_out)
         {
+            double fpkm = 0.0;
+            double cov = 0.0;
+            double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
+            if (eff_len > 0.0)
+            {
+                fpkm = num_frags_for_mRNA / (eff_len / 1000.0) / (total_frags / 1000000.0);
+                cov = num_frags_for_mRNA / eff_len;
+            }
             fprintf(expr_out, 
-                    "%s\t%s\t%g\t%g\t%g\t%g\t%d\n", 
+                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\n", 
                     ref_mRNAs[i].annotated_gene_id().c_str(),
                     ref_mRNAs[i].annotated_trans_id().c_str(),
-                    num_frags_for_mRNA / (ref_mRNAs[i].length() / 1000.0) / (total_frags / 1000000.0), 
+                    fpkm, 
                     ref_mRNAs[i].rho(),
                     0.0,
-                    num_frags_for_mRNA / (double)ref_mRNAs[i].length(),
-                    ref_mRNAs[i].length());
+                    cov,
+                    eff_len);
 		}
         
         if (last_ref_id != ref_mRNAs[i].ref_id())
@@ -671,14 +685,11 @@ void driver(FILE* sam_out,
         assign_abundances(flux_policy, source_molecules);
     }
 
-	
-	
-	calc_frag_abundances(source_molecules);
-	
 	NormalFragments frag_policy(frag_length_mean, 
                                 frag_length_std_dev,
-                                read_length, 9999999);
-	
+                                read_length, frag_length_mean  + 3 * frag_length_std_dev);
+	calc_frag_abundances(&frag_policy, source_molecules);
+    
 	// Set the fragment priming policy, default is uniform random priming.
 	if (priming_type == "three_prime")
 	{

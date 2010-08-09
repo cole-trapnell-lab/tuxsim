@@ -17,6 +17,9 @@
 
 #include <boost/random/normal_distribution.hpp>
 
+#include <boost/math/distributions/normal.hpp> 
+using boost::math::normal;
+
 #include "scaffolds.h"
 
 // This is a typedef for a random number generator.
@@ -71,6 +74,8 @@ public:
     virtual ~FragmentPolicy() {}
 	virtual bool next_fragment(const Scaffold& molecule,
 							   LibraryFragment& fragment) = 0;
+    
+    virtual double frag_len_prob(int frag_len) const = 0;
 };
 
 class NormalFragments : public FragmentPolicy
@@ -87,7 +92,8 @@ public:
         _length_generator(normal_generator_type(_base_generator, 
                                                 normal_distribution<>(mean_frag_length, frag_length_sd))),
         _min_frag_length(min_frag_length),
-        _max_frag_length(max_frag_length)
+        _max_frag_length(max_frag_length),
+        frag_len_dist(mean_frag_length, frag_length_sd)
 	{
 		_priming_policy = shared_ptr<PrimingPolicy>(new UniformRandomPriming());
 	}
@@ -99,11 +105,23 @@ public:
 	{ 
 		_priming_policy = policy; 
 	}
+    
+    double frag_len_prob(int frag_len) const
+    {
+        if (frag_len < _min_frag_length)
+            return 0.0;
+        if (frag_len > _max_frag_length)
+            return 0.0;
+        
+        return pdf(frag_len_dist, frag_len);
+    }
 	
 private:
 	base_generator_type _base_generator;
 	normal_generator_type _length_generator;
 	
+    normal frag_len_dist; 
+    
     shared_ptr<PrimingPolicy> _priming_policy;
     int _min_frag_length;
     int _max_frag_length;

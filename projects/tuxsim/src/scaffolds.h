@@ -25,6 +25,8 @@ using namespace std;
 
 enum CuffOpCode { CUFF_MATCH, CUFF_INTRON, CUFF_UNKNOWN };
 
+class FragmentPolicy;
+
 struct AugmentedCuffOp 
 {
 	AugmentedCuffOp(const CuffOpCode& O, int g_off, int g_len) 
@@ -225,6 +227,8 @@ public:
 	
 	int match_length(int left, int right) const;
 	
+    int effective_length(const FragmentPolicy* frag_policy) const;
+    
 	int length() const
 	{
 		int len = 0;

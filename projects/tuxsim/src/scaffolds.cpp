@@ -11,6 +11,7 @@
 #include <algorithm>
 #include "common.h"
 #include "scaffolds.h"
+#include "fragments.h"
 
 using namespace std;
 
@@ -190,6 +191,21 @@ bool Scaffold::add_hit(const MateHit* hit)
 	return true;	
 }
 
+int Scaffold::effective_length(const FragmentPolicy* frag_policy) const
+{
+    // Find average of effective lengths
+    double eff_len = 0.0;
+    int trans_len = length();
+    
+    // FIXME: replace 1000 with max of frag_policy
+    for(int l = 1; l <= trans_len; l++)
+    {
+        double fp = frag_policy->frag_len_prob(l);
+        eff_len += fp * (trans_len - l + 1);
+    }
+    return eff_len;
+}
+
 void get_scaffold_gtf_records(const RefSequenceTable& rt, 
                               const Scaffold& scaffold,
                               const string& gene_id,
@@ -247,4 +263,3 @@ void get_scaffold_gtf_records(const RefSequenceTable& rt,
 	}
     
 }
-
