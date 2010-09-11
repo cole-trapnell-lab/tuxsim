@@ -566,14 +566,16 @@ void generate_reads(RefSequenceTable& rt,
         
         if (expr_out)
         {
+
             double fpkm = 0.0;
             double cov = 0.0;
             double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
             if (eff_len > 0.0)
             {
                 fpkm = num_frags_for_mRNA / (eff_len / 1000.0) / (total_frags / 1000000.0);
-                cov = num_frags_for_mRNA / eff_len;
+                cov = (num_frags_for_mRNA * 2 * read_length) / (double)ref_mRNAs[i].effective_length(&frag_policy);
             }
+
             fprintf(expr_out, 
                     "%s\t%s\t%g\t%g\t%g\t%g\t%g\n", 
                     ref_mRNAs[i].annotated_gene_id().c_str(),
