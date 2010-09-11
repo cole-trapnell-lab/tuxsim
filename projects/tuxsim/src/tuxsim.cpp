@@ -453,7 +453,7 @@ void print_aligned_read(const ReadHit& read,
             ref_pos + 1,
             cigar_str.c_str(),
             mate_ref_name,
-            mate_ref_pos,
+            mate_ref_pos + 1,
             seq.c_str(),
             qual.c_str(),
             tag_str.c_str());
