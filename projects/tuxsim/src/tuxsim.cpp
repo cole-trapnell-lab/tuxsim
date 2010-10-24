@@ -354,7 +354,7 @@ void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
                 itr->second);
     }
     
-    fprintf(sam_out, "@PG\tID:TuxSim\tVN:%s", PACKAGE_VERSION);
+    fprintf(sam_out, "@PG\tID:TuxSim\tVN:%s\n", PACKAGE_VERSION);
 }
 
 void print_fastq_read(const ReadHit& read,
