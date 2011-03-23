@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8DD76F6A0486A84900D96B5E /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
+		9CD6E9501338F48500CCE1DE /* libboost_program_options.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */; };
 		ED0035BC1164509500E19F3F /* GArgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AD1164509500E19F3F /* GArgs.cpp */; };
 		ED0035BD1164509500E19F3F /* GBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AF1164509500E19F3F /* GBase.cpp */; };
 		ED0035BE1164509500E19F3F /* gdna.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035B11164509500E19F3F /* gdna.cpp */; };
@@ -19,7 +20,6 @@
 		ED003840116457DA00E19F3F /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED00383F116457DA00E19F3F /* common.cpp */; };
 		ED00385B1164627900E19F3F /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
 		ED0038631164630200E19F3F /* scaffolds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038611164630200E19F3F /* scaffolds.cpp */; };
-		ED3445191183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */; };
 		ED50796E1173A70500883983 /* abundances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED50796D1173A70500883983 /* abundances.cpp */; };
 		ED5079751173A7BA00883983 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
 		ED5079841173A8EF00883983 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
@@ -73,6 +73,7 @@
 
 /* Begin PBXFileReference section */
 		8DD76F6C0486A84900D96B5E /* tuxsim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tuxsim; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_program_options.dylib; path = usr/local/lib/libboost_program_options.dylib; sourceTree = SDKROOT; };
 		C6859E8B029090EE04C91782 /* tuxsim.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = tuxsim.1; sourceTree = "<group>"; };
 		ED0035AD1164509500E19F3F /* GArgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GArgs.cpp; path = src/GArgs.cpp; sourceTree = "<group>"; };
 		ED0035AE1164509500E19F3F /* GArgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GArgs.h; path = src/GArgs.h; sourceTree = "<group>"; };
@@ -136,7 +137,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED3445191183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */,
+				9CD6E9501338F48500CCE1DE /* libboost_program_options.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,6 +163,7 @@
 		08FB7794FE84155DC02AAC07 /* tuxsim */ = {
 			isa = PBXGroup;
 			children = (
+				9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */,
 				ED6D6631118C8D7400A682F4 /* libcppunit.a */,
 				ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */,
 				08FB7795FE84155DC02AAC07 /* Source */,
@@ -326,7 +328,11 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "tuxsim" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* tuxsim */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -427,7 +433,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
 					./src,
-					"/usr/local/include/boost-1_41",
+					/usr/local/include/boost,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
@@ -448,7 +454,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
 					./src,
-					"/usr/local/include/boost-1_41",
+					/usr/local/include/boost,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (

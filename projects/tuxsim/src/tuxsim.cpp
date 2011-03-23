@@ -459,8 +459,23 @@ void print_aligned_read(const ReadHit& read,
             tag_str.c_str());
 }
 
+struct TranscriptNameSorter
+{
+    bool operator()(const Scaffold& lhs, const Scaffold& rhs)
+    {
+        if (lhs.annotated_gene_id() != rhs.annotated_gene_id())
+        {
+            return lhs.annotated_gene_id() < rhs.annotated_gene_id();
+        }
+        else
+        {
+            return lhs.annotated_trans_id() != rhs.annotated_trans_id();
+        }
+    }
+};
+
 void generate_reads(RefSequenceTable& rt,
-                    const vector<Scaffold>& ref_mRNAs, 
+                    vector<Scaffold>& ref_mRNAs, 
 					AssayProtocol* sequencer,
 					int total_frags,
 					FILE* sam_frag_out,
@@ -497,7 +512,7 @@ void generate_reads(RefSequenceTable& rt,
             read_chunk.clear();
         }
         
-		int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+        int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
         
         vector<bool> covered_by_read(ref_mRNAs[i].length(), false);
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
@@ -564,29 +579,6 @@ void generate_reads(RefSequenceTable& rt,
             }
         }
         
-        if (expr_out)
-        {
-
-            double fpkm = 0.0;
-            double cov = 0.0;
-            double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
-            if (eff_len > 0.0)
-            {
-                fpkm = num_frags_for_mRNA / (eff_len / 1000.0) / (total_frags / 1000000.0);
-                cov = (num_frags_for_mRNA * 2 * read_length) / (double)ref_mRNAs[i].effective_length(&frag_policy);
-            }
-
-            fprintf(expr_out, 
-                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\n", 
-                    ref_mRNAs[i].annotated_gene_id().c_str(),
-                    ref_mRNAs[i].annotated_trans_id().c_str(),
-                    fpkm, 
-                    ref_mRNAs[i].rho(),
-                    0.0,
-                    cov,
-                    eff_len);
-		}
-        
         if (last_ref_id != ref_mRNAs[i].ref_id())
         {
             rna_rightmost = ref_mRNAs[i].right();
@@ -598,6 +590,33 @@ void generate_reads(RefSequenceTable& rt,
 		
 		last_ref_id = ref_mRNAs[i].ref_id();
 	}
+    
+    if (expr_out)
+    {
+        sort(ref_mRNAs.begin(), ref_mRNAs.end(), TranscriptNameSorter());
+        for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+        {
+            int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+            double fpkm = 0.0;
+            double cov = 0.0;
+            double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
+            if (eff_len > 0.0)
+            {
+                fpkm = num_frags_for_mRNA / (eff_len / 1000.0) / (total_frags / 1000000.0);
+                cov = (num_frags_for_mRNA * 2 * read_length) / (double)ref_mRNAs[i].effective_length(&frag_policy);
+            }
+            
+            fprintf(expr_out, 
+                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\n", 
+                    ref_mRNAs[i].annotated_gene_id().c_str(),
+                    ref_mRNAs[i].annotated_trans_id().c_str(),
+                    fpkm, 
+                    ref_mRNAs[i].rho(),
+                    0.0,
+                    cov,
+                    eff_len);
+        }
+    }
     
     sort(read_chunk.begin(), read_chunk.end(), SortReads());
         
@@ -676,6 +695,7 @@ void driver(FILE* sam_out,
 		exit(1);
 	}
 	
+    //    
 	FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
 	
     if (expr_in != NULL)
