@@ -98,6 +98,9 @@ void calc_frag_abundances(const FragmentPolicy* frag_policy,
 		fragment_pool_size += source_molecules[i].effective_length(frag_policy) * source_molecules[i].rho();
 	}
 	
+    if (fragment_pool_size == 0.0)
+        return;
+    
 	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{
 		double frag_n = source_molecules[i].effective_length(frag_policy) * source_molecules[i].rho();
