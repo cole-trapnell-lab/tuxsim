@@ -19,6 +19,10 @@ bool largeScale=false; //many input Cufflinks files processed at once by cuffcom
 
 int GXConsensus::count=0;
 
+char* getGSeqName(int gseq_id) {
+    return GffObj::names->gseqs.getName(gseq_id);
+}
+
 int cmpByPtr(const pointer p1, const pointer p2) {
   return (p1>p2) ? 1: ((p1==p2)? 0 : -1);
   }

@@ -80,7 +80,7 @@ public:
   // Find data OBJ* given key.
   OBJ* Find(const char* ky);
   bool hasKey(const char* ky);
-  const char* getLastKey() { return lastkeyptr; }
+  char* getLastKey() { return lastkeyptr; }
   OBJ* operator[](const char* ky) { return Find(ky); }
   void startIterate(); //iterator-like initialization
   char* NextKey(); //returns next valid key in the table (NULL if no more)

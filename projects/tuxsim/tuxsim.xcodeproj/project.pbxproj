@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		8DD76F6A0486A84900D96B5E /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
+		9C0E737913CE1906007B9806 /* libboost_thread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C0E737813CE1906007B9806 /* libboost_thread.dylib */; };
+		9C0E738613CE1A05007B9806 /* GFastaIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0E738413CE1A05007B9806 /* GFastaIndex.cpp */; };
 		9CD6E9501338F48500CCE1DE /* libboost_program_options.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */; };
 		ED0035BC1164509500E19F3F /* GArgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AD1164509500E19F3F /* GArgs.cpp */; };
 		ED0035BD1164509500E19F3F /* GBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AF1164509500E19F3F /* GBase.cpp */; };
@@ -37,7 +39,6 @@
 		ED6D62B9118B7BD900A682F4 /* abundances.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED50796D1173A70500883983 /* abundances.cpp */; };
 		ED6D62BA118B7BD900A682F4 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
 		ED6D62BB118B7BD900A682F4 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
-		ED6D62BF118B7BD900A682F4 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */; };
 		ED6D62C1118B7BD900A682F4 /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
 		ED6D6632118C8D7400A682F4 /* libcppunit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED6D6631118C8D7400A682F4 /* libcppunit.a */; };
 		ED6D6635118C8DD000A682F4 /* TestMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6634118C8DD000A682F4 /* TestMain.cpp */; };
@@ -73,6 +74,9 @@
 
 /* Begin PBXFileReference section */
 		8DD76F6C0486A84900D96B5E /* tuxsim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tuxsim; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C0E737813CE1906007B9806 /* libboost_thread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_thread.dylib; path = usr/local/lib/libboost_thread.dylib; sourceTree = SDKROOT; };
+		9C0E738413CE1A05007B9806 /* GFastaIndex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GFastaIndex.cpp; path = src/GFastaIndex.cpp; sourceTree = "<group>"; };
+		9C0E738513CE1A05007B9806 /* GFastaIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GFastaIndex.h; path = src/GFastaIndex.h; sourceTree = "<group>"; };
 		9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_program_options.dylib; path = usr/local/lib/libboost_program_options.dylib; sourceTree = SDKROOT; };
 		C6859E8B029090EE04C91782 /* tuxsim.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = tuxsim.1; sourceTree = "<group>"; };
 		ED0035AD1164509500E19F3F /* GArgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GArgs.cpp; path = src/GArgs.cpp; sourceTree = "<group>"; };
@@ -101,7 +105,6 @@
 		ED0038611164630200E19F3F /* scaffolds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scaffolds.cpp; path = src/scaffolds.cpp; sourceTree = "<group>"; };
 		ED0038621164630200E19F3F /* scaffolds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scaffolds.h; path = src/scaffolds.h; sourceTree = "<group>"; };
 		ED0E0B901190B3C6003D6DE9 /* samcompare */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = samcompare; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-xgcc40-mt-1_41.a"; path = "/usr/local/lib/libboost_program_options-xgcc40-mt-1_41.a"; sourceTree = "<absolute>"; };
 		ED3445FB11848EAF00D68A78 /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
 		ED3445FC11848EBA00D68A78 /* INSTALL */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = INSTALL; sourceTree = "<group>"; };
 		ED3445FD11848EBA00D68A78 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -137,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C0E737913CE1906007B9806 /* libboost_thread.dylib in Frameworks */,
 				9CD6E9501338F48500CCE1DE /* libboost_program_options.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -145,7 +149,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED6D62BF118B7BD900A682F4 /* libboost_program_options-xgcc40-mt-1_41.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,9 +166,9 @@
 		08FB7794FE84155DC02AAC07 /* tuxsim */ = {
 			isa = PBXGroup;
 			children = (
+				9C0E737813CE1906007B9806 /* libboost_thread.dylib */,
 				9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */,
 				ED6D6631118C8D7400A682F4 /* libcppunit.a */,
-				ED3445181183C3E700D68A78 /* libboost_program_options-xgcc40-mt-1_41.a */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -213,6 +216,8 @@
 				ED5079831173A8EF00883983 /* sequencing.cpp */,
 				EDADF8FA118493100018CFB9 /* tuxsim.cpp */,
 				ED6D6A58118F250500A682F4 /* samcompare.cpp */,
+				9C0E738413CE1A05007B9806 /* GFastaIndex.cpp */,
+				9C0E738513CE1A05007B9806 /* GFastaIndex.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -381,6 +386,7 @@
 				ED5079841173A8EF00883983 /* sequencing.cpp in Sources */,
 				EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */,
 				EDADF8FB118493100018CFB9 /* tuxsim.cpp in Sources */,
+				9C0E738613CE1A05007B9806 /* GFastaIndex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,11 +438,13 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
 					./src,
-					/usr/local/include/boost,
+					"/usr/local/include/boost-1_41",
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
 					"$(inherited)",
 					/usr/local/libIntel64,
 				);
@@ -453,11 +461,13 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
 					./src,
-					/usr/local/include/boost,
+					"/usr/local/include/boost-1_41",
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
 					"$(inherited)",
 					/usr/local/libIntel64,
 				);

@@ -35,28 +35,23 @@
 using namespace std;
 using namespace boost;
 
-char* getGSeqName(int gseq_id)
-{
-	return GffObj::names->gseqs.getName(gseq_id);
-}
-
-char* getFastaFile(int gseq_id) 
-{
-	if (fastadir == "") return NULL;
-	GStr s(fastadir.c_str());
-	s.trimR('/');
-	s.appendfmt("/%s",getGSeqName(gseq_id));
-	GStr sbase=s;
-	if (!fileExists(s.chars())) 
-		s.append(".fa");
-	if (!fileExists(s.chars())) s.append("sta");
-	if (fileExists(s.chars())) return Gstrdup(s.chars());
-	else
-	{
-		GMessage("Warning: cannot find genomic sequence file %s{.fa,.fasta}\n",sbase.chars());
-		return NULL;
-	}
-}
+//char* getFastaFile(int gseq_id) 
+//{
+//	if (fastadir == "") return NULL;
+//	GStr s(fastadir.c_str());
+//	s.trimR('/');
+//	s.appendfmt("/%s",getGSeqName(gseq_id));
+//	GStr sbase=s;
+//	if (!fileExists(s.chars())) 
+//		s.append(".fa");
+//	if (!fileExists(s.chars())) s.append("sta");
+//	if (fileExists(s.chars())) return Gstrdup(s.chars());
+//	else
+//	{
+//		GMessage("Warning: cannot find genomic sequence file %s{.fa,.fasta}\n",sbase.chars());
+//		return NULL;
+//	}
+//}
 
 struct ScaffoldSorter
 {
@@ -99,6 +94,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	
 	int last_gseq_id = -1;
 	GFaSeqGet* faseq = NULL;
+    GFastaHandler gfasta(fastadir.c_str());
 	// Geo groups them by chr.
 	if (ref_rnas.Count()>0) //if any ref data was loaded
 	{
@@ -116,19 +112,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 					delete faseq;
 					faseq = NULL;
 					last_gseq_id = rna.gseq_id;
-					char* sfile = getFastaFile(last_gseq_id);
-					if (sfile != NULL) 
-					{
-						if (verbose)
-							GMessage("Processing sequence from fasta file '%s'\n",sfile);
-						faseq = new GFaSeqGet(sfile, false);
-						faseq->loadall();
-						GFREE(sfile);
-					}
-					else 
-					{
-						assert (false);
-					}
+					faseq = gfasta.fetch(last_gseq_id);
 				}
 				
 				assert (faseq);
@@ -200,19 +184,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 					delete faseq;
 					faseq = NULL;
 					last_gseq_id = rna.gseq_id;
-					char* sfile = getFastaFile(last_gseq_id);
-					if (sfile != NULL) 
-					{
-						if (verbose)
-							GMessage("Processing sequence from fasta file '%s'\n",sfile);
-						faseq = new GFaSeqGet(sfile, false);
-						faseq->loadall();
-						GFREE(sfile);
-					}
-					else 
-					{
-						assert (false);
-					}
+					faseq = gfasta.fetch(last_gseq_id);
 				}
 				
 				assert (faseq);

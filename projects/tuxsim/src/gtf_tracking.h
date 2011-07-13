@@ -14,6 +14,9 @@
 #endif
 
 #include "GList.hh"
+#include "GFaSeqGet.h"
+#include "GFastaIndex.h"
+#include "GStr.h"
 #include "gff.h"
 
 #define MAX_QFILES 500
@@ -25,9 +28,124 @@ extern bool largeScale;
 //many input files, no accuracy stats are generated, no *.tmap
 // exon attributes are discarded
 
+char* getGSeqName(int gseq_id);
+
 int cmpByPtr(const pointer p1, const pointer p2);
 
 class GLocus;
+
+
+//genomic fasta sequence handling
+class GFastaHandler {
+public:
+    char* fastaPath;
+    GFastaIndex* faIdx;
+    char* getFastaFile(int gseq_id) {
+        if (fastaPath==NULL) return NULL;
+        GStr s(fastaPath);
+        s.trimR('/');
+        s.appendfmt("/%s",getGSeqName(gseq_id));
+        GStr sbase(s);
+        if (!fileExists(s.chars())) s.append(".fa");
+        if (!fileExists(s.chars())) s.append("sta");
+        if (fileExists(s.chars())) return Gstrdup(s.chars());
+        else {
+            GMessage("Warning: cannot find genomic sequence file %s{.fa,.fasta}\n",sbase.chars());
+            return NULL;
+        }
+    }
+    
+    GFastaHandler(const char* fpath=NULL) {
+        fastaPath=NULL;
+        faIdx=NULL;
+        if (fpath!=NULL && fpath[0]!=0) init(fpath);
+    }
+    
+    void init(const char* fpath) {
+        if (fpath==NULL || fpath[0]==0) return;
+        if (!fileExists(fpath))
+            GError("Error: file/directory %s does not exist!\n",fpath);
+        fastaPath=Gstrdup(fpath);
+        if (fastaPath!=NULL) {
+            if (fileExists(fastaPath)>1) { //exists and it's not a directory
+                GStr fainame(fastaPath);
+                //the .fai name might have been given directly
+                if (fainame.rindex(".fai")==fainame.length()-4) {
+                    //.fai index file given directly
+                    fastaPath[fainame.length()-4]=0;
+                    if (!fileExists(fastaPath))
+                        GError("Error: cannot find fasta file for index %s !\n", fastaPath);
+                }
+                else fainame.append(".fai");
+                //fainame.append(".fai");
+                faIdx=new GFastaIndex(fastaPath,fainame.chars());
+                GStr fainamecwd(fainame);
+                int ip=-1;
+                if ((ip=fainamecwd.rindex('/'))>=0)
+                    fainamecwd.cut(0,ip+1);
+                if (!faIdx->hasIndex()) { //could not load index
+                    //try current directory
+                    if (fainame!=fainamecwd) {
+                        if (fileExists(fainamecwd.chars())>1) {
+                            faIdx->loadIndex(fainamecwd.chars());
+                        }
+                    }
+                } //tried to load index
+                if (!faIdx->hasIndex()) {
+                    GMessage("No fasta index found for %s. Rebuilding, please wait..\n",fastaPath);
+                    faIdx->buildIndex();
+                    if (faIdx->getCount()==0) GError("Error: no fasta records found!\n");
+                    GMessage("Fasta index rebuilt.\n");
+                    FILE* fcreate=fopen(fainame.chars(), "w");
+                    if (fcreate==NULL) {
+                        GMessage("Warning: cannot create fasta index %s! (permissions?)\n", fainame.chars());
+                        if (fainame!=fainamecwd) fcreate=fopen(fainamecwd.chars(), "w");
+                        if (fcreate==NULL)
+                            GError("Error: cannot create fasta index %s!\n", fainamecwd.chars());
+                    }
+                    if (faIdx->storeIndex(fcreate)<faIdx->getCount())
+                        GMessage("Warning: error writing the index file!\n");
+                } //index created and attempted to store it
+            } //multi-fasta
+        } //genomic sequence given
+    }
+    GFaSeqGet* fetch(int gseq_id, bool checkFasta=false) {
+        if (fastaPath==NULL) return NULL;
+        //genomic sequence given
+        GFaSeqGet* faseq=NULL;
+        if (faIdx!=NULL) { //fastaPath was the multi-fasta file name
+            char* gseqname=getGSeqName(gseq_id);
+            GFastaRec* farec=faIdx->getRecord(gseqname);
+            if (farec!=NULL) {
+                faseq=new GFaSeqGet(fastaPath,farec->seqlen, farec->fpos,
+                                    farec->line_len, farec->line_blen);
+                faseq->loadall(); //just cache the whole sequence, it's faster
+            }
+            else {
+                GMessage("Warning: couldn't find fasta record for '%s'!\n",gseqname);
+                return NULL;
+            }
+        }
+        else //if (fileExists(fastaPath)==1)
+        {
+            char* sfile=getFastaFile(gseq_id);
+            if (sfile!=NULL) {
+                //if (gtf_tracking_verbose)
+                //   GMessage("Processing sequence from fasta file '%s'\n",sfile);
+                faseq=new GFaSeqGet(sfile,checkFasta);
+                faseq->loadall();
+                GFREE(sfile);
+            }
+        } //one fasta file per contig
+        return faseq;
+    }
+    
+    ~GFastaHandler() {
+        GFREE(fastaPath);
+        delete faIdx;
+    }
+};
+
 
 class COvLink {
 public:
