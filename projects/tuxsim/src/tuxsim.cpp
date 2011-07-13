@@ -115,6 +115,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 					faseq = gfasta.fetch(last_gseq_id);
 				}
 				
+                if (!faseq)
+                    continue;
+                
 				assert (faseq);
 				
 				int seqlen = 0;
@@ -187,6 +190,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 					faseq = gfasta.fetch(last_gseq_id);
 				}
 				
+                if (!faseq)
+                    continue;
+                
 				assert (faseq);
 				
 				int seqlen = 0;
