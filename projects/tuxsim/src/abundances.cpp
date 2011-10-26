@@ -76,7 +76,13 @@ void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
         }
         else 
         {
-            source_molecules[i].rho(ci->second / total_rho);
+            double rho = ci->second / total_rho;
+            if (rho < 0.0)
+            {
+                fprintf(stderr, "Error: rho must be >= 0.0!\n");
+                exit(1);
+            }
+            source_molecules[i].rho();
         }
 	}
 }
@@ -116,6 +122,6 @@ void calc_frag_abundances(const FragmentPolicy* frag_policy,
             exit(1);
         }
         
-		source_molecules[i].alpha();
+		source_molecules[i].alpha(new_alpha);
 	}
 }
