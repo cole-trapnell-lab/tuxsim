@@ -82,7 +82,7 @@ void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
                 fprintf(stderr, "Error: rho must be >= 0.0!\n");
                 exit(1);
             }
-            source_molecules[i].rho();
+            source_molecules[i].rho(rho);
         }
 	}
 }
