@@ -191,11 +191,11 @@ bool Scaffold::add_hit(const MateHit* hit)
 	return true;	
 }
 
-int Scaffold::effective_length(const FragmentPolicy* frag_policy) const
+double Scaffold::effective_length(const FragmentPolicy* frag_policy) const
 {
     // Find average of effective lengths
     double eff_len = 0.0;
-    int trans_len = length();
+    double trans_len = length();
     
     // FIXME: replace 1000 with max of frag_policy
     for(int l = 1; l <= trans_len; l++)

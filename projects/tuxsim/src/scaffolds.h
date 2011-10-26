@@ -227,7 +227,7 @@ public:
 	
 	int match_length(int left, int right) const;
 	
-    int effective_length(const FragmentPolicy* frag_policy) const;
+    double effective_length(const FragmentPolicy* frag_policy) const;
     
 	int length() const
 	{

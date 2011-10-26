@@ -441,12 +441,14 @@
 					/usr/local/include,
 					./src,
 					"/usr/local/include/boost-1_41",
+					/opt/local/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
 					"$(inherited)",
 					/usr/local/libIntel64,
+					/opt/local/lib,
 				);
 				PRODUCT_NAME = tuxsim;
 				VALID_ARCHS = "i386 x86_64";
@@ -464,12 +466,14 @@
 					/usr/local/include,
 					./src,
 					"/usr/local/include/boost-1_41",
+					/opt/local/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
 					"$(inherited)",
 					/usr/local/libIntel64,
+					/opt/local/lib,
 				);
 				PRODUCT_NAME = tuxsim;
 				VALID_ARCHS = "i386 x86_64";
@@ -518,11 +522,13 @@
 					/usr/local/include,
 					./src,
 					"/usr/local/include/boost-1_41",
+					/opt/local/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/lib,
+					/opt/local/lib,
 				);
 				PRODUCT_NAME = samcompare;
 				VALID_ARCHS = "i386 x86_64";
@@ -544,6 +550,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/libIntel64,
+					/opt/local/lib,
+					/usr/local/lib,
 				);
 				PRODUCT_NAME = tuxsim;
 				VALID_ARCHS = "i386 x86_64";
