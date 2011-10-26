@@ -467,7 +467,7 @@ void generate_reads(RefSequenceTable& rt,
 	
     if (expr_out)
     {
-        fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\n");
+        fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\ttss_id\n");
     }
     
 	print_sam_header(sam_frag_out, rt);
@@ -491,6 +491,12 @@ void generate_reads(RefSequenceTable& rt,
         }
         
         int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+        
+        if (num_frags_for_mRNA > total_frags)
+        {
+            fprintf (stderr, "Error: requesting more fragments than permitted in the experiment\n!");
+            exit(1);
+        }
         
         vector<bool> covered_by_read(ref_mRNAs[i].length(), false);
 		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
@@ -592,7 +598,8 @@ void generate_reads(RefSequenceTable& rt,
                     ref_mRNAs[i].rho(),
                     0.0,
                     cov,
-                    eff_len);
+                    eff_len,
+                    ref_mRNAs[i].annotated_tss_id().c_str());
         }
     }
     

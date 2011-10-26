@@ -52,6 +52,10 @@ void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
         const char* phys_cov = strsep((char**)&buf,"\t");
         if (!phys_cov)
             return;
+        
+        const char* tss_id = strsep((char**)&buf,"\t");
+        if (!tss_id)
+            return;
 
         double rho = strtod(_rho, NULL); 
         rhos[rna_name] = rho;
@@ -104,6 +108,13 @@ void calc_frag_abundances(const FragmentPolicy* frag_policy,
 	for (size_t i = 0; i < source_molecules.size(); ++i)
 	{
 		double frag_n = source_molecules[i].effective_length(frag_policy) * source_molecules[i].rho();
-		source_molecules[i].alpha(frag_n / fragment_pool_size);
+        double new_alpha = frag_n / fragment_pool_size;
+        if (new_alpha > 1.0 || new_alpha < 0.0 || isnan(new_alpha) || isinf(new_alpha))
+        {
+            fprintf(stderr, "Error: bad alpha (%lg) for RNA!\n", new_alpha);
+            exit(1);
+        }
+        
+		source_molecules[i].alpha();
 	}
 }
