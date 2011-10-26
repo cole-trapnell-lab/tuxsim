@@ -112,6 +112,7 @@ void calc_frag_abundances(const FragmentPolicy* frag_policy,
         if (new_alpha > 1.0 || new_alpha < 0.0 || isnan(new_alpha) || isinf(new_alpha))
         {
             fprintf(stderr, "Error: bad alpha (%lg) for RNA!\n", new_alpha);
+            fprintf(stderr, "\t rho : %lg, effective_length : %lg for RNA!\n", source_molecules[i].rho(), source_molecules[i].effective_length(frag_policy));
             exit(1);
         }
         
