@@ -22,6 +22,9 @@ string out_prefix;
 
 string genome_fasta;
 
+int indel_true_diff_per_bases = 0;
+int indel_seq_error_per_bases = 0;
+
 string fastadir;
 string mrna_gtf;
 string expr_filename;

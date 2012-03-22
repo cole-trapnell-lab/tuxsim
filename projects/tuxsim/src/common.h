@@ -28,6 +28,9 @@ extern string out_prefix;
 extern string genome_fasta;
 extern string expr_filename;
 
+extern int indel_true_diff_per_bases;
+extern int indel_seq_error_per_bases;
+
 // Both fastadir and mrna_gtf must be set, pending resolution of #169
 extern string fastadir;
 extern string mrna_gtf;

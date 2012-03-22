@@ -116,26 +116,26 @@ struct ReadHit
 		_right = get_right();
 	}
 	
-	int read_len() const
-	{
-		int len = 0;
-		for (size_t i = 0; i < _cigar.size(); ++i)
-		{
-			const CigarOp& op = _cigar[i];
-			switch(op.opcode)
-			{
-				case MATCH:
-				case INS:
-				case SOFT_CLIP:
-					len += op.length;
-					break;
-				default:
-					break;
-			}
-		}
-		
-		return len;
-	}
+  int read_len() const
+  {
+    int len = 0;
+    for (size_t i = 0; i < _cigar.size(); ++i)
+      {
+	const CigarOp& op = _cigar[i];
+	switch(op.opcode)
+	  {
+	  case MATCH:
+	  case INS:
+	  case SOFT_CLIP:
+	    len += op.length;
+	    break;
+	  default:
+	    break;
+	  }
+      }
+    
+    return len;
+  }
 	
 	bool operator==(const ReadHit& rhs) const
 	{

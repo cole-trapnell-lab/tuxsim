@@ -128,11 +128,11 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				for (int e = 0; e < rna.exons.Count(); ++e)
 				{
 					GffExon& ex = *(rna.exons[e]);
-					ops.push_back(AugmentedCuffOp(CUFF_MATCH, ex.start - 1, ex.end - ex.start + 1));
+					ops.push_back(AugmentedCuffOp(CUFF_MATCH, ref_id, ex.start - 1, ex.end - ex.start + 1));
 					if (e + 1 < rna.exons.Count())
 					{
 						GffExon& next_ex = *(rna.exons[e+1]);
-						ops.push_back(AugmentedCuffOp(CUFF_INTRON, ex.end, next_ex.start - ex.end - 1));
+						ops.push_back(AugmentedCuffOp(CUFF_INTRON, ref_id, ex.end, next_ex.start - ex.end - 1));
 					}
 				}
 				
@@ -203,11 +203,11 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				for (int e = 0; e < rna.exons.Count(); ++e)
 				{
 					GffExon& ex = *(rna.exons[e]);
-					ops.push_back(AugmentedCuffOp(CUFF_MATCH, ex.start - 1, ex.end - ex.start + 1));
+					ops.push_back(AugmentedCuffOp(CUFF_MATCH, ref_id, ex.start - 1, ex.end - ex.start + 1));
 					if (e + 1 < rna.exons.Count())
 					{
 						GffExon& next_ex = *(rna.exons[e+1]);
-						ops.push_back(AugmentedCuffOp(CUFF_INTRON, ex.end, next_ex.start - ex.end - 1));
+						ops.push_back(AugmentedCuffOp(CUFF_INTRON, ref_id, ex.end, next_ex.start - ex.end - 1));
 					}
 				}
 				
@@ -275,28 +275,29 @@ struct FastqOutfilePair
 class AssayProtocol
 {
 public:
-	AssayProtocol(FragmentPolicy& frag_impl, 
-				  SequencingPolicy& seq_impl) :
-		_frag_impl(frag_impl), 
-		_seq_impl(seq_impl) {}
-	
-	bool next_reads(const Scaffold& molecule, ReadsForFragment& reads)
-	{
-		LibraryFragment frag;
-		
-		if (_frag_impl.next_fragment(molecule, frag))
-		{
-			return _seq_impl.reads_for_fragment(frag, reads);
-		}
-		return false;
-	}
+  AssayProtocol(FragmentPolicy& frag_impl, 
+		SequencingPolicy& seq_impl) :
+    _frag_impl(frag_impl), 
+    _seq_impl(seq_impl)
+  {}
+  
+  bool next_reads(const Scaffold& molecule, ReadsForFragment& reads)
+  {
+    LibraryFragment frag;
     
-    const FragmentPolicy& fragment_policy() const { return _frag_impl; }
-    const SequencingPolicy& sequencing_policy() const { return _seq_impl; }
-	
+    if (_frag_impl.next_fragment(molecule, frag))
+      {
+	return _seq_impl.reads_for_fragment(frag, reads);
+      }
+    return false;
+  }
+  
+  const FragmentPolicy& fragment_policy() const { return _frag_impl; }
+  const SequencingPolicy& sequencing_policy() const { return _seq_impl; }
+  
 private:
-	FragmentPolicy& _frag_impl;
-	SequencingPolicy& _seq_impl;
+  FragmentPolicy& _frag_impl;
+  SequencingPolicy& _seq_impl;
 };
 
 struct SortReads
@@ -348,7 +349,7 @@ void print_fastq_pair(const ReadsForFragment& reads,
                       FastqOutfilePair& fastq_out)
 {
     assert (reads.size() == 2);
-	
+
 	if (reads.front()->sam_flag() & BAM_FREAD1)
 	{
 		print_fastq_read(*(reads.front()), fastq_out.left_out_file);
@@ -454,164 +455,164 @@ struct TranscriptNameSorter
 
 void generate_reads(RefSequenceTable& rt,
                     vector<Scaffold>& ref_mRNAs, 
-					AssayProtocol* sequencer,
-					int total_frags,
-					FILE* sam_frag_out,
-					FastqOutfilePair& fastq_out,
-					FILE* expr_out,
+		    AssayProtocol* sequencer,
+		    int total_frags,
+		    FILE* sam_frag_out,
+		    FastqOutfilePair& fastq_out,
+		    FILE* expr_out,
                     FILE* gtf_out)
 {
-    RefID last_ref_id = 0;
-    int rna_rightmost = 0;
-    vector<shared_ptr<ReadHit> > read_chunk; 
-	
-    if (expr_out)
+  RefID last_ref_id = 0;
+  int rna_rightmost = 0;
+  vector<shared_ptr<ReadHit> > read_chunk; 
+  
+  if (expr_out)
     {
-        fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\ttss_id\n");
+      fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\ttss_id\n");
     }
-    
-	print_sam_header(sam_frag_out, rt);
-    
-    const FragmentPolicy& frag_policy = sequencer->fragment_policy();
-    
-	for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+  
+  print_sam_header(sam_frag_out, rt);
+  
+  const FragmentPolicy& frag_policy = sequencer->fragment_policy();
+  
+  for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+    {
+      if (last_ref_id &&
+	  (last_ref_id != ref_mRNAs[i].ref_id() ||
+	   rna_rightmost <= ref_mRNAs[i].left()))
+        {
+	  sort(read_chunk.begin(), read_chunk.end(), SortReads());
+          
+	  for (size_t j = 0; j < read_chunk.size(); ++j)
+            {
+	      print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+            }
+	  
+	  read_chunk.clear();
+        }
+      
+      int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+      
+      if (num_frags_for_mRNA > total_frags)
+        {
+	  fprintf (stderr, "Error: requesting more fragments than permitted in the experiment\n!");
+	  exit(1);
+        }
+      
+      vector<bool> covered_by_read(ref_mRNAs[i].length(), false);
+      for (size_t j = 0; j < num_frags_for_mRNA; ++j)
 	{
-        if (last_ref_id &&
-            (last_ref_id != ref_mRNAs[i].ref_id() ||
-             rna_rightmost <= ref_mRNAs[i].left()))
-        {
-            sort(read_chunk.begin(), read_chunk.end(), SortReads());
-            
-            for (size_t j = 0; j < read_chunk.size(); ++j)
-            {
-                print_aligned_read(*read_chunk[j], rt, sam_frag_out);
-            }
-            
-            read_chunk.clear();
-        }
-        
-        int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
-        
-        if (num_frags_for_mRNA > total_frags)
-        {
-            fprintf (stderr, "Error: requesting more fragments than permitted in the experiment\n!");
-            exit(1);
-        }
-        
-        vector<bool> covered_by_read(ref_mRNAs[i].length(), false);
-		for (size_t j = 0; j < num_frags_for_mRNA; ++j)
-		{
-			ReadsForFragment reads;
-			
-			if (sequencer->next_reads(ref_mRNAs[i], reads))
-			{
-                const ReadHit& left = *(reads.front()); 
-                const ReadHit& right = *(reads.back()); 
-				read_chunk.push_back(reads.front());
-				read_chunk.push_back(reads.back());
-                
-				print_fastq_pair(reads, fastq_out);
-                
-                for (size_t k = 0; k < left.read_len(); ++k)
-                {
-                    covered_by_read[k + left.source_transcript_offset()] = true;
-                }
-                
-                for (size_t k = 0; k < right.read_len(); ++k)
-                {
-                    covered_by_read[k + right.source_transcript_offset()] = true;
-                }
-			}
-			else
-			{
-				// TODO: each sequencer should gracefully produce garbage in 
-				// cases of bad fragments (i.e. fragment is too small)
-			}
-		}
-        
-        int left_cov = -1;
-        int transfrag_id = 1;
-        for (size_t k = 0; k < covered_by_read.size(); ++k)
-        {
-            if (covered_by_read[k] && left_cov == -1)
-            {
-                left_cov = k;
-            }
-            if (!covered_by_read[k] && left_cov != -1)
-            {
-                vector<AugmentedCuffOp> transfrag_ops;
-                select_genomic_op_range(ref_mRNAs[i].augmented_ops(),
-                                        left_cov,
-                                        k,
-                                        transfrag_ops);
-                Scaffold transfrag(ref_mRNAs[i].ref_id(),
-                                   ref_mRNAs[i].strand(),
-                                   transfrag_ops);
-                                   
-                string gene_id = ref_mRNAs[i].annotated_gene_id();
-                char buf[2048];
-                sprintf(buf, "%s_%d", ref_mRNAs[i].annotated_trans_id().c_str(), transfrag_id); 
-                vector<string> gtf_recs;
-                
-                get_scaffold_gtf_records(rt, transfrag, gene_id, buf, gtf_recs);
-                foreach (const string& s, gtf_recs)
-                {
-                    fprintf(gtf_out, "%s\n", s.c_str());
-                }
-                left_cov = -1;
-                transfrag_id++;
-            }
-        }
-        
-        if (last_ref_id != ref_mRNAs[i].ref_id())
-        {
-            rna_rightmost = ref_mRNAs[i].right();
-        }
-        else 
-        {
-            rna_rightmost = max(rna_rightmost, ref_mRNAs[i].right());
-        }
-		
-		last_ref_id = ref_mRNAs[i].ref_id();
-	}
-    
-    if (expr_out)
-    {
-        sort(ref_mRNAs.begin(), ref_mRNAs.end(), TranscriptNameSorter());
-        for (size_t i = 0; i < ref_mRNAs.size(); ++i)
-        {
-            int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
-            double fpkm = 0.0;
-            double cov = 0.0;
-            double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
-            if (eff_len > 0.0)
-            {
-                fpkm = num_frags_for_mRNA / (eff_len / 1000.0) / (total_frags / 1000000.0);
-                cov = (num_frags_for_mRNA * 2 * read_length) / (double)ref_mRNAs[i].effective_length(&frag_policy);
-            }
-            
-            fprintf(expr_out, 
-                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\n", 
-                    ref_mRNAs[i].annotated_gene_id().c_str(),
-                    ref_mRNAs[i].annotated_trans_id().c_str(),
-                    fpkm, 
-                    ref_mRNAs[i].rho(),
-                    0.0,
-                    cov,
-                    eff_len,
-                    ref_mRNAs[i].annotated_tss_id().c_str());
-        }
-    }
-    
-    sort(read_chunk.begin(), read_chunk.end(), SortReads());
-        
-    for (size_t j = 0; j < read_chunk.size(); ++j)
-    {
-        print_aligned_read(*read_chunk[j], rt, sam_frag_out);
-    }
-    
-    read_chunk.clear();
+	  ReadsForFragment reads;
+	  
+	  if (sequencer->next_reads(ref_mRNAs[i], reads))
+	    {
+	      const ReadHit& left = *(reads.front()); 
+	      const ReadHit& right = *(reads.back()); 
+	      read_chunk.push_back(reads.front());
+	      read_chunk.push_back(reads.back());
 
+	      print_fastq_pair(reads, fastq_out);
+              
+	      for (size_t k = 0; k < left.read_len(); ++k)
+                {
+		  covered_by_read[k + left.source_transcript_offset()] = true;
+		}
+	      
+	      for (size_t k = 0; k < right.read_len(); ++k)
+                {
+		  covered_by_read[k + right.source_transcript_offset()] = true;
+                }
+	    }
+	  else
+	    {
+	      // TODO: each sequencer should gracefully produce garbage in 
+	      // cases of bad fragments (i.e. fragment is too small)
+	    }
+	}
+      
+      int left_cov = -1;
+      int transfrag_id = 1;
+      for (size_t k = 0; k < covered_by_read.size(); ++k)
+        {
+	  if (covered_by_read[k] && left_cov == -1)
+            {
+	      left_cov = k;
+            }
+	  if (!covered_by_read[k] && left_cov != -1)
+            {
+	      vector<AugmentedCuffOp> transfrag_ops;
+	      select_genomic_op_range(ref_mRNAs[i].augmented_ops(),
+				      left_cov,
+				      k,
+				      transfrag_ops);
+	      
+	      Scaffold transfrag(ref_mRNAs[i].ref_id(),
+				 ref_mRNAs[i].strand(),
+				 transfrag_ops);
+	      
+	      string gene_id = ref_mRNAs[i].annotated_gene_id();
+	      char buf[2048];
+	      sprintf(buf, "%s_%d", ref_mRNAs[i].annotated_trans_id().c_str(), transfrag_id); 
+	      vector<string> gtf_recs;
+              
+	      get_scaffold_gtf_records(rt, transfrag, gene_id, buf, gtf_recs);
+	      foreach (const string& s, gtf_recs)
+                {
+		  fprintf(gtf_out, "%s\n", s.c_str());
+                }
+	      left_cov = -1;
+	      transfrag_id++;
+            }
+        }
+      
+      if (last_ref_id != ref_mRNAs[i].ref_id())
+        {
+	  rna_rightmost = ref_mRNAs[i].right();
+        }
+      else 
+        {
+	  rna_rightmost = max(rna_rightmost, ref_mRNAs[i].right());
+        }
+      
+      last_ref_id = ref_mRNAs[i].ref_id();
+    }
+  
+  if (expr_out)
+    {
+      sort(ref_mRNAs.begin(), ref_mRNAs.end(), TranscriptNameSorter());
+      for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+        {
+	  int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+	  double fpkm = 0.0;
+	  double cov = 0.0;
+	  double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
+	  if (eff_len > 0.0)
+            {
+	      fpkm = num_frags_for_mRNA / (eff_len / 1000.0) / (total_frags / 1000000.0);
+	      cov = (num_frags_for_mRNA * 2 * read_length) / (double)ref_mRNAs[i].effective_length(&frag_policy);
+            }
+	  
+	  fprintf(expr_out, 
+		  "%s\t%s\t%g\t%g\t%g\t%g\t%g\n", 
+		  ref_mRNAs[i].annotated_gene_id().c_str(),
+		  ref_mRNAs[i].annotated_trans_id().c_str(),
+		  fpkm, 
+		  ref_mRNAs[i].rho(),
+		  0.0,
+		  cov,
+		  eff_len,
+		  ref_mRNAs[i].annotated_tss_id().c_str());
+        }
+    }
+  
+  sort(read_chunk.begin(), read_chunk.end(), SortReads());
+  
+  for (size_t j = 0; j < read_chunk.size(); ++j)
+    {
+      print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+    }
+  
+  read_chunk.clear();
 }
 
 void load_contigs(const string& genome_fasta, 
@@ -628,96 +629,161 @@ void load_contigs(const string& genome_fasta,
 		string s = contig.getSeq();
 		std::transform(s.begin(), s.end(), s.begin(), (int (*)(int))std::toupper);
 		
-		vector<AugmentedCuffOp> cuffop(1, AugmentedCuffOp(CUFF_MATCH, 0, s.length()));
 		RefID contig_id = rt.get_id(contig.getName(), NULL, s.length());
+		vector<AugmentedCuffOp> cuffop(1, AugmentedCuffOp(CUFF_MATCH, contig_id, 0, s.length()));
 		source_molecules.push_back(Scaffold(contig_id, CUFF_FWD, cuffop));
 		source_molecules.back().seq(s);
 	}while(!last);
 }
 
 void driver(FILE* sam_out,
-			FastqOutfilePair& fastq_out,
-			FILE* expr_out,
+	    FastqOutfilePair& fastq_out,
+	    FILE* expr_out,
             FILE* gtf_out,
             FILE* expr_in)
 {
-	ReadTable it;
-	RefSequenceTable rt(true, false);
-	
-	vector<Scaffold> source_molecules;
-	
-	if (mrna_gtf != "")
-	{        
-		FILE* ref_gtf = NULL;
-		
-		ref_gtf = fopen(mrna_gtf.c_str(), "r");
-		if (!ref_gtf)
-		{
-			fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
-					mrna_gtf.c_str());
-			exit(1);
-		}
-		
-		load_ref_rnas(ref_gtf, rt, source_molecules);
-		if (source_molecules.empty())
-		{
-			fprintf(stderr, "Error: GTF is empty!\n");
-			exit(1);
-		}
-	}
-	else if (genome_fasta != "")
+  ReadTable it;
+  RefSequenceTable rt(true, false);
+  
+  vector<Scaffold> source_molecules;
+  
+  if (mrna_gtf != "")
+    {        
+      FILE* ref_gtf = NULL;
+      
+      ref_gtf = fopen(mrna_gtf.c_str(), "r");
+      if (!ref_gtf)
 	{
-		load_contigs(genome_fasta, rt, source_molecules);
-		if (source_molecules.empty())
-		{
-			fprintf(stderr, "Error: FASTA files is empty!\n");
-			exit(1);
-		}
+	  fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
+		  mrna_gtf.c_str());
+	  exit(1);
 	}
-	else
+      
+      load_ref_rnas(ref_gtf, rt, source_molecules);
+      if (source_molecules.empty())
 	{
-		fprintf(stderr, "Error: No source_pool input files defined\n");
-		exit(1);
+	  fprintf(stderr, "Error: GTF is empty!\n");
+	  exit(1);
 	}
-	
-    //    
-	FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
-	
-    if (expr_in != NULL)
-    {
-        load_abundances(expr_in, source_molecules);
     }
-    else 
+  else if (genome_fasta != "")
     {
-        assign_abundances(flux_policy, source_molecules);
+      load_contigs(genome_fasta, rt, source_molecules);
+      if (source_molecules.empty())
+	{
+	  fprintf(stderr, "Error: FASTA files is empty!\n");
+	  exit(1);
+	}
     }
+  else
+    {
+      fprintf(stderr, "Error: No source_pool input files defined\n");
+      exit(1);
+    }
+  
+  // daehwan - generate true indels, here!
+  // later, I'll make Indel class for this routine.
+  vector<AugmentedCuffOp> exons, temp_exons;
+  for (size_t i = 0; i < source_molecules.size(); ++i)
+    {
+      const Scaffold& scaf = source_molecules[i];
+      const vector<AugmentedCuffOp>& ops = scaf.augmented_ops();
 
-	NormalFragments frag_policy(frag_length_mean, 
-                                frag_length_std_dev,
-                                read_length, frag_length_mean  + 3 * frag_length_std_dev);
-	calc_frag_abundances(&frag_policy, source_molecules);
-    
-	// Set the fragment priming policy, default is uniform random priming.
-	if (priming_type == "three_prime")
+      for (size_t j = 0; j < ops.size(); ++j)
 	{
-		shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
-		frag_policy.priming_policy(primer);
+	  if (ops[j].opcode == CUFF_MATCH)
+	    temp_exons.push_back(ops[j]);
 	}
-	
-	IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
-	
-	AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy);
-	
-	generate_reads(rt, 
-                   source_molecules,
-				   sequencer,
-				   num_fragments,
-				   sam_out,
-				   fastq_out,
-				   expr_out,
-                   gtf_out);
-	
-	delete sequencer;
+    }
+  
+  sort(temp_exons.begin(), temp_exons.end());
+  
+  if (temp_exons.size() > 0)
+    exons.push_back(temp_exons[0]);
+  
+  for (size_t i = 1; i < temp_exons.size(); ++i)
+    {
+      if (AugmentedCuffOp::overlap_in_genome(exons.back(), temp_exons[i]))
+	{
+	  if (exons.back().g_right() < temp_exons[i].g_right())
+	    exons.back().genomic_length = temp_exons[i].g_right() - exons.back().g_left();		
+	}
+      else
+	{
+	  exons.push_back(temp_exons[i]);
+	}
+    }
+  
+  vector<AugmentedCuffOp> indels;
+  if (indel_true_diff_per_bases > 0)
+    {
+      for (size_t i = 0; i < exons.size(); ++i)
+	{
+	  const AugmentedCuffOp& exon = exons[i];
+	  
+	  int random_number = rand() % indel_true_diff_per_bases;
+	  if (random_number < exon.genomic_length)
+	    {
+	      CuffOpCode opcode;
+	      if (rand() % 2 == 0)
+		opcode = CUFF_INS;
+	      else
+		opcode = CUFF_DEL;
+	      
+	      int length = rand() % 3 + 1;
+	      int pos = exon.g_left() + rand() % exon.genomic_length;
+	      if (opcode == CUFF_DEL &&
+		  pos + length >= exon.g_right())
+		continue;
+	      
+	      indels.push_back(AugmentedCuffOp(opcode, exon._ref_id, pos, length));
+	    }
+	}
+    }
+  
+  
+  //    
+  FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
+  
+  if (expr_in != NULL)
+    {
+      load_abundances(expr_in, source_molecules);
+    }
+  else 
+    {
+      assign_abundances(flux_policy, source_molecules);
+    }
+  
+  NormalFragments frag_policy(frag_length_mean, 
+			      frag_length_std_dev,
+			      read_length, frag_length_mean  + 3 * frag_length_std_dev);
+  calc_frag_abundances(&frag_policy, source_molecules);
+  
+  // Set the fragment priming policy, default is uniform random priming.
+  if (priming_type == "three_prime")
+    {
+      shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
+      frag_policy.priming_policy(primer);
+    }
+  
+  IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
+  AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy);
+  
+  for (size_t i = 0; i < source_molecules.size(); ++i)
+    {
+      source_molecules[i].insert_indels(indels);
+    }
+  
+  generate_reads(rt, 
+		 source_molecules,
+		 sequencer,
+		 num_fragments,
+		 sam_out,
+		 fastq_out,
+		 expr_out,
+		 gtf_out);
+  
+  delete sequencer;
 }
 
 int main(int argc, char** argv)
@@ -730,6 +796,7 @@ int main(int argc, char** argv)
 	random_seed = time(NULL);
 	
 	//random_seed = 1111111;
+
 	srand(random_seed);
     
 	FILE* sam_out = NULL;

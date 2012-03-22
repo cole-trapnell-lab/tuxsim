@@ -73,7 +73,7 @@ class FragmentPolicy
 public:
     virtual ~FragmentPolicy() {}
 	virtual bool next_fragment(const Scaffold& molecule,
-							   LibraryFragment& fragment) = 0;
+				   LibraryFragment& fragment) = 0;
     
     virtual double frag_len_prob(int frag_len) const = 0;
 };
@@ -99,7 +99,7 @@ public:
 	}
 	
 	virtual bool next_fragment(const Scaffold& molecule,
-							   LibraryFragment& fragment);
+				   LibraryFragment& fragment);
 	
 	void priming_policy(shared_ptr<PrimingPolicy> policy ) 
 	{ 

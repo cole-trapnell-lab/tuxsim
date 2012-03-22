@@ -19,7 +19,7 @@ class SequencingPolicy
 public:
     virtual ~SequencingPolicy() {}
 	virtual bool reads_for_fragment(const LibraryFragment& frag, 
-									ReadsForFragment& reads) = 0;
+					ReadsForFragment& reads) = 0;
 };
 
 /*******************************************************************************
@@ -43,8 +43,8 @@ struct IlluminaChIPSeqPE : public SequencingPolicy
     _bool_generator(bool_generator_type(_base_generator, uniform_smallint<>(0,1)))
 	{}
     
-	bool reads_for_fragment(const LibraryFragment& frag, 
-							ReadsForFragment& reads);
+    bool reads_for_fragment(const LibraryFragment& frag, 
+			    ReadsForFragment& reads);
 private:
 	int _left_len;
 	int _right_len;
@@ -57,7 +57,7 @@ private:
 
 // Selects a list of (clipped) cuff_ops from an RNA, given an interval
 // in RNA coordinates	
-void select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
+bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
                              int start,
                              int end,
                              vector<AugmentedCuffOp>& out_ops);

@@ -99,6 +99,8 @@ int parse_options(int argc, char** argv)
             //("sequencing.read_type", value(&read_type), "")
             ("sequencing.read_length", value<int>(&read_length)->default_value(75), "")
             ("sequencing.num_fragments", value<int>(&num_fragments)->default_value(20000000), "")
+	  ("indel.true_diff_per_bases", value<int>(&indel_true_diff_per_bases)->default_value(0), "")
+	  ("indel.seq_error_per_bases", value<int>(&indel_seq_error_per_bases)->default_value(0), "")
             //("fragment_length.distribution", value(&frag_dist), "")
         ;
         
