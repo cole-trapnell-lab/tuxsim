@@ -218,40 +218,25 @@ void Scaffold::insert_indels(const vector<AugmentedCuffOp>& indels)
 
   local_indels.insert(local_indels.begin(), low, up);
 
-    // daehwan - debug this
-#if 0
-  fprintf(stderr, "ops\n");
-  for (size_t i = 0; i < local_indels.size(); ++i)
-    {
-      const AugmentedCuffOp& indel = local_indels[i];
-      fprintf(stderr, "%d) opcode(%d): %d/%d\t",
-	      i+1, indel.opcode, indel.genomic_offset, indel.genomic_length);
-    }
-
-  fprintf(stderr, "\n");
-  
-  for (size_t i = 0; i < _augmented_ops.size(); ++i)
-    {
-      const AugmentedCuffOp& op = _augmented_ops[i];
-      fprintf(stderr, "\t%d - opcode(%d): %d-%d\n",
-	      i+1, op.opcode, op.g_left(), op.g_right());
-    }
-  fprintf(stderr, "\n\tvs.\n");
-#endif
-	 
+  vector<AugmentedCuffOp> temp_ops;
   for (size_t i = 0; i < _augmented_ops.size(); ++i)
     {
       AugmentedCuffOp& op = _augmented_ops[i];
       if (op.opcode != CUFF_MATCH)
-	continue;
+	{
+	  temp_ops.push_back(op);
+	  continue;
+	}
 
+      bool found_indel = false;
       for (size_t j = 0; j < local_indels.size(); ++j)
 	{
 	  const AugmentedCuffOp& indel = local_indels[j];
 	  if (indel.genomic_offset < op.genomic_offset ||
 	      indel.genomic_offset >= op.g_right())
 	    continue;
-	  
+
+	  found_indel = true;	  
 	  AugmentedCuffOp op2 = op;
 	  op2.genomic_offset = indel.genomic_offset;
 	  if (indel.opcode == CUFF_DEL)
@@ -260,24 +245,22 @@ void Scaffold::insert_indels(const vector<AugmentedCuffOp>& indels)
 	  op2.genomic_length = op.g_right() - op2.genomic_offset;
 	  
 	  op.genomic_length = indel.genomic_offset - op.genomic_offset;
-	  _augmented_ops.insert(_augmented_ops.begin() + i + 1, op2);
-	  _augmented_ops.insert(_augmented_ops.begin() + i + 1, indel);
+	  if (op.genomic_length > 0)
+	    temp_ops.push_back(op);
 
-	  i += 2;
+	  temp_ops.push_back(indel);
+
+	  if (op2.genomic_length > 0)
+	    temp_ops.push_back(op2);
+	  
 	  break;
 	}
+
+      if (!found_indel)
+	temp_ops.push_back(op);
     }
 
-  // daehwan - debug this
-#if 0
-  for (size_t i = 0; i < _augmented_ops.size(); ++i)
-    {
-      const AugmentedCuffOp& op = _augmented_ops[i];
-      fprintf(stderr, "\t%d - opcode(%d): %d-%d\n",
-	      i+1, op.opcode, op.g_left(), op.g_right());
-    }
-  fprintf(stderr, "\n\n");
-#endif
+  _augmented_ops = temp_ops;
 
   _target_seq = "";
   int start = 0;

@@ -343,7 +343,8 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		int length = (int)strtol(p_cig, &t, 10);
 		if (length <= 0)
 		{
-			fprintf (stderr, "SAM error on line %d: CIGAR op has zero length\n", line_num);
+			fprintf (stderr, "SAM error on line %d and read_id %s: CIGAR op has zero length: %s\n",
+				 line_num, name, cigar_str);
 			return false;
 		}
 		char op_char = toupper(*t);
