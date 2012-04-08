@@ -681,8 +681,7 @@ void driver(FILE* sam_out,
       exit(1);
     }
   
-  // daehwan - generate true indels, here!
-  // later, I'll make Indel class for this routine.
+  // daehwan - I'll make Indel class for this routine.
   vector<AugmentedCuffOp> exons, temp_exons;
   for (size_t i = 0; i < source_molecules.size(); ++i)
     {
@@ -771,9 +770,9 @@ void driver(FILE* sam_out,
   
   for (size_t i = 0; i < source_molecules.size(); ++i)
     {
-      source_molecules[i].insert_indels(indels);
+      source_molecules[i].insert_true_indels(indels);
     }
-  
+
   generate_reads(rt, 
 		 source_molecules,
 		 sequencer,

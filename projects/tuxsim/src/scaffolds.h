@@ -333,7 +333,9 @@ public:
   double alpha() const { return _alpha; }
   void alpha(double a) { _alpha = a; }
   
-  void insert_indels(const vector<AugmentedCuffOp>& indels);
+  void insert_true_indels(const vector<AugmentedCuffOp>& indels);
+  void insert_seq_error_indels(const vector<AugmentedCuffOp>& indels);
+  
   bool is_in_match(int trans_coord) const;
   
  private: 

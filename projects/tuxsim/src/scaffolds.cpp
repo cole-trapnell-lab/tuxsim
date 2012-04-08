@@ -203,7 +203,7 @@ double Scaffold::effective_length(const FragmentPolicy* frag_policy) const
   return eff_len;
 }
 
-void Scaffold::insert_indels(const vector<AugmentedCuffOp>& indels)
+void Scaffold::insert_true_indels(const vector<AugmentedCuffOp>& indels)
 {
   vector<AugmentedCuffOp>::const_iterator low, up;
   low = lower_bound(indels.begin(), indels.end(),
@@ -214,14 +214,17 @@ void Scaffold::insert_indels(const vector<AugmentedCuffOp>& indels)
 
   vector<AugmentedCuffOp> local_indels;
   if (low == indels.end() || low == up)
-    return;
+    {
+      _target_seq = _seq;
+      return;
+    }
 
   local_indels.insert(local_indels.begin(), low, up);
 
   vector<AugmentedCuffOp> temp_ops;
   for (size_t i = 0; i < _augmented_ops.size(); ++i)
     {
-      AugmentedCuffOp& op = _augmented_ops[i];
+      AugmentedCuffOp op = _augmented_ops[i];
       if (op.opcode != CUFF_MATCH)
 	{
 	  temp_ops.push_back(op);
@@ -234,6 +237,10 @@ void Scaffold::insert_indels(const vector<AugmentedCuffOp>& indels)
 	  const AugmentedCuffOp& indel = local_indels[j];
 	  if (indel.genomic_offset < op.genomic_offset ||
 	      indel.genomic_offset >= op.g_right())
+	    continue;
+
+	  if (indel.opcode == CUFF_DEL &&
+	      indel.g_right() > op.g_right())
 	    continue;
 
 	  found_indel = true;	  
@@ -285,7 +292,94 @@ void Scaffold::insert_indels(const vector<AugmentedCuffOp>& indels)
 
   if (length() != _target_seq.length())
     {
-      fprintf(stderr, "length differs!: %d vs. %d\n",
+      fprintf(stderr, "length differs! in true indels: %d vs. %d\n",
+	      length(), _target_seq.length());
+      exit(1);
+    }
+}
+
+void Scaffold::insert_seq_error_indels(const vector<AugmentedCuffOp>& indels)
+{
+  string target_seq = "";
+  int curr_pos = 0;
+  vector<AugmentedCuffOp> temp_ops;
+  for (size_t i = 0; i < _augmented_ops.size(); ++i)
+    {
+      AugmentedCuffOp op = _augmented_ops[i];
+      if (op.opcode != CUFF_MATCH)
+	{
+	  temp_ops.push_back(op);
+
+	  if (op.opcode == CUFF_INS)
+	    {
+	      target_seq += _target_seq.substr(curr_pos, op.genomic_length);
+	      curr_pos += op.genomic_length;
+	    }
+	  
+	  continue;
+	}
+
+      bool found_indel = false;
+      for (size_t j = 0; j < indels.size(); ++j)
+	{
+	  AugmentedCuffOp indel = indels[j];
+	  if (indel.genomic_offset < curr_pos ||
+	      indel.genomic_offset >= curr_pos + op.genomic_length)
+	    continue;
+
+	  if (indel.opcode == CUFF_DEL &&
+	      indel.genomic_offset + op.genomic_length > curr_pos + op.genomic_length)
+	    continue;
+
+	  found_indel = true;
+	  AugmentedCuffOp op2 = op;
+	  indel.genomic_offset = indel.genomic_offset - curr_pos + op.genomic_offset;
+	  op2.genomic_offset = indel.genomic_offset;
+	  if (indel.opcode == CUFF_DEL)
+	    op2.genomic_offset += indel.genomic_length;
+	  
+	  op2.genomic_length = op.g_right() - op2.genomic_offset;
+	  
+	  op.genomic_length = indel.genomic_offset - op.genomic_offset;
+	  if (op.genomic_length > 0)
+	    {
+	      temp_ops.push_back(op);
+	      target_seq += _target_seq.substr(curr_pos, op.genomic_length);
+	    }
+
+
+	  temp_ops.push_back(indel);
+	  if (indel.opcode == CUFF_INS)
+	    {
+	      for (size_t k = 0; k < indel.genomic_length; ++k)
+		target_seq.push_back('A');
+	    }
+	  
+	  if (op2.genomic_length > 0)
+	    {
+	      temp_ops.push_back(op2);
+	      target_seq += _target_seq.substr(curr_pos + op.genomic_length, op2.genomic_length);
+	    }
+
+	  curr_pos += (op.genomic_length + op2.genomic_length);
+	  
+	  break;
+	}
+
+      if (!found_indel)
+	{
+	  temp_ops.push_back(op);
+	  target_seq += _target_seq.substr(curr_pos, op.genomic_length);
+	  curr_pos += op.genomic_length;
+	}
+    }
+
+  _augmented_ops = temp_ops;
+  _target_seq = target_seq;
+
+  if (length() != _target_seq.length())
+    {
+      fprintf(stderr, "length differs! in seq indels: %d vs. %d\n",
 	      length(), _target_seq.length());
       exit(1);
     }

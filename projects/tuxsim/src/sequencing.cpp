@@ -15,12 +15,50 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                                            ReadsForFragment& reads)
 {
   assert (frag.source_seq);
-  const Scaffold& mRNA = *(frag.source_seq);
+  Scaffold mRNA = *(frag.source_seq);
+
   int frag_length = frag.end - frag.start;;
   if (frag_length < _left_len || frag_length < _right_len)
     return false;
   
   _next_fragment_id++;
+
+  if (indel_seq_error_per_bases > 0)
+    {
+      vector<AugmentedCuffOp> indels;
+      int random_number = rand() % indel_seq_error_per_bases;
+      if (random_number < frag_length)
+	{
+	  bool pass = true;
+	  static const int edge = 5;
+	  if (random_number < edge)
+	    random_number = edge;
+	  else if (random_number >= frag_length - edge)
+	    random_number = frag_length - edge - 1;
+	  else if (random_number < _left_len &&
+		   _left_len - random_number < edge)
+	    random_number = edge * 2;
+
+	  
+	  if (random_number > frag_length - _right_len - edge &&
+		   random_number - (frag_length - _right_len) < edge)
+	    pass = false;
+
+	  if (pass)
+	    {
+	      CuffOpCode opcode;
+	      if (rand() % 2 == 0)
+		opcode = CUFF_INS;
+	      else
+		opcode = CUFF_DEL;
+	  
+	      int length = rand() % 3 + 1;
+	      indels.push_back(AugmentedCuffOp(opcode, 0, frag.start + random_number, length));
+	      
+	      mRNA.insert_seq_error_indels(indels);
+	    }
+	}
+    }
   
   vector<AugmentedCuffOp> frag_ops;
   const vector<AugmentedCuffOp>& rna_ops = mRNA.augmented_ops();
@@ -52,7 +90,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
   
   left_seq = target_seq.substr(frag.start, _left_len);
   right_seq = target_seq.substr(frag.end - _right_len, _right_len);
-  
+
   bool reverse_strand_frag = _bool_generator();
   
   shared_ptr<ReadHit> left_read(new ReadHit());
@@ -86,15 +124,13 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 			0, //mRNA.annotated_trans_id()
 			frag.end - _right_len);
 
-  // daehwan - for debug purposes
   if (left_read->read_len() != _left_len ||
       right_read->read_len() != _right_len)
     {
       fprintf(stderr, "this should not happen!!\n");
       exit(1);
     }
-
-  
+ 
   if (_strand_specific || left_read->has_intron() || right_read->has_intron())
     {
       left_read->source_strand(frag.source_seq->strand());
@@ -188,11 +224,11 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
             {
 	      if (curr_op.opcode == CUFF_INS)
 		{
-		  // daehwan - for debug purposes
+		  /*
 		  fprintf(stderr, "%d) trans(%d-%d), genomic(%d-%d)\n",
 			  ++count, start, end, genomic_left, genomic_right);
-		  assert(false);
-		  exit(1);
+		  */
+
 		  return false;
 		}
 	      
@@ -203,11 +239,11 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
             {
 	      if (curr_op.opcode == CUFF_INS)
 		{
-		  // daehwan - for debug purposes
+		  /*
 		  fprintf(stderr, "%d) trans(%d-%d), genomic(%d-%d)\n",
 			  ++count, start, end, genomic_left, genomic_right);
-		  assert(0);
-		  exit(1);
+		  */
+
 		  return false;
 		}
 	      
@@ -239,7 +275,9 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
 	  curr_genomic_off < genomic_right)
 	{
 	  if (curr_op.opcode != CUFF_INS || genomic_left < curr_genomic_off)
-	    out_ops.push_back(curr_op);
+	    {
+	      out_ops.push_back(curr_op);
+	    }
 	}
 
       if (curr_op.opcode != CUFF_INS)
