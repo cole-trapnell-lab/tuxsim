@@ -32,13 +32,21 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 	  bool pass = true;
 	  static const int edge = 5;
 	  if (random_number < edge)
-	    random_number = edge;
+	    {
+	      random_number = edge;
+	      pass = false;
+	    }
 	  else if (random_number >= frag_length - edge)
-	    random_number = frag_length - edge - 1;
+	    {
+	      random_number = frag_length - edge - 1;
+	      pass = false;
+	    }
 	  else if (random_number < _left_len &&
 		   _left_len - random_number < edge)
-	    random_number = edge * 2;
-
+	    {
+	      random_number = edge * 2;
+	      pass = false;
+	    }
 	  
 	  if (random_number > frag_length - _right_len - edge &&
 		   random_number - (frag_length - _right_len) < edge)
