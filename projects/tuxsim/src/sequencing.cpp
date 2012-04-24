@@ -21,8 +21,6 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
   if (frag_length < _left_len || frag_length < _right_len)
     return false;
   
-  _next_fragment_id++;
-
   if (indel_seq_error_per_bases > 0)
     {
       vector<AugmentedCuffOp> indels;
@@ -59,7 +57,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 		opcode = CUFF_INS;
 	      else
 		opcode = CUFF_DEL;
-	  
+
 	      int length = rand() % 3 + 1;
 	      indels.push_back(AugmentedCuffOp(opcode, 0, frag.start + random_number, length));
 	      
@@ -92,8 +90,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
   vector<CigarOp> right_read_cigar;
   cuff_op_to_cigar(right_read_ops, right_read_cigar);
   assert (!right_read_cigar.empty());
-  
-  const string& target_seq = frag.source_seq->target_seq();
+
+  const string& target_seq = mRNA.target_seq();
   string left_seq, right_seq;
   
   left_seq = target_seq.substr(frag.start, _left_len);
@@ -105,27 +103,29 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
   shared_ptr<ReadHit> right_read(new ReadHit());
   
   CuffStrand strand = CUFF_STRAND_UNKNOWN;
+
+  _next_fragment_id++;
   
-  *left_read = ReadHit(frag.source_seq->ref_id(),
+  *left_read = ReadHit(mRNA.ref_id(),
 		       _next_fragment_id,
 		       left_read_ops.front().g_left(),
 		       left_read_cigar,
 		       true,
 		       strand,
-		       frag.source_seq->ref_id(),
+		       mRNA.ref_id(),
 		       right_read_ops.front().g_left(),
 		       0,
 		       0,
 		       0, //mRNA.annotated_trans_id()
 		       frag.start);
   
-  *right_read = ReadHit(frag.source_seq->ref_id(),
+  *right_read = ReadHit(mRNA.ref_id(),
 			_next_fragment_id,
 			right_read_ops.front().g_left(),
 			right_read_cigar,
 			true,
 			strand,
-			frag.source_seq->ref_id(),
+			mRNA.ref_id(),
 			left_read_ops.front().g_left(),
 			0,
 			0,
@@ -141,8 +141,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
  
   if (_strand_specific || left_read->has_intron() || right_read->has_intron())
     {
-      left_read->source_strand(frag.source_seq->strand());
-      right_read->source_strand(frag.source_seq->strand());
+      left_read->source_strand(mRNA.strand());
+      right_read->source_strand(mRNA.strand());
     }
   
   int base_flag = BAM_FPAIRED | BAM_FPROPER_PAIR;
@@ -327,7 +327,7 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
   int left_clip = genomic_left - out_ops.front().g_left();
   out_ops.front().genomic_length -= left_clip;
   out_ops.front().genomic_offset = genomic_left;
-
+  
   return true;
 }
 

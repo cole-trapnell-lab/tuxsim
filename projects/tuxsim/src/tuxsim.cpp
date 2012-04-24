@@ -795,7 +795,6 @@ int main(int argc, char** argv)
 	random_seed = time(NULL);
 	
 	//random_seed = 1111111;
-
 	srand(random_seed);
     
 	FILE* sam_out = NULL;

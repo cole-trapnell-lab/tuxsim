@@ -300,6 +300,9 @@ void Scaffold::insert_true_indels(const vector<AugmentedCuffOp>& indels)
 
 void Scaffold::insert_seq_error_indels(const vector<AugmentedCuffOp>& indels)
 {
+  if (_target_seq == "")
+    _target_seq = _seq;
+  
   string target_seq = "";
   int curr_pos = 0;
   vector<AugmentedCuffOp> temp_ops;
@@ -328,7 +331,7 @@ void Scaffold::insert_seq_error_indels(const vector<AugmentedCuffOp>& indels)
 	    continue;
 
 	  if (indel.opcode == CUFF_DEL &&
-	      indel.genomic_offset + op.genomic_length > curr_pos + op.genomic_length)
+	      indel.genomic_offset + indel.genomic_length > curr_pos + op.genomic_length)
 	    continue;
 
 	  found_indel = true;
@@ -347,7 +350,6 @@ void Scaffold::insert_seq_error_indels(const vector<AugmentedCuffOp>& indels)
 	      target_seq += _target_seq.substr(curr_pos, op.genomic_length);
 	    }
 
-
 	  temp_ops.push_back(indel);
 	  if (indel.opcode == CUFF_INS)
 	    {
@@ -358,10 +360,18 @@ void Scaffold::insert_seq_error_indels(const vector<AugmentedCuffOp>& indels)
 	  if (op2.genomic_length > 0)
 	    {
 	      temp_ops.push_back(op2);
-	      target_seq += _target_seq.substr(curr_pos + op.genomic_length, op2.genomic_length);
+
+	      int offset = op.genomic_length;
+
+	      if (indel.opcode == CUFF_DEL)
+		offset += indel.genomic_length;
+	      
+	      target_seq += _target_seq.substr(curr_pos + offset, op2.genomic_length);
 	    }
 
 	  curr_pos += (op.genomic_length + op2.genomic_length);
+	  if (indel.opcode == CUFF_DEL)
+	    curr_pos += indel.genomic_length;
 	  
 	  break;
 	}
