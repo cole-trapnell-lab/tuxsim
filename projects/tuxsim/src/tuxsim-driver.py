@@ -233,11 +233,19 @@ use_message = '''
  tuxsim-driver is a driver for benchmarking Cuffdiff
  
  Usage:
-     tuxsim-driver [options] 
+     tuxsim-driver [options] sim_params.cfg
      
  Options:
      -o/--output-dir                <string>    [ default: ./ ]
      -p/--num-threads               <int>       [ default: 1  ]
+     --dispersion-file              <filename>  
+     --expression-file              <filename>
+     --max-fold-change              <float>
+     --num-replicate                <int>
+     --num-genes                    <int>
+     --diff-mode                    <string>
+     --experiment-type              <string>
+     --deseq-mode                   <string>
      --keep-tmp
      --version
      --help
@@ -3023,7 +3031,7 @@ def main(argv=None):
             params.check()
             
         print >> sys.stderr
-        print >> sys.stderr, "[%s] Beginning Multiplexed RNA-Seq test (suite v%s)" % (right_now(), get_version())
+        print >> sys.stderr, "[%s] Beginning TuxSim test (suite v%s)" % (right_now(), get_version())
         print >> sys.stderr, "-----------------------------------------------" 
         
         global iso_switch
