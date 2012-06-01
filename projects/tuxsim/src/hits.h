@@ -45,16 +45,16 @@ typedef uint64_t InsertID;
 typedef uint32_t RefID;
 
 /*  Stores the information from a single record of the bowtie map. A given read
-    may have many of these.  Reads up to 255bp are supported. 
-*/
+ may have many of these.  Reads up to 255bp are supported. 
+ */
 struct ReadHit
 {
 	ReadHit() : 
-		_ref_id(0),
-		_insert_id(0),
-		_error_prob(1.0),
-		_edit_dist(0xFFFFFFFF),
-        _sam_flag(0) {}
+    _ref_id(0),
+    _insert_id(0),
+    _error_prob(1.0),
+    _edit_dist(0xFFFFFFFF),
+    _sam_flag(0) {}
 	
 	ReadHit(RefID ref_id,
 			InsertID insert_id, 
@@ -68,19 +68,19 @@ struct ReadHit
 			unsigned int edit_dist,
             RefID src_transcript_id,
             unsigned int src_transcript_offset) :
-		_ref_id(ref_id),
-		_insert_id(insert_id), 
-		_left(left), 
-		_partner_ref_id(partner_ref),
-		_partner_pos(partner_pos),
-		_cigar(vector<CigarOp>(1,CigarOp(MATCH,read_len))),
-		_source_strand(source_strand),
-		_antisense_aln(antisense),
-		_error_prob(error_prob),
-		_edit_dist(edit_dist),
-        _src_transcript_id(src_transcript_id),
-        _src_transcript_offset(src_transcript_offset),
-        _sam_flag(0)
+    _ref_id(ref_id),
+    _insert_id(insert_id), 
+    _left(left), 
+    _partner_ref_id(partner_ref),
+    _partner_pos(partner_pos),
+    _cigar(vector<CigarOp>(1,CigarOp(MATCH,read_len))),
+    _source_strand(source_strand),
+    _antisense_aln(antisense),
+    _error_prob(error_prob),
+    _edit_dist(edit_dist),
+    _src_transcript_id(src_transcript_id),
+    _src_transcript_offset(src_transcript_offset),
+    _sam_flag(0)
 	{
 		assert(_cigar.capacity() == _cigar.size());
 		_right = get_right();
@@ -98,44 +98,44 @@ struct ReadHit
 			unsigned int  edit_dist,
             RefID src_transcript_id,
             unsigned int src_transcript_offset) : 
-		_ref_id(ref_id),
-		_insert_id(insert_id), 	
-		_left(left),
-		_partner_ref_id(partner_ref),
-		_partner_pos(partner_pos),
-		_cigar(cigar),
-		_source_strand(source_strand),
-		_antisense_aln(antisense_aln),
-		_error_prob(error_prob),
-        _edit_dist(edit_dist),
-        _src_transcript_id(src_transcript_id),
-        _src_transcript_offset(src_transcript_offset),
-        _sam_flag(0)
+    _ref_id(ref_id),
+    _insert_id(insert_id), 	
+    _left(left),
+    _partner_ref_id(partner_ref),
+    _partner_pos(partner_pos),
+    _cigar(cigar),
+    _source_strand(source_strand),
+    _antisense_aln(antisense_aln),
+    _error_prob(error_prob),
+    _edit_dist(edit_dist),
+    _src_transcript_id(src_transcript_id),
+    _src_transcript_offset(src_transcript_offset),
+    _sam_flag(0)
 	{
 		assert(_cigar.capacity() == _cigar.size());
 		_right = get_right();
 	}
 	
-  int read_len() const
-  {
-    int len = 0;
-    for (size_t i = 0; i < _cigar.size(); ++i)
-      {
-	const CigarOp& op = _cigar[i];
-	switch(op.opcode)
-	  {
-	  case MATCH:
-	  case INS:
-	  case SOFT_CLIP:
-	    len += op.length;
-	    break;
-	  default:
-	    break;
-	  }
-      }
-    
-    return len;
-  }
+    int read_len() const
+    {
+        int len = 0;
+        for (size_t i = 0; i < _cigar.size(); ++i)
+        {
+            const CigarOp& op = _cigar[i];
+            switch(op.opcode)
+            {
+                case MATCH:
+                case INS:
+                case SOFT_CLIP:
+                    len += op.length;
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        return len;
+    }
 	
 	bool operator==(const ReadHit& rhs) const
 	{
@@ -162,10 +162,10 @@ struct ReadHit
     
     RefID source_transcript_id() const	{ return _src_transcript_id;}
     void source_transcript_id(RefID sid){  _src_transcript_id = sid;}
-
+    
     unsigned int source_transcript_offset() const	{ return _src_transcript_offset;}
     void source_transcript_offset(unsigned int soff){ _src_transcript_offset = soff;}
-
+    
     
     bool has_intron() const 
     { 
@@ -177,7 +177,7 @@ struct ReadHit
         return false;
     }
 	bool antisense_align() const		{ return _antisense_aln;	}
-		
+    
 	double error_prob() const			{ return _error_prob;		}
 	
 	// For convenience, if you just want a copy of the gap intervals
@@ -468,7 +468,7 @@ bool hit_insert_id_lt(const ReadHit& h1, const ReadHit& h2);
  The HitFactory abstract class is responsible for returning a single ReadHit 
  from an alignment file.  The only class that actually implements this interface
  right now in Cufflinks is SAMHitFactory
-*******************************************************************************/
+ *******************************************************************************/
 class HitFactory
 {
 public:
@@ -528,7 +528,7 @@ private:
 
 /******************************************************************************
  SAMHitFactory turns SAM alignments into ReadHits
-*******************************************************************************/
+ *******************************************************************************/
 class SAMHitFactory : public HitFactory
 {
 public:
@@ -554,7 +554,7 @@ bool hits_eq_mod_id(const ReadHit& lhs, const ReadHit& rhs);
  read alignments, but the other hasn't.  A "closed" MateHit is one where either
  both read alignments have been installed in the MateHit, or one read hit has,
  but the other will never come (i.e. singletons)
-*******************************************************************************/
+ *******************************************************************************/
 class MateHit
 {
 public:
@@ -573,7 +573,7 @@ public:
 	{
 		//fprintf(stderr, "Killing hit %lx\n",this);
 	}
-
+    
 	//bool closed() {return _closed;}
 	
 	shared_ptr<ReadHit const> left_alignment() const {return _left_alignment;}

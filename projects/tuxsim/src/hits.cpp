@@ -115,8 +115,8 @@ bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
 	
 	if (lhs_l && rhs_l)
 	{
-	  //if (lhs_l->antisense_align() != rhs_l->antisense_align())
-          //  return lhs_l->antisense_align() < rhs_l->antisense_align();
+        //if (lhs_l->antisense_align() != rhs_l->antisense_align())
+        //  return lhs_l->antisense_align() < rhs_l->antisense_align();
         
 		if (lhs_l->cigar().size() != rhs_l->cigar().size())
 			return lhs_l->cigar().size() < rhs_l->cigar().size(); 
@@ -131,8 +131,8 @@ bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
 	
 	if (lhs_r && rhs_r)
 	{
-	  //if (lhs_r->antisense_align() != rhs_r->antisense_align())
-          //  return lhs_r->antisense_align() < rhs_r->antisense_align();
+        //if (lhs_r->antisense_align() != rhs_r->antisense_align())
+        //  return lhs_r->antisense_align() < rhs_r->antisense_align();
         
 		if (lhs_r->cigar().size() != rhs_r->cigar().size())
 			return lhs_r->cigar().size() < rhs_r->cigar().size(); 
@@ -344,7 +344,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		if (length <= 0)
 		{
 			fprintf (stderr, "SAM error on line %d and read_id %s: CIGAR op has zero length: %s\n",
-				 line_num, name, cigar_str);
+                     line_num, name, cigar_str);
 			return false;
 		}
 		char op_char = toupper(*t);
@@ -352,10 +352,10 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		if (op_char == 'M') 
 		{
 			/*if (length > max_read_length)
-			{
-				fprintf(stderr, "SAM error on line %d:  %s: MATCH op has length > %d\n", line_num, name, max_read_length);
-				return false;
-			}*/
+             {
+             fprintf(stderr, "SAM error on line %d:  %s: MATCH op has length > %d\n", line_num, name, max_read_length);
+             return false;
+             }*/
 			opcode = MATCH;
 		}
 		else if (op_char == 'I') opcode = INS;
@@ -382,7 +382,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 		fprintf (stderr, "SAM error on line %d: unmatched CIGAR operation\n", line_num);
 		return false;
 	}
-		
+    
 	
 	string mrnm;
 	if (strcmp(mate_ref_name, "*"))

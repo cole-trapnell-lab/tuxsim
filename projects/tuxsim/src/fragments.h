@@ -50,8 +50,8 @@ class UniformRandomPriming : public PrimingPolicy
 	
 public:
 	UniformRandomPriming() : 
-		_base_generator(base_generator_type(random_seed)),
-		_uniform_generator(uniform_generator_type(_base_generator, uniform_01<>()))
+    _base_generator(base_generator_type(random_seed)),
+    _uniform_generator(uniform_generator_type(_base_generator, uniform_01<>()))
 	{
 	}
 	bool next_priming_site(const Scaffold& molecule,
@@ -73,7 +73,7 @@ class FragmentPolicy
 public:
     virtual ~FragmentPolicy() {}
 	virtual bool next_fragment(const Scaffold& molecule,
-				   LibraryFragment& fragment) = 0;
+                               LibraryFragment& fragment) = 0;
     
     virtual double frag_len_prob(int frag_len) const = 0;
 };
@@ -88,18 +88,18 @@ public:
                     int frag_length_sd, 
                     int min_frag_length,
                     int max_frag_length) :
-        _base_generator(base_generator_type(random_seed)),
-        _length_generator(normal_generator_type(_base_generator, 
-                                                normal_distribution<>(mean_frag_length, frag_length_sd))),
-        _min_frag_length(min_frag_length),
-        _max_frag_length(max_frag_length),
-        frag_len_dist(mean_frag_length, frag_length_sd)
+    _base_generator(base_generator_type(random_seed)),
+    _length_generator(normal_generator_type(_base_generator, 
+                                            normal_distribution<>(mean_frag_length, frag_length_sd))),
+    _min_frag_length(min_frag_length),
+    _max_frag_length(max_frag_length),
+    frag_len_dist(mean_frag_length, frag_length_sd)
 	{
 		_priming_policy = shared_ptr<PrimingPolicy>(new UniformRandomPriming());
 	}
 	
 	virtual bool next_fragment(const Scaffold& molecule,
-				   LibraryFragment& fragment);
+                               LibraryFragment& fragment);
 	
 	void priming_policy(shared_ptr<PrimingPolicy> policy ) 
 	{ 

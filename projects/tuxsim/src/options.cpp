@@ -39,12 +39,12 @@ void validate_options()
         invalid = true;
     }
     
-//    // For now, a GTF is required to use TuxSim, which only does RNA-Seq
-//    if (mrna_gtf == "")
-//    {
-//        fprintf(stderr, "source_pool.mrna_gtf must be set\n");
-//        invalid = true;
-//    }
+    //    // For now, a GTF is required to use TuxSim, which only does RNA-Seq
+    //    if (mrna_gtf == "")
+    //    {
+    //        fprintf(stderr, "source_pool.mrna_gtf must be set\n");
+    //        invalid = true;
+    //    }
     
 	if (priming_type == "uniform_random")
 	{
@@ -82,26 +82,26 @@ int parse_options(int argc, char** argv)
     {
         options_description generic("Command line options");
         generic.add_options()
-            ("help,h", "print usage message")
-            ("output.prefix", value(&out_prefix), "")
-            ("expression,e", value(&expr_filename), "Load mRNA expression values from input file instead of generating them")
+        ("help,h", "print usage message")
+        ("output.prefix", value(&out_prefix), "")
+        ("expression,e", value(&expr_filename), "Load mRNA expression values from input file instead of generating them")
         ;
         
         options_description config_file_options("Configuration file options");
         config_file_options.add_options()
-            ("input.fasta_dir", value(&fastadir), "")
-            ("output.prefix", value(&out_prefix), "")
-            ("source_pool.mrna_gtf", value(&mrna_gtf)->default_value(""), "")
-			("source_pool.genome_fasta", value(&genome_fasta)->default_value(""), "")
-			("fragment.priming", value(&priming_type)->default_value("uniform_random"), "")
-            ("fragment.length.mean", value<double>(&frag_length_mean)->default_value(200), "")
-            ("fragment.length.std_dev", value<double>(&frag_length_std_dev)->default_value(40), "")
-            //("sequencing.read_type", value(&read_type), "")
-            ("sequencing.read_length", value<int>(&read_length)->default_value(75), "")
-            ("sequencing.num_fragments", value<int>(&num_fragments)->default_value(20000000), "")
-	  ("indel.true_diff_per_bases", value<int>(&indel_true_diff_per_bases)->default_value(0), "")
-	  ("indel.seq_error_per_bases", value<int>(&indel_seq_error_per_bases)->default_value(0), "")
-            //("fragment_length.distribution", value(&frag_dist), "")
+        ("input.fasta_dir", value(&fastadir), "")
+        ("output.prefix", value(&out_prefix), "")
+        ("source_pool.mrna_gtf", value(&mrna_gtf)->default_value(""), "")
+        ("source_pool.genome_fasta", value(&genome_fasta)->default_value(""), "")
+        ("fragment.priming", value(&priming_type)->default_value("uniform_random"), "")
+        ("fragment.length.mean", value<double>(&frag_length_mean)->default_value(200), "")
+        ("fragment.length.std_dev", value<double>(&frag_length_std_dev)->default_value(40), "")
+        //("sequencing.read_type", value(&read_type), "")
+        ("sequencing.read_length", value<int>(&read_length)->default_value(75), "")
+        ("sequencing.num_fragments", value<int>(&num_fragments)->default_value(20000000), "")
+        ("indel.true_diff_per_bases", value<int>(&indel_true_diff_per_bases)->default_value(0), "")
+        ("indel.seq_error_per_bases", value<int>(&indel_seq_error_per_bases)->default_value(0), "")
+        //("fragment_length.distribution", value(&frag_dist), "")
         ;
         
         // Hidden options, will be allowed both on command line and
@@ -119,7 +119,7 @@ int parse_options(int argc, char** argv)
         
         variables_map vm;
         store(command_line_parser(argc, argv).
-                  options(cmdline_options).positional(p).run(), vm);
+              options(cmdline_options).positional(p).run(), vm);
         notify(vm);
         
         if (vm.count("help")) {  
@@ -161,6 +161,6 @@ int parse_options(int argc, char** argv)
     {
         cerr << e.what() << endl;
     }
-
+    
     return 0;
 }
