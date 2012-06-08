@@ -601,7 +601,7 @@ void generate_reads(RefSequenceTable& rt,
             }
             
             fprintf(expr_out, 
-                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\t\t%s\t%d\n", 
+                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\t%s\t%d\n", 
                     ref_mRNAs[i].annotated_gene_id().c_str(),
                     ref_mRNAs[i].annotated_trans_id().c_str(),
                     fpkm, 
