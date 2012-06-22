@@ -18,9 +18,13 @@ double frag_length_mean = 200;
 double frag_length_std_dev = 40;
 int num_fragments = 20000000;
 int read_length = 75;
+int max_edit_dist = 0;
 string out_prefix;
 
 string genome_fasta;
+
+int mismatch_true_diff_per_bases = 0;
+int mismatch_seq_error_per_bases = 0;
 
 int indel_true_diff_per_bases = 0;
 int indel_seq_error_per_bases = 0;

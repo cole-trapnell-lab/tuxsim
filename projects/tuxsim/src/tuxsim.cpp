@@ -32,6 +32,9 @@
 #include "fragments.h"
 #include "sequencing.h"
 
+#include "mismatches.h"
+#include "indels.h"
+
 using namespace std;
 using namespace boost;
 
@@ -79,10 +82,11 @@ struct ScaffoldSorter
 
 //FIXME: needs refactoring
 void load_ref_rnas(FILE* ref_mRNA_file, 
-				   RefSequenceTable& rt,
-				   vector<Scaffold>& ref_mRNAs) 
+		   RefSequenceTable& rt,
+		   GFastaHandler& gfasta,
+		   vector<Scaffold>& ref_mRNAs) 
 {
-	GList<GSeqData> ref_rnas;
+	static GList<GSeqData> ref_rnas;
 	
 	if (ref_mRNA_file)
 	{
@@ -94,7 +98,6 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	
 	int last_gseq_id = -1;
 	GFaSeqGet* faseq = NULL;
-    GFastaHandler gfasta(fastadir.c_str());
 	// Geo groups them by chr.
 	if (ref_rnas.Count()>0) //if any ref data was loaded
 	{
@@ -173,7 +176,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				std::transform(rs.begin(), rs.end(), rs.begin(), (int (*)(int))std::toupper);
 				ref_scaff.seq(rs);
 				GFREE(rna_seq);
-				
+
+				ref_scaff.gseq_id(rna.gseq_id);
 				ref_mRNAs.push_back(ref_scaff); 
 				
 			}
@@ -249,14 +253,14 @@ void load_ref_rnas(FILE* ref_mRNA_file,
                 reverse_complement(rs);
 				ref_scaff.seq(rs);
 				GFREE(rna_seq);
-				
+
+				ref_scaff.gseq_id(rna.gseq_id);
 				ref_mRNAs.push_back(ref_scaff); 
 			}
 		}
 		ScaffoldSorter sorter(rt);
 		sort(ref_mRNAs.begin(), ref_mRNAs.end(), sorter);
 	}
-	delete faseq;
 }
 
 struct FastqOutfilePair
@@ -275,10 +279,12 @@ struct FastqOutfilePair
 class AssayProtocol
 {
 public:
-    AssayProtocol(FragmentPolicy& frag_impl, 
-                  SequencingPolicy& seq_impl) :
+  AssayProtocol(FragmentPolicy& frag_impl, 
+		SequencingPolicy& seq_impl,
+		GFastaHandler& gfasta) :
     _frag_impl(frag_impl), 
-    _seq_impl(seq_impl)
+    _seq_impl(seq_impl),
+    _gfasta(gfasta)
     {}
     
     bool next_reads(const Scaffold& molecule, ReadsForFragment& reads)
@@ -287,7 +293,7 @@ public:
         
         if (_frag_impl.next_fragment(molecule, frag))
         {
-            return _seq_impl.reads_for_fragment(frag, reads);
+	  return _seq_impl.reads_for_fragment(frag, reads, _gfasta);
         }
         return false;
     }
@@ -298,6 +304,7 @@ public:
 private:
     FragmentPolicy& _frag_impl;
     SequencingPolicy& _seq_impl;
+  GFastaHandler& _gfasta;
 };
 
 struct SortReads
@@ -423,9 +430,17 @@ void print_aligned_read(const ReadHit& read,
     {
         tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
     }
+
+    string aux_str;
+    const vector<string>& aux_fields = read.aux_sam_fields();
+    for (size_t i = 0; i < aux_fields.size(); ++i)
+      {
+	aux_str += "\t";
+	aux_str += aux_fields[i];
+      }
     
     fprintf(sam_out,
-            "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s\n",
+            "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s%s\n",
             read_name,
             sam_flag,
             ref_name,
@@ -435,7 +450,8 @@ void print_aligned_read(const ReadHit& read,
             mate_ref_pos + 1,
             seq.c_str(),
             qual.c_str(),
-            tag_str.c_str());
+            tag_str.c_str(),
+	    aux_str.c_str());
 }
 
 struct TranscriptNameSorter
@@ -649,31 +665,34 @@ void driver(FILE* sam_out,
             FastqOutfilePair& fastq_out,
             FILE* expr_out,
             FILE* gtf_out,
+	    FILE* mismatches_out,
+	    FILE* indels_out,
             FILE* expr_in)
 {
-    ReadTable it;
-    RefSequenceTable rt(true, false);
-    
-    vector<Scaffold> source_molecules;
-    
-    if (mrna_gtf != "")
+  ReadTable it;
+  RefSequenceTable rt(true, false);
+  
+  vector<Scaffold> source_molecules;
+  GFastaHandler gfasta(fastadir.c_str());
+  
+  if (mrna_gtf != "")
     {        
-        FILE* ref_gtf = NULL;
-        
-        ref_gtf = fopen(mrna_gtf.c_str(), "r");
-        if (!ref_gtf)
-        {
-            fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
-                    mrna_gtf.c_str());
-            exit(1);
-        }
-        
-        load_ref_rnas(ref_gtf, rt, source_molecules);
-        if (source_molecules.empty())
-        {
-            fprintf(stderr, "Error: GTF is empty!\n");
-            exit(1);
-        }
+      FILE* ref_gtf = NULL;
+      
+      ref_gtf = fopen(mrna_gtf.c_str(), "r");
+      if (!ref_gtf)
+	{
+	  fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
+		  mrna_gtf.c_str());
+	  exit(1);
+	}
+
+      load_ref_rnas(ref_gtf, rt, gfasta, source_molecules);
+      if (source_molecules.empty())
+	{
+	  fprintf(stderr, "Error: GTF is empty!\n");
+	  exit(1);
+	}
     }
     else if (genome_fasta != "")
     {
@@ -689,10 +708,10 @@ void driver(FILE* sam_out,
         fprintf(stderr, "Error: No source_pool input files defined\n");
         exit(1);
     }
-    
-    // daehwan - I'll make Indel class for this routine.
-    vector<AugmentedCuffOp> exons, temp_exons;
-    for (size_t i = 0; i < source_molecules.size(); ++i)
+
+  // extract exons and merge them in case they overlap with one another.
+  vector<AugmentedCuffOp> exons, temp_exons;
+  for (size_t i = 0; i < source_molecules.size(); ++i)
     {
         const Scaffold& scaf = source_molecules[i];
         const vector<AugmentedCuffOp>& ops = scaf.augmented_ops();
@@ -721,39 +740,19 @@ void driver(FILE* sam_out,
             exons.push_back(temp_exons[i]);
         }
     }
-    
-    vector<AugmentedCuffOp> indels;
-    if (indel_true_diff_per_bases > 0)
-    {
-        for (size_t i = 0; i < exons.size(); ++i)
-        {
-            const AugmentedCuffOp& exon = exons[i];
-            
-            int random_number = rand() % indel_true_diff_per_bases;
-            if (random_number < exon.genomic_length)
-            {
-                CuffOpCode opcode;
-                if (rand() % 2 == 0)
-                    opcode = CUFF_INS;
-                else
-                    opcode = CUFF_DEL;
-                
-                int length = rand() % 3 + 1;
-                int pos = exon.g_left() + rand() % exon.genomic_length;
-                if (opcode == CUFF_DEL &&
-                    pos + length >= exon.g_right())
-                    continue;
-                
-                indels.push_back(AugmentedCuffOp(opcode, exon._ref_id, pos, length));
-            }
-        }
-    }
-    
-    
-    //    
-    FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
-    
-    if (expr_in != NULL)
+
+  vector<Mismatch> mismatches;
+  generate_true_mismatches(exons, mismatches);
+  print_mismatches(mismatches_out, rt, mismatches);
+
+  vector<AugmentedCuffOp> indels;
+  generate_true_indels(exons, indels);
+  print_indels(indels_out, rt, indels);
+  
+  //    
+  FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
+  
+  if (expr_in != NULL)
     {
         load_abundances(expr_in, source_molecules);
     }
@@ -773,25 +772,26 @@ void driver(FILE* sam_out,
         shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
         frag_policy.priming_policy(primer);
     }
-    
-    IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
-    AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy);
-    
-    for (size_t i = 0; i < source_molecules.size(); ++i)
+  
+  IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
+  AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy, gfasta);
+  
+  for (size_t i = 0; i < source_molecules.size(); ++i)
     {
-        source_molecules[i].insert_true_indels(indels);
+      source_molecules[i].insert_true_mismatches(mismatches);
+      source_molecules[i].insert_true_indels(indels);
     }
-    
-    generate_reads(rt, 
-                   source_molecules,
-                   sequencer,
-                   num_fragments,
-                   sam_out,
-                   fastq_out,
-                   expr_out,
-                   gtf_out);
-    
-    delete sequencer;
+
+  generate_reads(rt,
+		 source_molecules,
+		 sequencer,
+		 num_fragments,
+		 sam_out,
+		 fastq_out,
+		 expr_out,
+		 gtf_out);
+  
+  delete sequencer;
 }
 
 int main(int argc, char** argv)
@@ -870,13 +870,33 @@ int main(int argc, char** argv)
 	frag_gtf_out = fopen(out_gtf_filename.c_str(), "w");
 	if (!frag_gtf_out)
 	{
-		fprintf(stderr, "Error: cannot open .simexpr file %s for writing\n",
+		fprintf(stderr, "Error: cannot open .transfrags.gtf file %s for writing\n",
 				out_gtf_filename.c_str());
 		exit(1);
 	}
     
+	FILE* mismatches_out = NULL;
+	string out_mismatches_filename = out_prefix + ".mismatches";
+	mismatches_out = fopen(out_mismatches_filename.c_str(), "w");
+	if (!mismatches_out)
+	{
+	  fprintf(stderr, "Error: cannot open .mismatches file %s for writing\n",
+		  out_mismatches_filename.c_str());
+	  exit(1);
+	}
     
-	driver(sam_out, fastq_out, expr_out, frag_gtf_out, expr_in);
-    
+	FILE* indels_out = NULL;
+	string out_indels_filename = out_prefix + ".indels";
+	indels_out = fopen(out_indels_filename.c_str(), "w");
+	if (!indels_out)
+	{
+	  fprintf(stderr, "Error: cannot open .indels file %s for writing\n",
+		  out_indels_filename.c_str());
+	  exit(1);
+	}
+
+
+	driver(sam_out, fastq_out, expr_out, frag_gtf_out, mismatches_out, indels_out, expr_in);
+
 	return 0;
 }

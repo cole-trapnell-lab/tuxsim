@@ -18,7 +18,6 @@
 
 #include "common.h"
 #include "hits.h"
-
 #include <boost/thread.hpp>
 
 using namespace std;
@@ -33,6 +32,7 @@ enum CuffOpCode
 };
 
 class FragmentPolicy;
+class Mismatch;
 
 struct AugmentedCuffOp 
 {
@@ -284,11 +284,58 @@ public:
 	
     const vector<AugmentedCuffOp>& augmented_ops() const { return _augmented_ops; }
     
-    static bool overlap_in_genome(const Scaffold& lhs, 
-                                  const Scaffold& rhs, 
-                                  int overlap_radius);
+  
+  double rho() const { return _rho; }
+  void rho(double r) { _rho = r; }
+  
+  double alpha() const { return _alpha; }
+  void alpha(double a) { _alpha = a; }
+
+  void insert_true_mismatches(const vector<Mismatch>& mismatches);
+  void insert_seq_error_mismatches(const vector<Mismatch>& mismatches);
+  void insert_true_indels(const vector<AugmentedCuffOp>& indels);
+  void insert_seq_error_indels(const vector<AugmentedCuffOp>& indels);
+  
+  bool is_in_match(int trans_coord) const;
+
+  int gseq_id() const { return _gseq_id; }
+  void gseq_id(int id) { _gseq_id = id; }
+
+  // NOTE: sequences are always stored in forward strand space, they are NOT 
+  // reverse complemented
+  const string& seq() const { return _seq; }
+  void seq(const string& s) { _seq = s; }
+  
+  const string& target_seq() const
+  {
+    if (_target_seq.empty())
+      return _seq;
     
-    vector<pair< int, int> > gaps() const
+    return _target_seq;
+  }
+  
+  int num_frags_generated() const { return _frags_generated; }
+  void num_frags_generated(int f) { _frags_generated = f; }
+    
+ private: 
+  
+  static bool has_intron(const Scaffold& scaff)
+  {
+    const vector<AugmentedCuffOp>& ops = scaff.augmented_ops();
+    for (size_t j = 0; j < ops.size(); ++j)
+      {
+	if (ops[j].opcode == CUFF_INTRON)
+	  return true;
+      }
+
+    return false;
+  }
+
+static bool overlap_in_genome(const Scaffold& lhs, 
+			      const Scaffold& rhs, 
+			      int overlap_radius);
+
+vector<pair< int, int> > gaps() const
     {
         vector<pair<int,int> > g;
         const vector<AugmentedCuffOp>& ops = augmented_ops();
@@ -316,48 +363,7 @@ public:
     void clear_hits();
     bool add_hit(const MateHit*);
     
-    // NOTE: sequences are always stored in forward strand space, they are NOT 
-    // reverse complemented
-    const string& seq() const { return _seq; }
-    void seq(const string& s) { _seq = s; }
-    
-    const string& target_seq() const
-    {
-        if (_target_seq.empty())
-            return _seq;
-        
-        return _target_seq;
-    }
-    
-    double rho() const { return _rho; }
-    void rho(double r) { _rho = r; }
-    
-    double alpha() const { return _alpha; }
-    void alpha(double a) { _alpha = a; }
-    
-    int num_frags_generated() const { return _frags_generated; }
-    void num_frags_generated(int f) { _frags_generated = f; }
-    
-    
-    void insert_true_indels(const vector<AugmentedCuffOp>& indels);
-    void insert_seq_error_indels(const vector<AugmentedCuffOp>& indels);
-    
-    bool is_in_match(int trans_coord) const;
-    
 private: 
-    
-    static bool has_intron(const Scaffold& scaff)
-    {
-        const vector<AugmentedCuffOp>& ops = scaff.augmented_ops();
-        for (size_t j = 0; j < ops.size(); ++j)
-        {
-            if (ops[j].opcode == CUFF_INTRON)
-                return true;
-        }
-        
-        return false;
-    }
-    
     typedef vector<AugmentedCuffOp> OpList;
     
     vector<const MateHit*> _mates_in_scaff;
@@ -382,6 +388,8 @@ private:
     double _rho;
     double _alpha;
     int _frags_generated;
+
+  int _gseq_id;
 };
 
 bool scaff_lt(const Scaffold& lhs, const Scaffold& rhs);

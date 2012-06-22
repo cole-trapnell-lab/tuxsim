@@ -12,6 +12,7 @@
 #include "common.h"
 #include "scaffolds.h"
 #include "fragments.h"
+#include "mismatches.h"
 
 using namespace std;
 
@@ -201,6 +202,100 @@ double Scaffold::effective_length(const FragmentPolicy* frag_policy) const
       eff_len += fp * (trans_len - l + 1);
     }
   return eff_len;
+}
+
+void Scaffold::insert_true_mismatches(const vector<Mismatch>& mismatches)
+{
+  vector<Mismatch>::const_iterator low, up;
+  low = lower_bound(mismatches.begin(), mismatches.end(),
+		    Mismatch(_ref_id, _left));
+  
+  up = upper_bound(mismatches.begin(), mismatches.end(),
+		   Mismatch(_ref_id, _right));
+
+  vector<Mismatch> local_mismatches;
+  if (low == mismatches.end() || low == up)
+    {
+      // _target_seq = _seq;
+      return;
+    }
+
+  local_mismatches.insert(local_mismatches.begin(), low, up);
+
+  int seq_pos = 0;
+  for (size_t i = 0; i < _augmented_ops.size(); ++i)
+    {
+      AugmentedCuffOp op = _augmented_ops[i];
+      if (op.opcode != CUFF_MATCH)
+	  continue;
+      
+      for (size_t j = 0; j < local_mismatches.size(); ++j)
+	{
+	  const Mismatch& mismatch = local_mismatches[j];
+	  if (mismatch._genomic_offset < op.genomic_offset ||
+	      mismatch._genomic_offset >= op.g_right())
+	    continue;
+
+	  int mismatch_pos = seq_pos + mismatch._genomic_offset - op.genomic_offset;
+	  assert (mismatch_pos >= 0 && mismatch_pos < _seq.length());
+	  char base = _seq[mismatch_pos];
+	  if (base == 'A' || base =='a')
+	    base = 'C';
+	  else if (base == 'C' || base == 'c')
+	    base = 'G';
+	  else if (base == 'G' || base == 'g')
+	    base = 'T';
+	  else if (base == 'T' || base == 't')
+	    base = 'A';
+
+	  _seq[mismatch_pos] = base;
+	}
+
+      seq_pos += op.genomic_length;
+    }
+
+  _target_seq = _seq;
+}
+
+void Scaffold::insert_seq_error_mismatches(const vector<Mismatch>& mismatches)
+{
+  int seq_pos = 0;
+
+  if (_target_seq.length() > 0 )
+    _seq = _target_seq;
+  
+  for (size_t i = 0; i < _augmented_ops.size(); ++i)
+    {
+      AugmentedCuffOp op = _augmented_ops[i];
+      if (op.opcode != CUFF_MATCH)
+	  continue;
+      
+      for (size_t j = 0; j < mismatches.size(); ++j)
+	{
+	  const Mismatch& mismatch = mismatches[j];
+	  if (mismatch._genomic_offset < op.genomic_offset ||
+	      mismatch._genomic_offset >= op.g_right())
+	    continue;
+
+	  int mismatch_pos = seq_pos + mismatch._genomic_offset - op.genomic_offset;
+	  assert (mismatch_pos >= 0 && mismatch_pos < _seq.length());
+	  char base = _seq[mismatch_pos];
+	  if (base == 'A' || base =='a')
+	    base = 'C';
+	  else if (base == 'C' || base == 'c')
+	    base = 'G';
+	  else if (base == 'G' || base == 'g')
+	    base = 'T';
+	  else if (base == 'T' || base == 't')
+	    base = 'A';
+
+	  _seq[mismatch_pos] = base;
+	}
+
+      seq_pos += op.genomic_length;
+    }
+
+  _target_seq = _seq;
 }
 
 void Scaffold::insert_true_indels(const vector<AugmentedCuffOp>& indels)

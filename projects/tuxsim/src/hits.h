@@ -230,6 +230,9 @@ struct ReadHit
     
     void orig_hit_str(const string& sam_str) { _orig_hit_str = sam_str; }
     const string& orig_hit_str() const { return _orig_hit_str; }
+
+  void aux_sam_fields(const vector<string>& fields) { _aux_sam_fields = fields; }
+  const vector<string>& aux_sam_fields() const { return _aux_sam_fields; }
     
 private:
 	
@@ -280,6 +283,7 @@ private:
     string _orig_hit_str;
     
     int _sam_flag;
+  vector<string> _aux_sam_fields;
 };
 
 class ReadTable

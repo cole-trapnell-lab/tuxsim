@@ -12,14 +12,17 @@
 #include "fragments.h"
 #include "hits.h"
 
-typedef vector<shared_ptr<ReadHit> > ReadsForFragment; 
+typedef vector<shared_ptr<ReadHit> > ReadsForFragment;
+
+class GFastaHandler;
 
 class SequencingPolicy
 {
 public:
-    virtual ~SequencingPolicy() {}
-	virtual bool reads_for_fragment(const LibraryFragment& frag, 
-					ReadsForFragment& reads) = 0;
+  virtual ~SequencingPolicy() {}
+  virtual bool reads_for_fragment(const LibraryFragment& frag, 
+				  ReadsForFragment& reads,
+				  GFastaHandler& gfasta) = 0;
 };
 
 /*******************************************************************************
@@ -27,32 +30,32 @@ public:
  *******************************************************************************/
 struct IlluminaChIPSeqPE : public SequencingPolicy
 {
-	
-	typedef boost::minstd_rand base_generator_type;
-	typedef variate_generator<base_generator_type&,
+  
+  typedef boost::minstd_rand base_generator_type;
+  typedef variate_generator<base_generator_type&,
     boost::uniform_smallint<> > bool_generator_type;
-	
-	IlluminaChIPSeqPE(int left_read_len, 
-					  int right_read_len,
-                      bool strand_specific) :
-    _left_len(left_read_len),
+  
+ IlluminaChIPSeqPE(int left_read_len, 
+		   int right_read_len,
+		   bool strand_specific) :
+  _left_len(left_read_len),
     _right_len(right_read_len),
     _strand_specific(strand_specific),
     _next_fragment_id(0),
     _base_generator(base_generator_type(random_seed)),
     _bool_generator(bool_generator_type(_base_generator, uniform_smallint<>(0,1)))
-	{}
-    
-    bool reads_for_fragment(const LibraryFragment& frag, 
-			    ReadsForFragment& reads);
-private:
-	int _left_len;
-	int _right_len;
-    bool _strand_specific;
-	InsertID _next_fragment_id;
-	base_generator_type _base_generator;
-	bool_generator_type _bool_generator;
-
+      {}
+  
+  bool reads_for_fragment(const LibraryFragment& frag, 
+			  ReadsForFragment& reads,
+			  GFastaHandler& gfasta);
+ private:
+  int _left_len;
+  int _right_len;
+  bool _strand_specific;
+  InsertID _next_fragment_id;
+  base_generator_type _base_generator;
+  bool_generator_type _bool_generator;
 };
 
 // Selects a list of (clipped) cuff_ops from an RNA, given an interval

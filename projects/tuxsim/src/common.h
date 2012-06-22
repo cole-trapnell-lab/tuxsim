@@ -24,9 +24,13 @@ extern int num_fragments;
 extern int read_length;
 extern int num_reads;
 extern string out_prefix;
+extern int max_edit_dist;
 
 extern string genome_fasta;
 extern string expr_filename;
+
+extern int mismatch_true_diff_per_bases;
+extern int mismatch_seq_error_per_bases;
 
 extern int indel_true_diff_per_bases;
 extern int indel_seq_error_per_bases;
