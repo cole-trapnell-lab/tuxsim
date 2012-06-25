@@ -215,7 +215,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
   right_read->aux_sam_fields(right_aux_fields);
 
   if (left_edit_dist > max_edit_dist || right_edit_dist > max_edit_dist)
-    return false;
+    {
+      --_next_fragment_id;
+      return false;
+    }
 
   return true;
 }
