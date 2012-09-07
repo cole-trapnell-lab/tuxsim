@@ -6,9 +6,9 @@ GffNames* GffObj::names=NULL;
 //global set of feature names, attribute names etc.
 // -- common for all GffObjs in current application!
 
-const uint GFF_MAX_LOCUS = 4000000; //longest known gene in human is ~2.2M, UCSC claims a gene for mouse of ~ 3.1 M
-const uint GFF_MAX_EXON  =   20000; //longest known exon in human is ~11K
-const uint GFF_MAX_INTRON= 1600000;
+const uint GFF_MAX_LOCUS = 7000000; //longest known gene in human is ~2.2M, UCSC claims a gene for mouse of ~ 3.1 M
+const uint GFF_MAX_EXON  =   30000; //longest known exon in human is ~11K
+const uint GFF_MAX_INTRON= 6000000; //Ensembl shows a >5MB human intron
 
 const int gff_fid_mRNA=0;
 const int gff_fid_exon=1;

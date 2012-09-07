@@ -58,9 +58,9 @@ libtuxsim_a_SOURCES = \
     
     
 tuxsim_SOURCES = tuxsim.cpp  
-tuxsim_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
+tuxsim_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_SYSTEM_LIB) 
 tuxsim_LDFLAGS =  $(BOOST_LDFLAGS)
 
 samcompare_SOURCES = samcompare.cpp  
-samcompare_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB)
+samcompare_LDADD = libtuxsim.a $(BOOST_THREAD_LIB) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_SYSTEM_LIB) 
 samcompare_LDFLAGS =  $(BOOST_LDFLAGS)
