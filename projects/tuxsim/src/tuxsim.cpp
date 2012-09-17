@@ -14,7 +14,7 @@
 #include <locale>
 
 
-//#include <boost/math/distributions/normal.hpp> 
+//#include <boost/math/distributions/normal.hpp>
 //using boost::math::normal;
 
 #include "common.h"
@@ -38,14 +38,14 @@
 using namespace std;
 using namespace boost;
 
-//char* getFastaFile(int gseq_id) 
+//char* getFastaFile(int gseq_id)
 //{
 //	if (fastadir == "") return NULL;
 //	GStr s(fastadir.c_str());
 //	s.trimR('/');
 //	s.appendfmt("/%s",getGSeqName(gseq_id));
 //	GStr sbase=s;
-//	if (!fileExists(s.chars())) 
+//	if (!fileExists(s.chars()))
 //		s.append(".fa");
 //	if (!fileExists(s.chars())) s.append("sta");
 //	if (fileExists(s.chars())) return Gstrdup(s.chars());
@@ -58,7 +58,7 @@ using namespace boost;
 
 struct ScaffoldSorter
 {
-	ScaffoldSorter(RefSequenceTable& _rt) : rt(_rt) {} 
+	ScaffoldSorter(RefSequenceTable& _rt) : rt(_rt) {}
 	bool operator()(const Scaffold& lhs, const Scaffold& rhs)
 	{
         uint32_t l_id = lhs.ref_id();
@@ -70,7 +70,7 @@ struct ScaffoldSorter
         {
             //if (l_len != 0 && r_len != 0)
             //    return l_len > r_len;
-            //else 
+            //else
             return (strcmp(rt.get_name(lhs.ref_id()), rt.get_name(rhs.ref_id())) < 0);
         }
         return lhs.left() < rhs.left();
@@ -81,10 +81,10 @@ struct ScaffoldSorter
 
 
 //FIXME: needs refactoring
-void load_ref_rnas(FILE* ref_mRNA_file, 
-		   RefSequenceTable& rt,
-		   GFastaHandler& gfasta,
-		   vector<Scaffold>& ref_mRNAs) 
+void load_ref_rnas(FILE* ref_mRNA_file,
+                   RefSequenceTable& rt,
+                   GFastaHandler& gfasta,
+                   vector<Scaffold>& ref_mRNAs)
 {
 	static GList<GSeqData> ref_rnas;
 	
@@ -101,13 +101,13 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	// Geo groups them by chr.
 	if (ref_rnas.Count()>0) //if any ref data was loaded
 	{
-		for (int j = 0; j < ref_rnas.Count(); ++j) 
+		for (int j = 0; j < ref_rnas.Count(); ++j)
 		{    //ref data is grouped by genomic sequence
 			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->gseq_id);
 			
 			RefID ref_id = rt.get_id(name, NULL, 0);
 			for (int i = 0; i < ref_rnas[j]->mrnas_f.Count(); ++i)
-			{	
+			{
 				GffObj& rna = *(ref_rnas[j]->mrnas_f[i]);
 				
 				if (rna.gseq_id != last_gseq_id)
@@ -176,14 +176,14 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				std::transform(rs.begin(), rs.end(), rs.begin(), (int (*)(int))std::toupper);
 				ref_scaff.seq(rs);
 				GFREE(rna_seq);
-
+                
 				ref_scaff.gseq_id(rna.gseq_id);
-				ref_mRNAs.push_back(ref_scaff); 
+				ref_mRNAs.push_back(ref_scaff);
 				
 			}
 			
 			for (int i = 0; i < ref_rnas[j]->mrnas_r.Count(); ++i)
-			{	
+			{
 				GffObj& rna = *(ref_rnas[j]->mrnas_r[i]);
 				
 				if (rna.gseq_id != last_gseq_id)
@@ -253,9 +253,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
                 reverse_complement(rs);
 				ref_scaff.seq(rs);
 				GFREE(rna_seq);
-
+                
 				ref_scaff.gseq_id(rna.gseq_id);
-				ref_mRNAs.push_back(ref_scaff); 
+				ref_mRNAs.push_back(ref_scaff);
 			}
 		}
 		ScaffoldSorter sorter(rt);
@@ -265,8 +265,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 
 struct FastqOutfilePair
 {
-	FastqOutfilePair(FILE* left, FILE* right) : 
-	left_out_file(left), 
+	FastqOutfilePair(FILE* left, FILE* right) :
+	left_out_file(left),
 	right_out_file(right) {}
 	
 	FILE* left_out_file;
@@ -279,10 +279,10 @@ struct FastqOutfilePair
 class AssayProtocol
 {
 public:
-  AssayProtocol(FragmentPolicy& frag_impl, 
-		SequencingPolicy& seq_impl,
-		GFastaHandler& gfasta) :
-    _frag_impl(frag_impl), 
+    AssayProtocol(FragmentPolicy& frag_impl,
+                  SequencingPolicy& seq_impl,
+                  GFastaHandler& gfasta) :
+    _frag_impl(frag_impl),
     _seq_impl(seq_impl),
     _gfasta(gfasta)
     {}
@@ -293,7 +293,7 @@ public:
         
         if (_frag_impl.next_fragment(molecule, frag))
         {
-	  return _seq_impl.reads_for_fragment(frag, reads, _gfasta);
+            return _seq_impl.reads_for_fragment(frag, reads, _gfasta);
         }
         return false;
     }
@@ -304,7 +304,7 @@ public:
 private:
     FragmentPolicy& _frag_impl;
     SequencingPolicy& _seq_impl;
-  GFastaHandler& _gfasta;
+    GFastaHandler& _gfasta;
 };
 
 struct SortReads
@@ -323,9 +323,9 @@ void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
          itr != rt.end();
          ++itr)
     {
-        //        fprintf(sam_out, 
-        //                "@SQ\tSN:%s\tLN:%u\n", 
-        //                itr->second.name, 
+        //        fprintf(sam_out,
+        //                "@SQ\tSN:%s\tLN:%u\n",
+        //                itr->second.name,
         //                itr->second.len);
         seq_dict[itr->second.name] = itr->second.len;
     }
@@ -334,9 +334,9 @@ void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
          itr != seq_dict.end();
          ++itr)
     {
-        fprintf(sam_out, 
-                "@SQ\tSN:%s\tLN:%u\n", 
-                itr->first.c_str(), 
+        fprintf(sam_out,
+                "@SQ\tSN:%s\tLN:%u\n",
+                itr->first.c_str(),
                 itr->second);
     }
     
@@ -352,7 +352,7 @@ void print_fastq_read(const ReadHit& read,
     fprintf(fastq_file, "%s\n", read.qual().c_str());
 }
 
-void print_fastq_pair(const ReadsForFragment& reads, 
+void print_fastq_pair(const ReadsForFragment& reads,
                       FastqOutfilePair& fastq_out)
 {
     assert (reads.size() == 2);
@@ -430,14 +430,14 @@ void print_aligned_read(const ReadHit& read,
     {
         tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
     }
-
+    
     string aux_str;
     const vector<string>& aux_fields = read.aux_sam_fields();
     for (size_t i = 0; i < aux_fields.size(); ++i)
-      {
-	aux_str += "\t";
-	aux_str += aux_fields[i];
-      }
+    {
+        aux_str += "\t";
+        aux_str += aux_fields[i];
+    }
     
     fprintf(sam_out,
             "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s%s\n",
@@ -451,7 +451,7 @@ void print_aligned_read(const ReadHit& read,
             seq.c_str(),
             qual.c_str(),
             tag_str.c_str(),
-	    aux_str.c_str());
+            aux_str.c_str());
 }
 
 struct TranscriptNameSorter
@@ -470,7 +470,7 @@ struct TranscriptNameSorter
 };
 
 void generate_reads(RefSequenceTable& rt,
-                    vector<Scaffold>& ref_mRNAs, 
+                    vector<Scaffold>& ref_mRNAs,
                     AssayProtocol* sequencer,
                     int total_frags,
                     FILE* sam_frag_out,
@@ -480,7 +480,7 @@ void generate_reads(RefSequenceTable& rt,
 {
     RefID last_ref_id = 0;
     int rna_rightmost = 0;
-    vector<shared_ptr<ReadHit> > read_chunk; 
+    vector<shared_ptr<ReadHit> > read_chunk;
     
     if (expr_out)
     {
@@ -526,8 +526,8 @@ void generate_reads(RefSequenceTable& rt,
             
             if (sequencer->next_reads(ref_mRNAs[i], reads))
             {
-                const ReadHit& left = *(reads.front()); 
-                const ReadHit& right = *(reads.back()); 
+                const ReadHit& left = *(reads.front());
+                const ReadHit& right = *(reads.back());
                 read_chunk.push_back(reads.front());
                 read_chunk.push_back(reads.back());
                 
@@ -547,7 +547,7 @@ void generate_reads(RefSequenceTable& rt,
             }
             else
             {
-                // TODO: each sequencer should gracefully produce garbage in 
+                // TODO: each sequencer should gracefully produce garbage in
                 // cases of bad fragments (i.e. fragment is too small)
             }
         }
@@ -576,7 +576,7 @@ void generate_reads(RefSequenceTable& rt,
                 
                 string gene_id = ref_mRNAs[i].annotated_gene_id();
                 char buf[2048];
-                sprintf(buf, "%s_%d", ref_mRNAs[i].annotated_trans_id().c_str(), transfrag_id); 
+                sprintf(buf, "%s_%d", ref_mRNAs[i].annotated_trans_id().c_str(), transfrag_id);
                 vector<string> gtf_recs;
                 
                 get_scaffold_gtf_records(rt, transfrag, gene_id, buf, gtf_recs);
@@ -593,7 +593,7 @@ void generate_reads(RefSequenceTable& rt,
         {
             rna_rightmost = ref_mRNAs[i].right();
         }
-        else 
+        else
         {
             rna_rightmost = max(rna_rightmost, ref_mRNAs[i].right());
         }
@@ -616,11 +616,11 @@ void generate_reads(RefSequenceTable& rt,
                 cov = (num_frags_for_mRNA * 2 * read_length) / (double)ref_mRNAs[i].effective_length(&frag_policy);
             }
             
-            fprintf(expr_out, 
-                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\t%s\t%d\n", 
+            fprintf(expr_out,
+                    "%s\t%s\t%g\t%g\t%g\t%g\t%g\t%s\t%d\n",
                     ref_mRNAs[i].annotated_gene_id().c_str(),
                     ref_mRNAs[i].annotated_trans_id().c_str(),
-                    fpkm, 
+                    fpkm,
                     ref_mRNAs[i].rho(),
                     0.0,
                     cov,
@@ -640,14 +640,14 @@ void generate_reads(RefSequenceTable& rt,
     read_chunk.clear();
 }
 
-void load_contigs(const string& genome_fasta, 
-				  RefSequenceTable& rt, 
+void load_contigs(const string& genome_fasta,
+				  RefSequenceTable& rt,
 				  vector<Scaffold>& source_molecules)
 {
 	GFastaFile genome(genome_fasta.c_str());
 	
 	bool last = false;
-	do 
+	do
 	{
 		FastaSeq contig;
 		genome.getFastaSeq(last, &contig);
@@ -665,34 +665,34 @@ void driver(FILE* sam_out,
             FastqOutfilePair& fastq_out,
             FILE* expr_out,
             FILE* gtf_out,
-	    FILE* mismatches_out,
-	    FILE* indels_out,
+            FILE* mismatches_out,
+            FILE* indels_out,
             FILE* expr_in)
 {
-  ReadTable it;
-  RefSequenceTable rt(true, false);
-  
-  vector<Scaffold> source_molecules;
-  GFastaHandler gfasta(fastadir.c_str());
-  
-  if (mrna_gtf != "")
-    {        
-      FILE* ref_gtf = NULL;
-      
-      ref_gtf = fopen(mrna_gtf.c_str(), "r");
-      if (!ref_gtf)
-	{
-	  fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
-		  mrna_gtf.c_str());
-	  exit(1);
-	}
-
-      load_ref_rnas(ref_gtf, rt, gfasta, source_molecules);
-      if (source_molecules.empty())
-	{
-	  fprintf(stderr, "Error: GTF is empty!\n");
-	  exit(1);
-	}
+    ReadTable it;
+    RefSequenceTable rt(true, false);
+    
+    vector<Scaffold> source_molecules;
+    GFastaHandler gfasta(fastadir.c_str());
+    
+    if (mrna_gtf != "")
+    {
+        FILE* ref_gtf = NULL;
+        
+        ref_gtf = fopen(mrna_gtf.c_str(), "r");
+        if (!ref_gtf)
+        {
+            fprintf(stderr, "Error: cannot open GTF file %s for reading\n",
+                    mrna_gtf.c_str());
+            exit(1);
+        }
+        
+        load_ref_rnas(ref_gtf, rt, gfasta, source_molecules);
+        if (source_molecules.empty())
+        {
+            fprintf(stderr, "Error: GTF is empty!\n");
+            exit(1);
+        }
     }
     else if (genome_fasta != "")
     {
@@ -708,10 +708,10 @@ void driver(FILE* sam_out,
         fprintf(stderr, "Error: No source_pool input files defined\n");
         exit(1);
     }
-
-  // extract exons and merge them in case they overlap with one another.
-  vector<AugmentedCuffOp> exons, temp_exons;
-  for (size_t i = 0; i < source_molecules.size(); ++i)
+    
+    // extract exons and merge them in case they overlap with one another.
+    vector<AugmentedCuffOp> exons, temp_exons;
+    for (size_t i = 0; i < source_molecules.size(); ++i)
     {
         const Scaffold& scaf = source_molecules[i];
         const vector<AugmentedCuffOp>& ops = scaf.augmented_ops();
@@ -733,35 +733,35 @@ void driver(FILE* sam_out,
         if (AugmentedCuffOp::overlap_in_genome(exons.back(), temp_exons[i]))
         {
             if (exons.back().g_right() < temp_exons[i].g_right())
-                exons.back().genomic_length = temp_exons[i].g_right() - exons.back().g_left();		
+                exons.back().genomic_length = temp_exons[i].g_right() - exons.back().g_left();
         }
         else
         {
             exons.push_back(temp_exons[i]);
         }
     }
-
-  vector<Mismatch> mismatches;
-  generate_true_mismatches(exons, mismatches);
-  print_mismatches(mismatches_out, rt, mismatches);
-
-  vector<AugmentedCuffOp> indels;
-  generate_true_indels(exons, indels);
-  print_indels(indels_out, rt, indels);
-  
-  //    
-  FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
-  
-  if (expr_in != NULL)
+    
+    vector<Mismatch> mismatches;
+    generate_true_mismatches(exons, mismatches);
+    print_mismatches(mismatches_out, rt, mismatches);
+    
+    vector<AugmentedCuffOp> indels;
+    generate_true_indels(exons, indels);
+    print_indels(indels_out, rt, indels);
+    
+    //
+    FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
+    
+    if (expr_in != NULL)
     {
         load_abundances(expr_in, source_molecules);
     }
-    else 
+    else
     {
         assign_abundances(flux_policy, source_molecules);
     }
     
-    NormalFragments frag_policy(frag_length_mean, 
+    NormalFragments frag_policy(frag_length_mean,
                                 frag_length_std_dev,
                                 read_length, frag_length_mean  + 3 * frag_length_std_dev);
     calc_frag_abundances(&frag_policy, source_molecules);
@@ -772,26 +772,26 @@ void driver(FILE* sam_out,
         shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
         frag_policy.priming_policy(primer);
     }
-  
-  IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
-  AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy, gfasta);
-  
-  for (size_t i = 0; i < source_molecules.size(); ++i)
+    
+    IlluminaChIPSeqPE seq_policy(read_length, read_length, false);
+    AssayProtocol* sequencer = new AssayProtocol(frag_policy, seq_policy, gfasta);
+    
+    for (size_t i = 0; i < source_molecules.size(); ++i)
     {
-      source_molecules[i].insert_true_mismatches(mismatches);
-      source_molecules[i].insert_true_indels(indels);
+        source_molecules[i].insert_true_mismatches(mismatches);
+        source_molecules[i].insert_true_indels(indels);
     }
-
-  generate_reads(rt,
-		 source_molecules,
-		 sequencer,
-		 num_fragments,
-		 sam_out,
-		 fastq_out,
-		 expr_out,
-		 gtf_out);
-  
-  delete sequencer;
+    
+    generate_reads(rt,
+                   source_molecules,
+                   sequencer,
+                   num_fragments,
+                   sam_out,
+                   fastq_out,
+                   expr_out,
+                   gtf_out);
+    
+    delete sequencer;
 }
 
 int main(int argc, char** argv)
@@ -800,7 +800,7 @@ int main(int argc, char** argv)
     if (parse_ret)
         return parse_ret;
     
-	// seed the random number generator 
+	// seed the random number generator
 	random_seed = time(NULL);
 	
 	//random_seed = 1111111;
@@ -851,7 +851,7 @@ int main(int argc, char** argv)
             exit(1);
         }
 	}
-    //else 
+    //else
     {
         string out_expr_filename = out_prefix + ".simexpr";
         expr_out = fopen(out_expr_filename.c_str(), "w");
@@ -880,9 +880,9 @@ int main(int argc, char** argv)
 	mismatches_out = fopen(out_mismatches_filename.c_str(), "w");
 	if (!mismatches_out)
 	{
-	  fprintf(stderr, "Error: cannot open .mismatches file %s for writing\n",
-		  out_mismatches_filename.c_str());
-	  exit(1);
+        fprintf(stderr, "Error: cannot open .mismatches file %s for writing\n",
+                out_mismatches_filename.c_str());
+        exit(1);
 	}
     
 	FILE* indels_out = NULL;
@@ -890,13 +890,13 @@ int main(int argc, char** argv)
 	indels_out = fopen(out_indels_filename.c_str(), "w");
 	if (!indels_out)
 	{
-	  fprintf(stderr, "Error: cannot open .indels file %s for writing\n",
-		  out_indels_filename.c_str());
-	  exit(1);
+        fprintf(stderr, "Error: cannot open .indels file %s for writing\n",
+                out_indels_filename.c_str());
+        exit(1);
 	}
-
-
+    
+    
 	driver(sam_out, fastq_out, expr_out, frag_gtf_out, mismatches_out, indels_out, expr_in);
-
+    
 	return 0;
 }

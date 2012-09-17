@@ -21,79 +21,92 @@ using namespace std;
 
 int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields);
 
-bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag, 
+bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                                            ReadsForFragment& reads,
-					   GFastaHandler& gfasta)
+                                           GFastaHandler& gfasta)
 {
-  assert (frag.source_seq);
-  Scaffold mRNA = *(frag.source_seq);
+    assert (frag.source_seq);
+    Scaffold mRNA = *(frag.source_seq);
+    
+    int frag_length = frag.end - frag.start;;
+    
+    int left_len = _left_len;
+    int right_len = _right_len;
+    
+    // This simulates perfect adapter trimming in the case that the fragment is shorter than the
+    // requested reads.
+    if (left_len < frag_length)
+        left_len = frag_length;
 
-  int frag_length = frag.end - frag.start;;
-  if (frag_length < _left_len || frag_length < _right_len)
-    return false;
+    if (right_len < frag_length)
+        right_len = frag_length;
 
-  if (mismatch_seq_error_per_bases > 0)
+    
+//    if (frag_length < _left_len || frag_length < _right_len)
+//        return false;
+    
+    if (mismatch_seq_error_per_bases > 0)
     {
-      vector<Mismatch> mismatches;
-      int random_number = rand() % mismatch_seq_error_per_bases;
-      if (random_number < frag_length)
-	{
-	  mismatches.push_back(Mismatch(mRNA.ref_id(), random_number));
-	}
-      
-      mRNA.insert_seq_error_mismatches(mismatches);
-    }  
-  
-  if (indel_seq_error_per_bases > 0)
+        vector<Mismatch> mismatches;
+        int random_number = rand() % mismatch_seq_error_per_bases;
+        if (random_number < frag_length)
+        {
+            mismatches.push_back(Mismatch(mRNA.ref_id(), random_number));
+        }
+        
+        mRNA.insert_seq_error_mismatches(mismatches);
+    }
+    
+    if (indel_seq_error_per_bases > 0)
     {
-      vector<AugmentedCuffOp> indels;
-      int random_number = rand() % indel_seq_error_per_bases;
-      if (random_number < frag_length)
-	{
-	  bool pass = true;
-	  static const int edge = 5;
-	  if (random_number < edge)
-	    {
-	      random_number = edge;
-	      pass = false;
-	    }
-	  else if (random_number >= frag_length - edge)
-	    {
-	      random_number = frag_length - edge - 1;
-	      pass = false;
-	    }
-	  else if (random_number < _left_len &&
-		   _left_len - random_number < edge)
-	    {
-	      random_number = edge * 2;
-	      pass = false;
-	    }
-	  
-	  if (random_number > frag_length - _right_len - edge &&
-		   random_number - (frag_length - _right_len) < edge)
-	    pass = false;
-
-	  if (pass)
-	    {
-	      CuffOpCode opcode;
-	      if (rand() % 2 == 0)
-		opcode = CUFF_INS;
-	      else
-		opcode = CUFF_DEL;
-
-	      int length = rand() % 3 + 1;
-	      indels.push_back(AugmentedCuffOp(opcode, mRNA.ref_id(), frag.start + random_number, length));
-	      
-	      mRNA.insert_seq_error_indels(indels);
-	    }
-	}
+        vector<AugmentedCuffOp> indels;
+        int random_number = rand() % indel_seq_error_per_bases;
+        if (random_number < frag_length)
+        {
+            bool pass = true;
+            static const int edge = 5;
+            if (random_number < edge)
+            {
+                random_number = edge;
+                pass = false;
+            }
+            else if (random_number >= frag_length - edge)
+            {
+                random_number = frag_length - edge - 1;
+                pass = false;
+            }
+            else if (random_number < left_len &&
+                     left_len - random_number < edge)
+            {
+                random_number = edge * 2;
+                pass = false;
+            }
+            
+            if (random_number > frag_length - right_len - edge &&
+                random_number - (frag_length - right_len) < edge)
+                pass = false;
+            
+            if (pass)
+            {
+                CuffOpCode opcode;
+                if (rand() % 2 == 0)
+                    opcode = CUFF_INS;
+                else
+                    opcode = CUFF_DEL;
+                
+                int length = rand() % 3 + 1;
+                indels.push_back(AugmentedCuffOp(opcode, mRNA.ref_id(), frag.start + random_number, length));
+                
+                mRNA.insert_seq_error_indels(indels);
+            }
+        }
     }
     
     vector<AugmentedCuffOp> frag_ops;
     const vector<AugmentedCuffOp>& rna_ops = mRNA.augmented_ops();
     
     vector<AugmentedCuffOp> left_read_ops;
-    bool result = select_genomic_op_range(rna_ops, frag.start, frag.start + _left_len, left_read_ops);
+    bool result = select_genomic_op_range(rna_ops, frag.start, frag.start + left_len, left_read_ops);
     if (!result)
         return false;
     
@@ -104,7 +117,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     assert (!left_read_cigar.empty());
     
     vector<AugmentedCuffOp> right_read_ops;
-    result = select_genomic_op_range(rna_ops, frag.end - _right_len, frag.end, right_read_ops);
+    result = select_genomic_op_range(rna_ops, frag.end - right_len, frag.end, right_read_ops);
     if (!result)
         return false;
     
@@ -117,8 +130,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     const string& target_seq = mRNA.target_seq();
     string left_seq, right_seq;
     
-    left_seq = target_seq.substr(frag.start, _left_len);
-    right_seq = target_seq.substr(frag.end - _right_len, _right_len);
+    left_seq = target_seq.substr(frag.start, left_len);
+    right_seq = target_seq.substr(frag.end - right_len, right_len);
     
     bool reverse_strand_frag = _bool_generator();
     
@@ -153,10 +166,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                           0,
                           0,
                           0, //mRNA.annotated_trans_id()
-                          frag.end - _right_len);
+                          frag.end - right_len);
     
-    if (left_read->read_len() != _left_len ||
-        right_read->read_len() != _right_len)
+    if (left_read->read_len() != left_len ||
+        right_read->read_len() != right_len)
     {
         fprintf(stderr, "this should not happen!!\n");
         exit(1);
@@ -172,7 +185,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     int left_flag = base_flag;
     int right_flag = base_flag;
     
-    string right_seq_rc = right_seq;            
+    string right_seq_rc = right_seq;
     reverse_complement(right_seq_rc);
     right_flag |= BAM_FREVERSE;
     left_flag |= BAM_FMREVERSE;
@@ -190,37 +203,37 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
         left_flag |= BAM_FREAD1;
         right_flag |= BAM_FREAD2;
     }
-  
-  reads.push_back(left_read);
-  reads.push_back(right_read);
-  
-  left_read->sam_flag(left_flag);
-  right_read->sam_flag(right_flag);
-  
-  char buf[2048];
-  sprintf(buf,"%llu",left_read->insert_id());
-  
-  left_read->name(buf);
-  right_read->name(buf);
-  
-  left_read->qual(string(left_read->seq().length(), 'I'));
-  right_read->qual(string(right_read->seq().length(), 'I'));
-
-  vector<string> left_aux_fields;
-  int left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields);
-  left_read->aux_sam_fields(left_aux_fields);
-
-  vector<string> right_aux_fields;
-  int right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields);
-  right_read->aux_sam_fields(right_aux_fields);
-
-  if (left_edit_dist > max_edit_dist || right_edit_dist > max_edit_dist)
+    
+    reads.push_back(left_read);
+    reads.push_back(right_read);
+    
+    left_read->sam_flag(left_flag);
+    right_read->sam_flag(right_flag);
+    
+    char buf[2048];
+    sprintf(buf,"%llu",left_read->insert_id());
+    
+    left_read->name(buf);
+    right_read->name(buf);
+    
+    left_read->qual(string(left_read->seq().length(), 'I'));
+    right_read->qual(string(right_read->seq().length(), 'I'));
+    
+    vector<string> left_aux_fields;
+    int left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields);
+    left_read->aux_sam_fields(left_aux_fields);
+    
+    vector<string> right_aux_fields;
+    int right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields);
+    right_read->aux_sam_fields(right_aux_fields);
+    
+    if (left_edit_dist > max_edit_dist || right_edit_dist > max_edit_dist)
     {
-      --_next_fragment_id;
-      return false;
+        --_next_fragment_id;
+        return false;
     }
-
-  return true;
+    
+    return true;
 }
 
 bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
@@ -311,7 +324,7 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
 #endif
     
     while (curr_op_idx < src_ops.size() &&
-           curr_genomic_off < src_ops.back().g_right() && 
+           curr_genomic_off < src_ops.back().g_right() &&
            curr_genomic_off < genomic_right)
     {
         const AugmentedCuffOp& curr_op = src_ops[curr_op_idx++];
@@ -401,179 +414,179 @@ void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
 
 void str_appendInt(string& str, int64_t v)
 {
-  char int_str[32] = {0};
-  sprintf(int_str, "%ld", v);
-  str += int_str;
+    char int_str[32] = {0};
+    sprintf(int_str, "%ld", v);
+    str += int_str;
 }
 
 int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields)
 {
-  static GFaSeqGet* buf_faseq = NULL;
-  static int buf_gseq_id = -1;
-
-  GFaSeqGet* faseq = NULL;
-  if (gseq_id != buf_gseq_id)
+    static GFaSeqGet* buf_faseq = NULL;
+    static int buf_gseq_id = -1;
+    
+    GFaSeqGet* faseq = NULL;
+    if (gseq_id != buf_gseq_id)
     {
-      buf_gseq_id = gseq_id;
-      faseq = buf_faseq = gfasta.fetch(gseq_id);
+        buf_gseq_id = gseq_id;
+        faseq = buf_faseq = gfasta.fetch(gseq_id);
     }
-  else
+    else
     {
-      faseq = buf_faseq;
+        faseq = buf_faseq;
     }
-
-  if (!faseq)
-    return -1;
-  
-  int length = 1;
-  const char* ref_str = faseq->subseq(0, length);
-
-  if (!ref_str)
-    return -1;
-
-  size_t pos_seq = 0;
-  size_t pos_mismatch = 0;
-  size_t pos_ref = rh.left();
-  size_t mismatch = 0;
-  size_t N_mismatch = 0;
-  size_t num_gap_opens = 0;
-  size_t num_gap_conts = 0;
-
-  static const int bowtie2_min_score = -10;
-  static const int bowtie2_max_penalty = 6;
-  static const int bowtie2_min_penalty = 2;
-  static const int bowtie2_penalty_for_N = 1;
-  static const int bowtie2_read_gap_open = 5;
-  static const int bowtie2_read_gap_cont = 3;
-  static const int bowtie2_ref_gap_open = 5;
-  static const int bowtie2_ref_gap_cont = 3;
-
-  int AS_score = 0;
-  
-  const vector<CigarOp>& cigars = rh.cigar();
-  string seq = rh.seq();
-  if (rh.sam_flag() & BAM_FREVERSE)
-    reverse_complement(seq);
-
-  const string& qual = rh.qual();
-  string AS = "AS:i:";
-  string MD = "MD:Z:";
-
-  for (size_t i = 0; i < cigars.size(); ++i)
+    
+    if (!faseq)
+        return -1;
+    
+    int length = 1;
+    const char* ref_str = faseq->subseq(0, length);
+    
+    if (!ref_str)
+        return -1;
+    
+    size_t pos_seq = 0;
+    size_t pos_mismatch = 0;
+    size_t pos_ref = rh.left();
+    size_t mismatch = 0;
+    size_t N_mismatch = 0;
+    size_t num_gap_opens = 0;
+    size_t num_gap_conts = 0;
+    
+    static const int bowtie2_min_score = -10;
+    static const int bowtie2_max_penalty = 6;
+    static const int bowtie2_min_penalty = 2;
+    static const int bowtie2_penalty_for_N = 1;
+    static const int bowtie2_read_gap_open = 5;
+    static const int bowtie2_read_gap_cont = 3;
+    static const int bowtie2_ref_gap_open = 5;
+    static const int bowtie2_ref_gap_cont = 3;
+    
+    int AS_score = 0;
+    
+    const vector<CigarOp>& cigars = rh.cigar();
+    string seq = rh.seq();
+    if (rh.sam_flag() & BAM_FREVERSE)
+        reverse_complement(seq);
+    
+    const string& qual = rh.qual();
+    string AS = "AS:i:";
+    string MD = "MD:Z:";
+    
+    for (size_t i = 0; i < cigars.size(); ++i)
     {
-      CigarOp cigar = cigars[i];
-      switch(cigar.opcode)
-	{
-	case MATCH:
-	  {
-	    const char* ref_seq = ref_str + pos_ref + 1;
-	    pos_ref += cigar.length;
-	    
-	    for (size_t j = 0; j < cigar.length; ++j)
-	      {
-		char ref_nt = ref_seq[j];
-		if (seq[pos_seq] != ref_nt)
-		  {
-		    ++mismatch;
-
-		    if (pos_seq < qual.length())
-		      {
-			if (seq[pos_seq] == 'N' || ref_nt == 'N')
-			  {
-			    AS_score -= (int)bowtie2_penalty_for_N;
-			  }
-			else
-			  {
-			    float penalty = bowtie2_min_penalty + (bowtie2_max_penalty - bowtie2_min_penalty) * min((int)(qual[pos_seq] - '!'), 40) / 40.0;
-			    AS_score -= (int)penalty;
-			  }
-		      }
-
-		    str_appendInt(MD, (int)pos_mismatch);
-		    MD.push_back((char)ref_nt);
-		    pos_mismatch = 0;
-		  }
-		else
-		  {
-		    if (ref_nt == 'N')
-		      {
-			++N_mismatch;
-			AS_score -= (int)bowtie2_penalty_for_N;
-		      }
-
-		    ++pos_mismatch;
-		  }
-
-		++pos_seq;
-	      }
-	  }
-	  break;
-
-	case INS:
-	  {
-	    pos_seq += cigar.length;
-
-	    AS_score -= bowtie2_read_gap_open;
-	    AS_score -= (int)(bowtie2_read_gap_cont * cigar.length);
-
-	    num_gap_opens += 1;
-	    num_gap_conts += cigar.length;
-	  }
-	  break;
-	  
-	case DEL:
-	  {
-	    AS_score -= bowtie2_ref_gap_open;
-	    AS_score -= (int)(bowtie2_ref_gap_cont * cigar.length);
-
-	    num_gap_opens += 1;
-	    num_gap_conts += cigar.length;
-	      
-	    const char* ref_seq = ref_str + pos_ref + 1;
-	    pos_ref += cigar.length;
-
-	    str_appendInt(MD, (int)pos_mismatch);
-	    MD.push_back('^');
-	    for (size_t k = 0; k < cigar.length; ++k)
-	      MD.push_back((char)ref_seq[k]);
-	    
-	    pos_mismatch = 0;
-	  }
-	  break;
-
-	case REF_SKIP:
-	  {
-	    pos_ref += cigar.length;
-	  }
-	  break;
-
-	default:
-	  break;
-	}
+        CigarOp cigar = cigars[i];
+        switch(cigar.opcode)
+        {
+            case MATCH:
+            {
+                const char* ref_seq = ref_str + pos_ref + 1;
+                pos_ref += cigar.length;
+                
+                for (size_t j = 0; j < cigar.length; ++j)
+                {
+                    char ref_nt = ref_seq[j];
+                    if (seq[pos_seq] != ref_nt)
+                    {
+                        ++mismatch;
+                        
+                        if (pos_seq < qual.length())
+                        {
+                            if (seq[pos_seq] == 'N' || ref_nt == 'N')
+                            {
+                                AS_score -= (int)bowtie2_penalty_for_N;
+                            }
+                            else
+                            {
+                                float penalty = bowtie2_min_penalty + (bowtie2_max_penalty - bowtie2_min_penalty) * min((int)(qual[pos_seq] - '!'), 40) / 40.0;
+                                AS_score -= (int)penalty;
+                            }
+                        }
+                        
+                        str_appendInt(MD, (int)pos_mismatch);
+                        MD.push_back((char)ref_nt);
+                        pos_mismatch = 0;
+                    }
+                    else
+                    {
+                        if (ref_nt == 'N')
+                        {
+                            ++N_mismatch;
+                            AS_score -= (int)bowtie2_penalty_for_N;
+                        }
+                        
+                        ++pos_mismatch;
+                    }
+                    
+                    ++pos_seq;
+                }
+            }
+                break;
+                
+            case INS:
+            {
+                pos_seq += cigar.length;
+                
+                AS_score -= bowtie2_read_gap_open;
+                AS_score -= (int)(bowtie2_read_gap_cont * cigar.length);
+                
+                num_gap_opens += 1;
+                num_gap_conts += cigar.length;
+            }
+                break;
+                
+            case DEL:
+            {
+                AS_score -= bowtie2_ref_gap_open;
+                AS_score -= (int)(bowtie2_ref_gap_cont * cigar.length);
+                
+                num_gap_opens += 1;
+                num_gap_conts += cigar.length;
+                
+                const char* ref_seq = ref_str + pos_ref + 1;
+                pos_ref += cigar.length;
+                
+                str_appendInt(MD, (int)pos_mismatch);
+                MD.push_back('^');
+                for (size_t k = 0; k < cigar.length; ++k)
+                    MD.push_back((char)ref_seq[k]);
+                
+                pos_mismatch = 0;
+            }
+                break;
+                
+            case REF_SKIP:
+            {
+                pos_ref += cigar.length;
+            }
+                break;
+                
+            default:
+                break;
+        }
     }
-
-  str_appendInt(AS, AS_score);
-  fields.push_back(AS);
-
-  string XM = "XM:i:";
-  str_appendInt(XM, (int)mismatch);
-  fields.push_back(XM);
-
-  string XO = "XO:i:";
-  str_appendInt(XO, (int)num_gap_opens);
-  fields.push_back(XO);
-
-  string XG = "XG:i:";
-  str_appendInt(XG, (int)num_gap_conts);
-  fields.push_back(XG);
-
-  str_appendInt(MD, (int)pos_mismatch);
-  fields.push_back(MD);
-
-  string NM = "NM:i:";
-  int edit_dist = mismatch + num_gap_conts;
-  str_appendInt(NM, (int)edit_dist);
-  fields.push_back(NM);
-
-  return edit_dist;
+    
+    str_appendInt(AS, AS_score);
+    fields.push_back(AS);
+    
+    string XM = "XM:i:";
+    str_appendInt(XM, (int)mismatch);
+    fields.push_back(XM);
+    
+    string XO = "XO:i:";
+    str_appendInt(XO, (int)num_gap_opens);
+    fields.push_back(XO);
+    
+    string XG = "XG:i:";
+    str_appendInt(XG, (int)num_gap_conts);
+    fields.push_back(XG);
+    
+    str_appendInt(MD, (int)pos_mismatch);
+    fields.push_back(MD);
+    
+    string NM = "NM:i:";
+    int edit_dist = mismatch + num_gap_conts;
+    str_appendInt(NM, (int)edit_dist);
+    fields.push_back(NM);
+    
+    return edit_dist;
 }

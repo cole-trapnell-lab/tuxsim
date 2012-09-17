@@ -8,9 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8DD76F6A0486A84900D96B5E /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
-		9C0E737913CE1906007B9806 /* libboost_thread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C0E737813CE1906007B9806 /* libboost_thread.dylib */; };
 		9C0E738613CE1A05007B9806 /* GFastaIndex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C0E738413CE1A05007B9806 /* GFastaIndex.cpp */; };
-		9CD6E9501338F48500CCE1DE /* libboost_program_options.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */; };
 		ED0035BC1164509500E19F3F /* GArgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AD1164509500E19F3F /* GArgs.cpp */; };
 		ED0035BD1164509500E19F3F /* GBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035AF1164509500E19F3F /* GBase.cpp */; };
 		ED0035BE1164509500E19F3F /* gdna.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0035B11164509500E19F3F /* gdna.cpp */; };
@@ -40,13 +38,19 @@
 		ED6D62BA118B7BD900A682F4 /* fragments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079741173A7BA00883983 /* fragments.cpp */; };
 		ED6D62BB118B7BD900A682F4 /* sequencing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED5079831173A8EF00883983 /* sequencing.cpp */; };
 		ED6D62C1118B7BD900A682F4 /* tuxsim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* tuxsim.1 */; };
-		ED6D6632118C8D7400A682F4 /* libcppunit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED6D6631118C8D7400A682F4 /* libcppunit.a */; };
 		ED6D6635118C8DD000A682F4 /* TestMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6634118C8DD000A682F4 /* TestMain.cpp */; };
 		ED6D6638118C8DF700A682F4 /* TestHits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6637118C8DF700A682F4 /* TestHits.cpp */; };
 		ED6D667A118CA39000A682F4 /* hits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED0038591164627900E19F3F /* hits.cpp */; };
 		ED6D6A59118F250500A682F4 /* samcompare.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED6D6A58118F250500A682F4 /* samcompare.cpp */; };
 		EDADF8FB118493100018CFB9 /* tuxsim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDADF8FA118493100018CFB9 /* tuxsim.cpp */; };
 		EDCCF4DF117624E5000D83D5 /* options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EDCCF4DE117624E5000D83D5 /* options.cpp */; };
+		F497EDA916075A7E009E4879 /* libboost_thread-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F497EDA816075A7E009E4879 /* libboost_thread-mt.a */; };
+		F497EDAB16075A8B009E4879 /* libboost_program_options-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F497EDAA16075A8B009E4879 /* libboost_program_options-mt.a */; };
+		F497EDAD16075ADD009E4879 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F497EDAC16075ADD009E4879 /* libboost_system-mt.dylib */; };
+		F497EDB016075B28009E4879 /* indels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F497EDAE16075B27009E4879 /* indels.cpp */; };
+		F497EDB316075B31009E4879 /* mismatches.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F497EDB116075B31009E4879 /* mismatches.cpp */; };
+		F497EDB416075B5C009E4879 /* indels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F497EDAE16075B27009E4879 /* indels.cpp */; };
+		F497EDB516075B5C009E4879 /* mismatches.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F497EDB116075B31009E4879 /* mismatches.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -74,10 +78,8 @@
 
 /* Begin PBXFileReference section */
 		8DD76F6C0486A84900D96B5E /* tuxsim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tuxsim; sourceTree = BUILT_PRODUCTS_DIR; };
-		9C0E737813CE1906007B9806 /* libboost_thread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_thread.dylib; path = usr/local/lib/libboost_thread.dylib; sourceTree = SDKROOT; };
 		9C0E738413CE1A05007B9806 /* GFastaIndex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GFastaIndex.cpp; path = src/GFastaIndex.cpp; sourceTree = "<group>"; };
 		9C0E738513CE1A05007B9806 /* GFastaIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GFastaIndex.h; path = src/GFastaIndex.h; sourceTree = "<group>"; };
-		9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_program_options.dylib; path = usr/local/lib/libboost_program_options.dylib; sourceTree = SDKROOT; };
 		C6859E8B029090EE04C91782 /* tuxsim.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = tuxsim.1; sourceTree = "<group>"; };
 		ED0035AD1164509500E19F3F /* GArgs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GArgs.cpp; path = src/GArgs.cpp; sourceTree = "<group>"; };
 		ED0035AE1164509500E19F3F /* GArgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GArgs.h; path = src/GArgs.h; sourceTree = "<group>"; };
@@ -120,7 +122,6 @@
 		ED5079821173A8EF00883983 /* sequencing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sequencing.h; path = src/sequencing.h; sourceTree = "<group>"; };
 		ED5079831173A8EF00883983 /* sequencing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sequencing.cpp; path = src/sequencing.cpp; sourceTree = "<group>"; };
 		ED6D662C118C8D1B00A682F4 /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED6D6631118C8D7400A682F4 /* libcppunit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcppunit.a; path = /usr/local/lib/libcppunit.a; sourceTree = "<absolute>"; };
 		ED6D6634118C8DD000A682F4 /* TestMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestMain.cpp; path = tests/unit_tests/TestMain.cpp; sourceTree = "<group>"; };
 		ED6D6636118C8DF700A682F4 /* TestHits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestHits.h; path = tests/unit_tests/TestHits.h; sourceTree = "<group>"; };
 		ED6D6637118C8DF700A682F4 /* TestHits.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestHits.cpp; path = tests/unit_tests/TestHits.cpp; sourceTree = "<group>"; };
@@ -133,6 +134,13 @@
 		EDCCF4DE117624E5000D83D5 /* options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = options.cpp; path = src/options.cpp; sourceTree = "<group>"; };
 		EDE1082C11E384E3005F1F4B /* ax_check_zlib.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_check_zlib.m4; sourceTree = "<group>"; };
 		EDE1082D11E384E3005F1F4B /* ax_bam.m4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ax_bam.m4; sourceTree = "<group>"; };
+		F497EDA816075A7E009E4879 /* libboost_thread-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_thread-mt.a"; path = "../../../../opt/local/lib/libboost_thread-mt.a"; sourceTree = "<group>"; };
+		F497EDAA16075A8B009E4879 /* libboost_program_options-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-mt.a"; path = "../../../../opt/local/lib/libboost_program_options-mt.a"; sourceTree = "<group>"; };
+		F497EDAC16075ADD009E4879 /* libboost_system-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_system-mt.dylib"; path = "../../../../opt/local/lib/libboost_system-mt.dylib"; sourceTree = "<group>"; };
+		F497EDAE16075B27009E4879 /* indels.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = indels.cpp; path = src/indels.cpp; sourceTree = "<group>"; };
+		F497EDAF16075B27009E4879 /* indels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = indels.h; path = src/indels.h; sourceTree = "<group>"; };
+		F497EDB116075B31009E4879 /* mismatches.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mismatches.cpp; path = src/mismatches.cpp; sourceTree = "<group>"; };
+		F497EDB216075B31009E4879 /* mismatches.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mismatches.h; path = src/mismatches.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,8 +148,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9C0E737913CE1906007B9806 /* libboost_thread.dylib in Frameworks */,
-				9CD6E9501338F48500CCE1DE /* libboost_program_options.dylib in Frameworks */,
+				F497EDA916075A7E009E4879 /* libboost_thread-mt.a in Frameworks */,
+				F497EDAB16075A8B009E4879 /* libboost_program_options-mt.a in Frameworks */,
+				F497EDAD16075ADD009E4879 /* libboost_system-mt.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,7 +165,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED6D6632118C8D7400A682F4 /* libcppunit.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -166,9 +174,9 @@
 		08FB7794FE84155DC02AAC07 /* tuxsim */ = {
 			isa = PBXGroup;
 			children = (
-				9C0E737813CE1906007B9806 /* libboost_thread.dylib */,
-				9CD6E94F1338F48500CCE1DE /* libboost_program_options.dylib */,
-				ED6D6631118C8D7400A682F4 /* libcppunit.a */,
+				F497EDAC16075ADD009E4879 /* libboost_system-mt.dylib */,
+				F497EDAA16075A8B009E4879 /* libboost_program_options-mt.a */,
+				F497EDA816075A7E009E4879 /* libboost_thread-mt.a */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -218,6 +226,10 @@
 				ED6D6A58118F250500A682F4 /* samcompare.cpp */,
 				9C0E738413CE1A05007B9806 /* GFastaIndex.cpp */,
 				9C0E738513CE1A05007B9806 /* GFastaIndex.h */,
+				F497EDAE16075B27009E4879 /* indels.cpp */,
+				F497EDAF16075B27009E4879 /* indels.h */,
+				F497EDB116075B31009E4879 /* mismatches.cpp */,
+				F497EDB216075B31009E4879 /* mismatches.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -370,6 +382,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F497EDB416075B5C009E4879 /* indels.cpp in Sources */,
+				F497EDB516075B5C009E4879 /* mismatches.cpp in Sources */,
 				ED0035BC1164509500E19F3F /* GArgs.cpp in Sources */,
 				ED0035BD1164509500E19F3F /* GBase.cpp in Sources */,
 				ED0035BE1164509500E19F3F /* gdna.cpp in Sources */,
@@ -419,6 +433,8 @@
 				ED6D667A118CA39000A682F4 /* hits.cpp in Sources */,
 				ED6D6635118C8DD000A682F4 /* TestMain.cpp in Sources */,
 				ED6D6638118C8DF700A682F4 /* TestHits.cpp in Sources */,
+				F497EDB016075B28009E4879 /* indels.cpp in Sources */,
+				F497EDB316075B31009E4879 /* mismatches.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,7 +506,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -502,7 +518,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
