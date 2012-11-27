@@ -1,0 +1,129 @@
+#ifndef FRAGMENTS_H
+#define FRAGMENTS_H
+/*
+ *  fragments.h
+ *  tuxsim
+ *
+ *  Created by Cole Trapnell on 4/12/10.
+ *  Copyright 2010 Cole Trapnell. All rights reserved.
+ *
+ */
+
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/uniform_smallint.hpp>
+#include <boost/random/variate_generator.hpp>
+
+#include <boost/random/normal_distribution.hpp>
+
+#include <boost/math/distributions/normal.hpp> 
+using boost::math::normal;
+
+#include "scaffolds.h"
+
+// This is a typedef for a random number generator.
+// Try boost::mt19937 or boost::ecuyer1988 instead of boost::minstd_rand
+typedef boost::minstd_rand base_generator_type;
+
+struct LibraryFragment
+{
+	const Scaffold* source_seq;
+	
+	// Fragment specified as an open interval [start, end)
+	int start;
+	int end;	
+};
+
+class PrimingPolicy
+{
+public:
+    virtual ~PrimingPolicy() {}
+	virtual bool next_priming_site(const Scaffold& molecule,
+								   int& priming_site) = 0;
+};
+
+class UniformRandomPriming : public PrimingPolicy
+{
+	
+	typedef variate_generator<base_generator_type&, boost::uniform_01<> > uniform_generator_type;
+	
+public:
+	UniformRandomPriming() : 
+    _base_generator(base_generator_type(random_seed)),
+    _uniform_generator(uniform_generator_type(_base_generator, uniform_01<>()))
+	{
+	}
+	bool next_priming_site(const Scaffold& molecule,
+						   int& priming_site);
+	
+private:
+	base_generator_type _base_generator;
+	uniform_generator_type _uniform_generator;
+};
+
+class ThreePrimeEndPriming : public PrimingPolicy
+{
+	bool next_priming_site(const Scaffold& molecule,
+						   int& priming_site);
+};
+
+class FragmentPolicy
+{
+public:
+    virtual ~FragmentPolicy() {}
+	virtual bool next_fragment(const Scaffold& molecule,
+                               LibraryFragment& fragment) = 0;
+    
+    virtual double frag_len_prob(int frag_len) const = 0;
+};
+
+class NormalFragments : public FragmentPolicy
+{
+	typedef variate_generator<base_generator_type&, normal_distribution<> > normal_generator_type;
+	
+public:
+	
+	NormalFragments(int mean_frag_length, 
+                    int frag_length_sd, 
+                    int min_frag_length,
+                    int max_frag_length) :
+    _base_generator(base_generator_type(random_seed)),
+    _length_generator(normal_generator_type(_base_generator, 
+                                            normal_distribution<>(mean_frag_length, frag_length_sd))),
+    _min_frag_length(min_frag_length),
+    _max_frag_length(max_frag_length),
+    frag_len_dist(mean_frag_length, frag_length_sd)
+	{
+		_priming_policy = shared_ptr<PrimingPolicy>(new UniformRandomPriming());
+	}
+	
+	virtual bool next_fragment(const Scaffold& molecule,
+                               LibraryFragment& fragment);
+	
+	void priming_policy(shared_ptr<PrimingPolicy> policy ) 
+	{ 
+		_priming_policy = policy; 
+	}
+    
+    double frag_len_prob(int frag_len) const
+    {
+        if (frag_len < _min_frag_length)
+            return 0.0;
+        if (frag_len > _max_frag_length)
+            return 0.0;
+        
+        return pdf(frag_len_dist, frag_len);
+    }
+	
+private:
+	base_generator_type _base_generator;
+	normal_generator_type _length_generator;
+	
+    normal frag_len_dist; 
+    
+    shared_ptr<PrimingPolicy> _priming_policy;
+    int _min_frag_length;
+    int _max_frag_length;
+};
+#endif
