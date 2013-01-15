@@ -295,6 +295,7 @@ public:
         {
             return _seq_impl.reads_for_fragment(frag, reads, _gfasta);
         }
+
         return false;
     }
     
@@ -752,10 +753,7 @@ void driver(FILE* sam_out,
         generate_true_indels(exons, indels);
         print_indels(indels_out, rt, indels);
     }
-     
-    
-    
-    //
+
     FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
     
     if (expr_in != NULL)
