@@ -35,10 +35,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     
     // This simulates perfect adapter trimming in the case that the fragment is shorter than the
     // requested reads.
-    if (left_len < frag_length)
+    if (left_len > frag_length)
         left_len = frag_length;
 
-    if (right_len < frag_length)
+    if (right_len > frag_length)
         right_len = frag_length;
 
     
@@ -108,7 +108,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     vector<AugmentedCuffOp> left_read_ops;
     bool result = select_genomic_op_range(rna_ops, frag.start, frag.start + left_len, left_read_ops);
     if (!result)
+    {
+        //assert(false);
         return false;
+    }
     
     assert (!left_read_ops.empty());
     
@@ -119,7 +122,10 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     vector<AugmentedCuffOp> right_read_ops;
     result = select_genomic_op_range(rna_ops, frag.end - right_len, frag.end, right_read_ops);
     if (!result)
+    {
+        //assert(false);
         return false;
+    }
     
     assert (!right_read_ops.empty());
     
