@@ -709,7 +709,11 @@ void driver(FILE* sam_out,
         exit(1);
     }
     
+    vector<Mismatch> mismatches;
+    vector<AugmentedCuffOp> indels;
+    
     // extract exons and merge them in case they overlap with one another.
+    
     vector<AugmentedCuffOp> exons, temp_exons;
     for (size_t i = 0; i < source_molecules.size(); ++i)
     {
@@ -726,28 +730,30 @@ void driver(FILE* sam_out,
     sort(temp_exons.begin(), temp_exons.end());
     
     if (temp_exons.size() > 0)
-        exons.push_back(temp_exons[0]);
-    
-    for (size_t i = 1; i < temp_exons.size(); ++i)
     {
-        if (AugmentedCuffOp::overlap_in_genome(exons.back(), temp_exons[i]))
+        exons.push_back(temp_exons[0]);
+        
+        for (size_t i = 1; i < temp_exons.size(); ++i)
         {
-            if (exons.back().g_right() < temp_exons[i].g_right())
-                exons.back().genomic_length = temp_exons[i].g_right() - exons.back().g_left();
+            if (AugmentedCuffOp::overlap_in_genome(exons.back(), temp_exons[i]))
+            {
+                if (exons.back().g_right() < temp_exons[i].g_right())
+                    exons.back().genomic_length = temp_exons[i].g_right() - exons.back().g_left();
+            }
+            else
+            {
+                exons.push_back(temp_exons[i]);
+            }
         }
-        else
-        {
-            exons.push_back(temp_exons[i]);
-        }
+    
+        generate_true_mismatches(exons, mismatches);
+        print_mismatches(mismatches_out, rt, mismatches);
+        
+        generate_true_indels(exons, indels);
+        print_indels(indels_out, rt, indels);
     }
+     
     
-    vector<Mismatch> mismatches;
-    generate_true_mismatches(exons, mismatches);
-    print_mismatches(mismatches_out, rt, mismatches);
-    
-    vector<AugmentedCuffOp> indels;
-    generate_true_indels(exons, indels);
-    print_indels(indels_out, rt, indels);
     
     //
     FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
