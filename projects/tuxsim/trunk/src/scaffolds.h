@@ -36,7 +36,7 @@ class Mismatch;
 
 struct AugmentedCuffOp 
 {
-    AugmentedCuffOp(const CuffOpCode& O, RefID ref_id, int g_off, int g_len) 
+    AugmentedCuffOp(const CuffOpCode O, RefID ref_id, int g_off, int g_len) 
 	: opcode(O),
     _ref_id(ref_id),
     genomic_offset(g_off),
@@ -139,6 +139,7 @@ struct AugmentedCuffOp
         
         if (opcode != rhs.opcode)
             return opcode == CUFF_MATCH;
+        return false;
     }
     
     bool operator!=(const AugmentedCuffOp& rhs) const
@@ -147,9 +148,9 @@ struct AugmentedCuffOp
     }
     
     CuffOpCode opcode;
+    RefID _ref_id;
     int genomic_offset;
     int genomic_length;
-    RefID _ref_id;
 };
 
 class Scaffold
