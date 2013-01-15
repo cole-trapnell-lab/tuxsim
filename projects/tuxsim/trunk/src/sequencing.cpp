@@ -485,7 +485,7 @@ int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vect
                 for (size_t j = 0; j < cigar.length; ++j)
                 {
                     char ref_nt = ref_seq[j];
-                    if (seq[pos_seq] != ref_nt)
+                    if (toupper(seq[pos_seq]) != toupper(ref_nt))
                     {
                         ++mismatch;
                         
