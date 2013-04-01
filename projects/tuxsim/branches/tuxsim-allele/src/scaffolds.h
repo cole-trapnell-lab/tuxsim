@@ -120,15 +120,15 @@ struct AugmentedCuffOp
     
     bool operator==(const AugmentedCuffOp& rhs) const
     {
-        return (opcode == rhs.opcode &&
-                _ref_id == rhs._ref_id &&
-                genomic_offset == rhs.genomic_offset &&
-                genomic_length == rhs.genomic_length);
-    }
+        if (opcode == rhs.opcode &&
+			_ref_id == rhs._ref_id &&
+			genomic_offset == rhs.genomic_offset &&
+			genomic_length == rhs.genomic_length);
+	}
     
     bool operator<(const AugmentedCuffOp& rhs) const
     {
-        if (_ref_id != rhs._ref_id)
+		if (_ref_id != rhs._ref_id)
             return _ref_id < rhs._ref_id;
         
         if (genomic_offset != rhs.genomic_offset)
@@ -139,6 +139,7 @@ struct AugmentedCuffOp
         
         if (opcode != rhs.opcode)
             return opcode == CUFF_MATCH;
+		return false;
     }
     
     bool operator!=(const AugmentedCuffOp& rhs) const
@@ -307,6 +308,14 @@ public:
   void seq(const string& s) { _seq = s; }
   
   const string& target_seq() const
+  {
+    if (_target_seq.empty())
+      return _seq;
+    
+    return _target_seq;
+  }
+  
+  string target_seq()
   {
     if (_target_seq.empty())
       return _seq;

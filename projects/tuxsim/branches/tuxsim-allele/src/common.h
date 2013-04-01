@@ -9,7 +9,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
-
+#include <vector>
 #include <boost/foreach.hpp>
 #define foreach         BOOST_FOREACH
 #define reverse_foreach BOOST_REVERSE_FOREACH
@@ -38,6 +38,9 @@ extern int indel_seq_error_per_bases;
 // Both fastadir and mrna_gtf must be set, pending resolution of #169
 extern string fastadir;
 extern string mrna_gtf;
+extern string vcf_table;
+extern bool allele_simulator;
+extern bool only_phased_reads;
 
 extern int random_seed;
 
@@ -51,6 +54,7 @@ float parseFloat(float lower,
 				 void (*print_usage)());
 
 void reverse_complement(string& seq);
+void splitString(const string& str,vector<string>& subStrs,const string& delimiter);
 
 
 // From SAMtools (Li et al):
