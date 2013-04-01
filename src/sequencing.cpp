@@ -20,16 +20,35 @@
 using namespace std;
 
 int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields);
+int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields, map<int,char>& pos2var, bool& covered);
 
 bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                                            ReadsForFragment& reads,
-                                           GFastaHandler& gfasta)
+                                           GFastaHandler& gfasta,
+										   map<RefID,map<int,pair<char,char> > >& vcfTable)
 {
     assert (frag.source_seq);
     Scaffold mRNA = *(frag.source_seq);
-    
-    int frag_length = frag.end - frag.start;;
-    
+	int frag_length = frag.end - frag.start;
+	map<int,char> pos2var; //this will cover all variant (relative) positions that are part of this mRNA's augmented_ops with the correct parent sequence
+	if(allele_simulator){
+		map<RefID,map<int,pair<char,char> > >::iterator ref_id_itr = vcfTable.find(mRNA.ref_id());
+		if(ref_id_itr != vcfTable.end()){
+			for(map<int,pair<char,char> >::iterator pos_itr = ref_id_itr->second.begin();pos_itr != ref_id_itr->second.end();++pos_itr){
+				for(int ex = 0;ex < mRNA.augmented_ops().size();++ex){
+					if(pos_itr->first > mRNA.augmented_ops()[ex].g_left() && pos_itr->first <= mRNA.augmented_ops()[ex].g_right()){
+						if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
+							pos2var[pos_itr->first] = (pos_itr->second).first;
+						}
+						else if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "M"){
+							pos2var[pos_itr->first] = (pos_itr->second).second;
+						}
+					}
+				}
+			}
+		}
+	}
+	
     int left_len = _left_len;
     int right_len = _right_len;
     
@@ -48,7 +67,11 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     if (mismatch_seq_error_per_bases > 0)
     {
         vector<Mismatch> mismatches;
-        int random_number = rand() % mismatch_seq_error_per_bases;
+		int	random_number = rand() % mismatch_seq_error_per_bases;
+		if(allele_simulator){//will only accept mismatches in non-var positions
+			while(pos2var.find(random_number) != pos2var.end()) random_number = rand() % mismatch_seq_error_per_bases;
+		}
+		
         if (random_number < frag_length)
         {
             mismatches.push_back(Mismatch(mRNA.ref_id(), random_number));
@@ -60,8 +83,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     if (indel_seq_error_per_bases > 0)
     {
         vector<AugmentedCuffOp> indels;
-        int random_number = rand() % indel_seq_error_per_bases;
-        if (random_number < frag_length)
+		int random_number = rand() % indel_seq_error_per_bases;
+		if (random_number < frag_length)
         {
             bool pass = true;
             static const int edge = 5;
@@ -95,9 +118,20 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                     opcode = CUFF_DEL;
                 
                 int length = rand() % 3 + 1;
-                indels.push_back(AugmentedCuffOp(opcode, mRNA.ref_id(), frag.start + random_number, length));
-                
-                mRNA.insert_seq_error_indels(indels);
+				if(!allele_simulator){
+					indels.push_back(AugmentedCuffOp(opcode, mRNA.ref_id(), frag.start + random_number, length));
+				}
+				else{//will only accept indels in non-var positions
+					bool covers = false;
+					for(int pos = random_number;pos <= random_number+length;++pos){
+						if(pos2var.find(pos) != pos2var.end()){
+							covers = true;
+							break;
+						}
+					}
+					if(!covers) indels.push_back(AugmentedCuffOp(opcode, mRNA.ref_id(), frag.start + random_number, length));
+				}
+				mRNA.insert_seq_error_indels(indels);
             }
         }
     }
@@ -127,13 +161,15 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     cuff_op_to_cigar(right_read_ops, right_read_cigar);
     assert (!right_read_cigar.empty());
     
-    const string& target_seq = mRNA.target_seq();
-    string left_seq, right_seq;
-    
-    left_seq = target_seq.substr(frag.start, left_len);
+    //const string& target_seq = mRNA.target_seq();
+	//replace target_seq to parent_seq
+	string target_seq = mRNA.target_seq();
+	string left_seq, right_seq;
+
+	left_seq = target_seq.substr(frag.start, left_len);
     right_seq = target_seq.substr(frag.end - right_len, right_len);
-    
-    bool reverse_strand_frag = _bool_generator();
+    	
+	bool reverse_strand_frag = _bool_generator();
     
     shared_ptr<ReadHit> left_read(new ReadHit());
     shared_ptr<ReadHit> right_read(new ReadHit());
@@ -154,7 +190,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                          0,
                          0, //mRNA.annotated_trans_id()
                          frag.start);
-    
+	    
     *right_read = ReadHit(mRNA.ref_id(),
                           _next_fragment_id,
                           right_read_ops.front().g_left(),
@@ -167,7 +203,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                           0,
                           0, //mRNA.annotated_trans_id()
                           frag.end - right_len);
-    
+	    
+		
     if (left_read->read_len() != left_len ||
         right_read->read_len() != right_len)
     {
@@ -219,21 +256,79 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     left_read->qual(string(left_read->seq().length(), 'I'));
     right_read->qual(string(right_read->seq().length(), 'I'));
     
-    vector<string> left_aux_fields;
-    int left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields);
+    vector<string> left_aux_fields,right_aux_fields;
+	int left_edit_dist,right_edit_dist;
+	
+	if(!allele_simulator){
+		left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields);
+		right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields);
+	}
+	else{
+		bool left_covered,right_covered;
+		AlleleInfo left_allele,right_allele;
+		left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields, pos2var, left_covered);
+		right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields, pos2var, right_covered);
+		if(!left_covered && !right_covered){//this means that neither reads cover vars
+			if(only_phased_reads)//this is the only unphased case and we are skipping it
+			{
+				--_next_fragment_id;
+				return false;
+			}
+			else{
+				if(rand() % 2 == 0){
+					left_allele = ALLELE_UNINFORMATIVE_PATERNAL_REF;
+					right_allele = ALLELE_UNINFORMATIVE_PATERNAL_REF;
+				}
+				else{
+					left_allele = ALLELE_UNINFORMATIVE_MATERNAL_REF;
+					right_allele = ALLELE_UNINFORMATIVE_MATERNAL_REF;
+				}
+			}
+		}
+		else if(left_covered && !right_covered){
+			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
+				left_allele = ALLELE_PATERNAL;
+			}
+			else if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "M"){
+				left_allele = ALLELE_MATERNAL;
+			}
+			right_allele = left_allele;
+		}
+		else if(!left_covered && right_covered){
+			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
+				right_allele = ALLELE_PATERNAL;
+			}
+			else if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "M"){
+				right_allele = ALLELE_MATERNAL;
+			}
+			left_allele = right_allele;
+		}
+		else if(left_covered && right_covered){
+			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
+				left_allele = ALLELE_PATERNAL;
+				right_allele = ALLELE_PATERNAL;
+			}
+			else if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "M"){
+				left_allele = ALLELE_MATERNAL;
+				right_allele = ALLELE_MATERNAL;
+			}
+		}
+		else{
+			fprintf (stderr, "Error: problem with read allele asignment in IlluminaChIPSeqPE::reads_for_fragment\n");
+			exit(1);
+		}
+		left_read->allele_info(left_allele);
+		right_read->allele_info(right_allele);
+	}
     left_read->aux_sam_fields(left_aux_fields);
-    
-    vector<string> right_aux_fields;
-    int right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields);
     right_read->aux_sam_fields(right_aux_fields);
     
     if (left_edit_dist > max_edit_dist || right_edit_dist > max_edit_dist)
     {
         --_next_fragment_id;
-        return false;
+		return false;
     }
-    
-    return true;
+	return true;
 }
 
 bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
@@ -589,4 +684,220 @@ int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vect
     fields.push_back(NM);
     
     return edit_dist;
+}
+
+int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields, map<int,char>& pos2var, bool& covered)
+{
+	covered = false;
+	map<int,char> pos2seq;
+	static GFaSeqGet* buf_faseq = NULL;
+    static int buf_gseq_id = -1;
+    
+    GFaSeqGet* faseq = NULL;
+    if (gseq_id != buf_gseq_id)
+    {
+        buf_gseq_id = gseq_id;
+        faseq = buf_faseq = gfasta.fetch(gseq_id);
+    }
+    else
+    {
+        faseq = buf_faseq;
+    }
+    
+    if (!faseq)
+        return -1;
+    
+    int length = 1;
+    const char* ref_str = faseq->subseq(0, length);
+    
+    if (!ref_str)
+        return -1;
+    
+    size_t pos_seq = 0;
+    size_t pos_mismatch = 0;
+    size_t pos_ref = rh.left();
+    size_t mismatch = 0;
+    size_t N_mismatch = 0;
+    size_t num_gap_opens = 0;
+    size_t num_gap_conts = 0;
+    
+    static const int bowtie2_min_score = -10;
+    static const int bowtie2_max_penalty = 6;
+    static const int bowtie2_min_penalty = 2;
+    static const int bowtie2_penalty_for_N = 1;
+    static const int bowtie2_read_gap_open = 5;
+    static const int bowtie2_read_gap_cont = 3;
+    static const int bowtie2_ref_gap_open = 5;
+    static const int bowtie2_ref_gap_cont = 3;
+    
+    int AS_score = 0;
+    
+    const vector<CigarOp>& cigars = rh.cigar();
+    string seq = rh.seq();
+    if (rh.sam_flag() & BAM_FREVERSE)
+        reverse_complement(seq);
+    
+    const string& qual = rh.qual();
+    string AS = "AS:i:";
+    string MD = "MD:Z:";
+	
+    for (size_t i = 0; i < cigars.size(); ++i)
+    {		
+        CigarOp cigar = cigars[i];
+        switch(cigar.opcode)
+        {
+            case MATCH:
+            {
+                const char* ref_seq = ref_str + pos_ref + 1;
+                //pos_ref += cigar.length;
+                
+                for (size_t j = 0; j < cigar.length; ++j,++pos_ref)
+                {
+					if(pos2var.find(pos_ref+1) != pos2var.end()){
+						pos2seq[pos_seq] = pos2var[pos_ref+1];
+					}
+					
+					char ref_nt = ref_seq[j];
+                    if (seq[pos_seq] != ref_nt)
+                    {
+                        ++mismatch;
+                        
+                        if (pos_seq < qual.length())
+                        {
+                            if (seq[pos_seq] == 'N' || ref_nt == 'N')
+                            {
+                                AS_score -= (int)bowtie2_penalty_for_N;
+                            }
+                            else
+                            {
+                                float penalty = bowtie2_min_penalty + (bowtie2_max_penalty - bowtie2_min_penalty) * min((int)(qual[pos_seq] - '!'), 40) / 40.0;
+                                AS_score -= (int)penalty;
+                            }
+                        }
+                        
+                        str_appendInt(MD, (int)pos_mismatch);
+                        MD.push_back((char)ref_nt);
+                        pos_mismatch = 0;
+                    }
+                    else
+                    {
+                        if (ref_nt == 'N')
+                        {
+                            ++N_mismatch;
+                            AS_score -= (int)bowtie2_penalty_for_N;
+                        }
+                        
+                        ++pos_mismatch;
+                    }
+                    
+                    ++pos_seq;
+                }
+            }
+			
+                break;
+                
+            case INS:
+            {
+                pos_seq += cigar.length;
+                
+                AS_score -= bowtie2_read_gap_open;
+                AS_score -= (int)(bowtie2_read_gap_cont * cigar.length);
+                
+                num_gap_opens += 1;
+                num_gap_conts += cigar.length;
+            }
+                break;
+                
+            case DEL:
+            {
+                AS_score -= bowtie2_ref_gap_open;
+                AS_score -= (int)(bowtie2_ref_gap_cont * cigar.length);
+                
+                num_gap_opens += 1;
+                num_gap_conts += cigar.length;
+                
+                const char* ref_seq = ref_str + pos_ref + 1;
+                pos_ref += cigar.length;
+                
+                str_appendInt(MD, (int)pos_mismatch);
+                MD.push_back('^');
+                for (size_t k = 0; k < cigar.length; ++k)
+                    MD.push_back((char)ref_seq[k]);
+                
+                pos_mismatch = 0;
+            }
+                break;
+                
+            case REF_SKIP:
+            {
+                pos_ref += cigar.length;
+            }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+    str_appendInt(AS, AS_score);
+    fields.push_back(AS);
+    
+    string XM = "XM:i:";
+    str_appendInt(XM, (int)mismatch);
+    fields.push_back(XM);
+    
+    string XO = "XO:i:";
+    str_appendInt(XO, (int)num_gap_opens);
+    fields.push_back(XO);
+    
+    string XG = "XG:i:";
+    str_appendInt(XG, (int)num_gap_conts);
+    fields.push_back(XG);
+    
+    str_appendInt(MD, (int)pos_mismatch);
+    fields.push_back(MD);
+    
+    string NM = "NM:i:";
+    int edit_dist = mismatch + num_gap_conts;
+    str_appendInt(NM, (int)edit_dist);
+    fields.push_back(NM);
+    //append read sequence to have the allele-specific sequence
+	for(map<int,char>::iterator pos_itr = pos2seq.begin();pos_itr != pos2seq.end();++pos_itr){
+		rh.seq_at(pos_itr->first,pos_itr->second);
+		covered = true;
+	}
+	//cout<<rh.seq()<<endl;
+	return edit_dist;
+}
+
+void covered_genomic_positions(vector<CigarOp>& read_cigar, int genomic_start, map<int,int> &covered)
+{
+	//when an op is entered r and genomic_start always point at the current read/ref position
+	int o,l,r;
+	r = 0;
+	covered.clear();
+	for(o = 0;o < read_cigar.size();++o){
+		const CigarOp& op =read_cigar[o];
+		switch(op.opcode)
+		{
+			case MATCH:
+				for(l = 0;l < op.length;++l,++r)
+					covered[genomic_start+l] = r;
+				genomic_start += l+1;
+				r += 1;
+				break;
+		    case INS:
+				r += op.length;
+				break;
+		    case DEL:
+			case REF_SKIP:
+				genomic_start += op.length;
+				break;
+		    case SOFT_CLIP:
+				r += op.length;
+				break;
+		    default:
+				break;
+		}
+	}
 }
