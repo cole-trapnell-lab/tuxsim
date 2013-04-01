@@ -20,9 +20,10 @@ class SequencingPolicy
 {
 public:
   virtual ~SequencingPolicy() {}
-  virtual bool reads_for_fragment(const LibraryFragment& frag, 
-				  ReadsForFragment& reads,
-				  GFastaHandler& gfasta) = 0;
+	virtual bool reads_for_fragment(const LibraryFragment& frag, 
+									ReadsForFragment& reads,
+									GFastaHandler& gfasta,
+									map<RefID,map<int,pair<char,char> > >& vcfTable) = 0;
 };
 
 /*******************************************************************************
@@ -47,8 +48,9 @@ struct IlluminaChIPSeqPE : public SequencingPolicy
       {}
   
   bool reads_for_fragment(const LibraryFragment& frag, 
-			  ReadsForFragment& reads,
-			  GFastaHandler& gfasta);
+						  ReadsForFragment& reads,
+						  GFastaHandler& gfasta,
+						  map<RefID,map<int,pair<char,char> > >& vcfTable);
  private:
   int _left_len;
   int _right_len;
@@ -67,4 +69,9 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
 
 void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
                       vector<CigarOp>& cigar);
+//will fill all genomic positions covered by the read with the read coordinates according to the cigar ops
+void covered_genomic_positions(vector<CigarOp>& read_cigar,
+							   int genomic_start,
+							   map<int,int> &covered);
+
 #endif
