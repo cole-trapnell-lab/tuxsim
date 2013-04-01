@@ -33,12 +33,24 @@ void validate_options()
 {
     bool invalid = false;
     
+	if(allele_simulator){
+		if (mrna_gtf == "" || fastadir == ""){
+			fprintf(stderr, "Error: for allele_simulator both mrna_gtf and fastadir must be set\n");
+			invalid = true;
+		}
+		if(vcf_table == ""){
+			fprintf(stderr, "Error: input.vcf_table must be set\n");
+			invalid = true;
+		}			
+	}
+	
     if (mrna_gtf != "" && fastadir == "")
     {
-        fprintf(stderr, "Error: input.fastadir must be set\n");
+		fprintf(stderr, "Error: input.fastadir must be set\n");
         invalid = true;
     }
-    
+	
+	
     //    // For now, a GTF is required to use TuxSim, which only does RNA-Seq
     //    if (mrna_gtf == "")
     //    {
@@ -90,9 +102,12 @@ int parse_options(int argc, char** argv)
         options_description config_file_options("Configuration file options");
         config_file_options.add_options()
 	  ("input.fasta_dir", value(&fastadir), "")
-	  ("output.prefix", value(&out_prefix), "")
+	  ("input.allele_simulator", value<bool>(&allele_simulator)->default_value(false), "")
+	  ("input.only_phased_reads", value<bool>(&only_phased_reads)->default_value(false), "")
+      ("output.prefix", value(&out_prefix), "")
 	  ("source_pool.mrna_gtf", value(&mrna_gtf)->default_value(""), "")
 	  ("source_pool.genome_fasta", value(&genome_fasta)->default_value(""), "")
+	  ("source_pool.vcf_table", value(&vcf_table)->default_value(""), "")		
 	  ("fragment.priming", value(&priming_type)->default_value("uniform_random"), "")
 	  ("fragment.length.mean", value<double>(&frag_length_mean)->default_value(200), "")
 	  ("fragment.length.std_dev", value<double>(&frag_length_std_dev)->default_value(40), "")

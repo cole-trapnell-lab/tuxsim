@@ -41,6 +41,17 @@ bool hits_eq_mod_id(const ReadHit& lhs, const ReadHit& rhs)
 			lhs.cigar() == rhs.cigar());
 }
 
+//identical to hits_eq_mod_id but requiring allele equality
+bool hits_eq_mod_id_allele(const ReadHit& lhs, const ReadHit& rhs)
+{
+	return (lhs.ref_id() == rhs.ref_id() &&
+			lhs.antisense_align() == rhs.antisense_align() &&
+			lhs.left() == rhs.left() && 
+			lhs.source_strand() == rhs.source_strand() &&
+			lhs.cigar() == rhs.cigar() &&
+			lhs.allele_info() == rhs.allele_info());
+}
+
 bool hits_equals(const MateHit& lhs, const MateHit& rhs) 
 {
 	if (lhs.ref_id() != rhs.ref_id())
@@ -63,15 +74,49 @@ bool hits_equals(const MateHit& lhs, const MateHit& rhs)
 	return true;
 }
 
+// identical to hits_equals but requiring allele equality
+bool hits_equals_allele(const MateHit& lhs, const MateHit& rhs) 
+{
+	if (lhs.ref_id() != rhs.ref_id())
+		return false;
+	
+	if ((lhs.left_alignment() == NULL) != (rhs.left_alignment() == NULL))
+		return false;
+	if ((lhs.right_alignment() == NULL) != (rhs.right_alignment() == NULL))
+		return false;
+	if (lhs.left_alignment())
+	{
+		if (!(hits_eq_mod_id_allele(*lhs.left_alignment(),*(rhs.left_alignment()))))
+			return false;
+	}
+	if (lhs.right_alignment())
+	{
+		if (!(hits_eq_mod_id_allele(*lhs.right_alignment(),*(rhs.right_alignment()))))
+			return false;
+	}
+	return true;
+}
+
 // Assumes hits are sorted by mate_hit_lt
 void collapse_hits(const vector<MateHit>& hits,
 				   vector<MateHit>& non_redundant,
-				   vector<int>& collapse_counts)
+				   vector<int>& collapse_counts,
+				   const bool allele)
 {
 	copy(hits.begin(), hits.end(), back_inserter(non_redundant));
-	vector<MateHit>::iterator new_end = unique(non_redundant.begin(), 
-											   non_redundant.end(), 
-											   hits_equals);
+	vector<MateHit>::iterator new_end;
+	
+	if(!allele)
+	{
+		new_end = unique(non_redundant.begin(), 
+						 non_redundant.end(), 
+						 hits_equals);
+	}
+	else{
+		new_end = unique(non_redundant.begin(), 
+						 non_redundant.end(), 
+						 hits_equals_allele);
+	}
 	non_redundant.erase(new_end, non_redundant.end());
 	
 	collapse_counts = vector<int>(non_redundant.size(), 1);
@@ -79,16 +124,27 @@ void collapse_hits(const vector<MateHit>& hits,
 	size_t curr_unique_aln = 0;
 	while (curr_aln < collapse_counts.size())
 	{
-		if (hits_equals(non_redundant[curr_unique_aln], hits[curr_aln]))
-			collapse_counts[curr_unique_aln]++;
-		else
-		{
-			curr_unique_aln++;
+		if(!allele){
+			if (hits_equals(non_redundant[curr_unique_aln], hits[curr_aln]))
+				collapse_counts[curr_unique_aln]++;
+			else
+			{
+				curr_unique_aln++;
+			}
+			
+			++curr_aln;
 		}
-		
-		++curr_aln;
+		else{
+			if (hits_equals_allele(non_redundant[curr_unique_aln], hits[curr_aln]))
+				collapse_counts[curr_unique_aln]++;
+			else
+			{
+				curr_unique_aln++;
+			}
+			
+			++curr_aln;
+		}
 	}
-	
 }
 
 bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
@@ -171,7 +227,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   double error_prob,
 							   unsigned int edit_dist,
                                RefID source_transcript_id,
-                               unsigned int source_transcript_offset)
+                               unsigned int source_transcript_offset,
+							   AlleleInfo allele_info)
 {
 	uint64_t insert_id = _insert_table.get_id(insert_name);
 	uint32_t reference_id = _ref_table.get_id(ref_name, NULL, 0);
@@ -188,7 +245,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   error_prob,
 				   edit_dist,
                    source_transcript_id,
-                   source_transcript_offset);	
+                   source_transcript_offset,
+				   allele_info);	
 }
 
 ReadHit HitFactory::create_hit(const string& insert_name, 
@@ -202,7 +260,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   double error_prob,
 							   unsigned int edit_dist,
                                RefID source_transcript_id,
-                               unsigned int source_transcript_offset)
+                               unsigned int source_transcript_offset,
+							   AlleleInfo allele_info)
 {
 	uint64_t insert_id = _insert_table.get_id(insert_name);
 	uint32_t reference_id = _ref_table.get_id(ref_name, NULL, 0);
@@ -219,7 +278,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   error_prob,
 				   edit_dist,
                    source_transcript_id,
-                   source_transcript_offset);	
+                   source_transcript_offset,
+				   allele_info);	
 }
 
 int anchor_mismatch = 0;

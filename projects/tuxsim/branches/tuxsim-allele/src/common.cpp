@@ -31,6 +31,9 @@ int indel_seq_error_per_bases = 0;
 
 string fastadir;
 string mrna_gtf;
+string vcf_table;
+bool allele_simulator = false;
+bool only_phased_reads = false;
 string expr_filename;
 
 int random_seed;
@@ -111,4 +114,23 @@ void reverse_complement(string& seq)
     }
     reverse(seq.begin(), seq.end());
     //fprintf(stderr, "rev: %s\n", seq.c_str());
+}
+
+void splitString(const string& str,vector<string>& subStrs,const string& delimiter)
+{
+	// Skip delimiter at beginning.
+	string::size_type lastPos = str.find_first_not_of(delimiter,0);
+	// Find first "non-delimiter".
+	string::size_type pos = str.find_first_of(delimiter,lastPos);
+	subStrs.clear();
+	
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		// Found a subStr, add it to the vector.
+		subStrs.push_back(str.substr(lastPos,pos - lastPos));
+		// Skip delimiter.  Note the "not_of"
+		lastPos = str.find_first_not_of(delimiter,pos);
+		// Find next "non-delimiter"
+		pos = str.find_first_of(delimiter,lastPos);
+	}
 }
