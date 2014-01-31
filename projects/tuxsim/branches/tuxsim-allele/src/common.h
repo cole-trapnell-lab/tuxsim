@@ -25,6 +25,7 @@ extern int read_length;
 extern int num_reads;
 extern string out_prefix;
 extern int max_edit_dist;
+extern bool single_end;
 
 extern string genome_fasta;
 extern string expr_filename;
@@ -55,6 +56,7 @@ float parseFloat(float lower,
 
 void reverse_complement(string& seq);
 void splitString(const string& str,vector<string>& subStrs,const string& delimiter);
+void str_appendInt(string& str, int64_t v);
 
 
 // From SAMtools (Li et al):

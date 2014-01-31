@@ -19,6 +19,7 @@ double frag_length_std_dev = 40;
 int num_fragments = 20000000;
 int read_length = 75;
 int max_edit_dist = 0;
+bool single_end = false;
 string out_prefix;
 
 string genome_fasta;
@@ -92,6 +93,13 @@ float parseFloat(float lower, float upper, const char *errmsg, void (*print_usag
     print_usage();
     exit(1);
     return -1;
+}
+
+void str_appendInt(string& str, int64_t v)
+{
+    char int_str[32] = {0};
+    sprintf(int_str, "%ld", v);
+    str += int_str;
 }
 
 // This could be faster.
