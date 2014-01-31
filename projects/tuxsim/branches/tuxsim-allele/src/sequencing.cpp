@@ -20,7 +20,7 @@
 using namespace std;
 
 int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields);
-int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields, map<int,char>& pos2var, bool& covered);
+int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields, map<int,char>& pos2var, int& vars);
 
 bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                                            ReadsForFragment& reads,
@@ -51,7 +51,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 	
     int left_len = _left_len;
     int right_len = _right_len;
-    
+
     // This simulates perfect adapter trimming in the case that the fragment is shorter than the
     // requested reads.
     if (left_len < frag_length)
@@ -60,7 +60,6 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     if (right_len < frag_length)
         right_len = frag_length;
 
-    
 //    if (frag_length < _left_len || frag_length < _right_len)
 //        return false;
     
@@ -203,8 +202,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
                           0,
                           0, //mRNA.annotated_trans_id()
                           frag.end - right_len);
-	    
-		
+	    	
     if (left_read->read_len() != left_len ||
         right_read->read_len() != right_len)
     {
@@ -264,11 +262,13 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 		right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields);
 	}
 	else{
-		bool left_covered,right_covered;
+		int left_vars,right_vars;
 		AlleleInfo left_allele,right_allele;
-		left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields, pos2var, left_covered);
-		right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields, pos2var, right_covered);
-		if(!left_covered && !right_covered){//this means that neither reads cover vars
+		left_vars = 0;
+		right_vars = 0;
+		left_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *left_read, gfasta, left_aux_fields, pos2var, left_vars);
+		right_edit_dist = bowtie_sam_extra(mRNA.gseq_id(), *right_read, gfasta, right_aux_fields, pos2var, right_vars);
+		if(left_vars == 0 && right_vars == 0){//this means that neither reads cover vars
 			if(only_phased_reads)//this is the only unphased case and we are skipping it
 			{
 				--_next_fragment_id;
@@ -276,16 +276,16 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 			}
 			else{
 				if(rand() % 2 == 0){
-					left_allele = ALLELE_UNINFORMATIVE_PATERNAL_REF;
-					right_allele = ALLELE_UNINFORMATIVE_PATERNAL_REF;
+					left_allele = ALLELE_UNKNOWN;
+					right_allele = ALLELE_UNKNOWN;
 				}
 				else{
-					left_allele = ALLELE_UNINFORMATIVE_MATERNAL_REF;
-					right_allele = ALLELE_UNINFORMATIVE_MATERNAL_REF;
+					left_allele = ALLELE_UNKNOWN;
+					right_allele = ALLELE_UNKNOWN;
 				}
 			}
 		}
-		else if(left_covered && !right_covered){
+		else if(left_vars > 0 && right_vars == 0){
 			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
 				left_allele = ALLELE_PATERNAL;
 			}
@@ -294,7 +294,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 			}
 			right_allele = left_allele;
 		}
-		else if(!left_covered && right_covered){
+		else if(left_vars == 0 && right_vars > 0){
 			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
 				right_allele = ALLELE_PATERNAL;
 			}
@@ -303,7 +303,7 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 			}
 			left_allele = right_allele;
 		}
-		else if(left_covered && right_covered){
+		else if(left_vars > 0 && right_vars > 0){
 			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P"){
 				left_allele = ALLELE_PATERNAL;
 				right_allele = ALLELE_PATERNAL;
@@ -317,15 +317,18 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
 			fprintf (stderr, "Error: problem with read allele asignment in IlluminaChIPSeqPE::reads_for_fragment\n");
 			exit(1);
 		}
+		
 		left_read->allele_info(left_allele);
+		left_read->vars(left_vars);
 		right_read->allele_info(right_allele);
+		right_read->vars(right_vars);
 	}
     left_read->aux_sam_fields(left_aux_fields);
     right_read->aux_sam_fields(right_aux_fields);
     
     if (left_edit_dist > max_edit_dist || right_edit_dist > max_edit_dist)
     {
-        --_next_fragment_id;
+		--_next_fragment_id;
 		return false;
     }
 	return true;
@@ -507,12 +510,14 @@ void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
     }
 }
 
+/*
 void str_appendInt(string& str, int64_t v)
 {
     char int_str[32] = {0};
     sprintf(int_str, "%ld", v);
     str += int_str;
 }
+*/
 
 int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields)
 {
@@ -686,9 +691,8 @@ int bowtie_sam_extra(int gseq_id, const ReadHit& rh, GFastaHandler& gfasta, vect
     return edit_dist;
 }
 
-int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields, map<int,char>& pos2var, bool& covered)
+int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<string>& fields, map<int,char>& pos2var, int& vars)
 {
-	covered = false;
 	map<int,char> pos2seq;
 	static GFaSeqGet* buf_faseq = NULL;
     static int buf_gseq_id = -1;
@@ -856,17 +860,18 @@ int bowtie_sam_extra(int gseq_id, ReadHit& rh, GFastaHandler& gfasta, vector<str
     
     str_appendInt(MD, (int)pos_mismatch);
     fields.push_back(MD);
-    
+
     string NM = "NM:i:";
     int edit_dist = mismatch + num_gap_conts;
-    str_appendInt(NM, (int)edit_dist);
+	str_appendInt(NM, (int)edit_dist);
     fields.push_back(NM);
     //append read sequence to have the allele-specific sequence
 	for(map<int,char>::iterator pos_itr = pos2seq.begin();pos_itr != pos2seq.end();++pos_itr){
 		rh.seq_at(pos_itr->first,pos_itr->second);
-		covered = true;
+		vars += 1;
 	}
 	//cout<<rh.seq()<<endl;
+		
 	return edit_dist;
 }
 
