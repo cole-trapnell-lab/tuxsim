@@ -30,7 +30,7 @@ using boost::shared_ptr;
 
 enum CuffStrand { CUFF_STRAND_UNKNOWN = 0, CUFF_FWD = 1, CUFF_REV = 2, CUFF_BOTH = 3 };
 //Nimrod
-enum AlleleInfo { ALLELE_PATERNAL = 0, ALLELE_MATERNAL = 1, ALLELE_UNINFORMATIVE_PATERNAL_REF = 2, ALLELE_UNINFORMATIVE_MATERNAL_REF = 3, ALLELE_UNKNOWN = 4 };
+enum AlleleInfo { ALLELE_UNKNOWN = 0, ALLELE_PATERNAL = 1, ALLELE_MATERNAL = 2 };
 
 enum CigarOpCode { MATCH, INS, DEL, REF_SKIP, SOFT_CLIP, HARD_CLIP, PAD };
 
@@ -70,7 +70,8 @@ struct ReadHit
 			unsigned int edit_dist,
             RefID src_transcript_id,
             unsigned int src_transcript_offset,
-			AlleleInfo allele_info = ALLELE_UNKNOWN) :
+			AlleleInfo allele_info = ALLELE_UNKNOWN,
+			int vars = 0) :
     _ref_id(ref_id),
     _insert_id(insert_id), 
     _left(left), 
@@ -84,7 +85,8 @@ struct ReadHit
     _src_transcript_id(src_transcript_id),
     _src_transcript_offset(src_transcript_offset),
     _sam_flag(0),
-	_allele_info(allele_info)
+	_vars(vars),
+	_allele_info(allele_info)	
 	{
 		assert(_cigar.capacity() == _cigar.size());
 		_right = get_right();
@@ -102,7 +104,8 @@ struct ReadHit
 			unsigned int  edit_dist,
             RefID src_transcript_id,
             unsigned int src_transcript_offset,
-			AlleleInfo allele_info = ALLELE_UNKNOWN) : 
+			AlleleInfo allele_info = ALLELE_UNKNOWN,
+			int vars = 0) : 
     _ref_id(ref_id),
     _insert_id(insert_id), 	
     _left(left),
@@ -116,12 +119,13 @@ struct ReadHit
     _src_transcript_id(src_transcript_id),
     _src_transcript_offset(src_transcript_offset),
     _sam_flag(0),
+	_vars(vars),
 	_allele_info(allele_info)
 	{
 		assert(_cigar.capacity() == _cigar.size());
 		_right = get_right();
 	}
-	
+		
     int read_len() const
     {
         int len = 0;
@@ -152,8 +156,9 @@ struct ReadHit
 	            _source_strand == rhs._source_strand &&
 	            /* DO NOT USE ACCEPTED IN COMPARISON */
 	            _cigar == rhs._cigar,
-				_allele_info == rhs._allele_info);
-    }
+				_allele_info == rhs._allele_info,
+				_vars == rhs._vars);
+	}
 	
 	RefID ref_id() const				{ return _ref_id;			}
 	InsertID insert_id() const			{ return _insert_id;		}
@@ -217,23 +222,17 @@ struct ReadHit
 		string allele_info;
 		switch (_allele_info)
 		{
-		case ALLELE_PATERNAL:
+		case ALLELE_UNKNOWN:
 			allele_info = "0";
 			break;
-		case ALLELE_MATERNAL:
+		case ALLELE_PATERNAL:
 			allele_info = "1";
 			break;
-		case ALLELE_UNINFORMATIVE_PATERNAL_REF:
+		case ALLELE_MATERNAL:
 			allele_info = "2";
 			break;
-		case ALLELE_UNINFORMATIVE_MATERNAL_REF:
-			allele_info = "3";
-			break;
-		case ALLELE_UNKNOWN:
-			allele_info = "4";
-			break;
 		default:
-			allele_info = "4";
+			allele_info = "0";
 			break;
 		}
 		return allele_info;
@@ -247,6 +246,7 @@ struct ReadHit
 	}
 	
 	unsigned int  edit_dist() const { return _edit_dist; }
+	int vars() const { return _vars; }	
 	
 	const string& hitfile_rec() const { return _hitfile_rec; }
 	void hitfile_rec(const string& rec) { _hitfile_rec = rec; }
@@ -281,6 +281,8 @@ struct ReadHit
   const vector<string>& aux_sam_fields() const { return _aux_sam_fields; }
   AlleleInfo allele_info()	const	{ return _allele_info; }
   void allele_info(AlleleInfo allele_info)	{ _allele_info = allele_info; }
+  void vars(int vars) {_vars = vars; }
+	
   string cigar_vec_to_string()
   {
 	  string res = "";
@@ -373,7 +375,8 @@ private:
     string _orig_hit_str;
     
     int _sam_flag;
-  vector<string> _aux_sam_fields;
+	int _vars;
+	vector<string> _aux_sam_fields;
 	AlleleInfo _allele_info; //Nimrod: which allele the read really came from, if known
 };
 
@@ -606,7 +609,8 @@ public:
 					   unsigned int  edit_dist,
                        RefID source_transcript_id,
                        unsigned int source_transcript_offset,
-					   AlleleInfo allele_info = ALLELE_UNKNOWN);
+					   AlleleInfo allele_info = ALLELE_UNKNOWN,
+					   int vars = 0);
 	
 	ReadHit create_hit(const string& insert_name, 
 					   const string& ref_name,
@@ -620,7 +624,8 @@ public:
 					   unsigned int  edit_dist,
                        RefID source_transcript_id,
                        unsigned int source_transcript_offset,
-					   AlleleInfo allele_info = ALLELE_UNKNOWN);
+					   AlleleInfo allele_info = ALLELE_UNKNOWN,
+					   int vars = 0);
 	
 	virtual bool get_hit_from_buf(int line_num, 
 								  const char* bwt_buf, 
@@ -803,6 +808,16 @@ public:
 		return edits;
 	}
 	
+	int vars() const
+	{
+		int vars = 0;
+		if (_left_alignment)
+			vars += _left_alignment->vars();
+		if (_right_alignment)
+			vars += _right_alignment->vars();
+		return vars;
+	}
+	
     bool operator<(const MateHit& other) const;
     
 	RefID _refid;
@@ -829,9 +844,9 @@ public:
 			}
 			else{
 				if(rand() % 2 == 0)
-					allele = ALLELE_UNINFORMATIVE_PATERNAL_REF;
+					allele = ALLELE_UNKNOWN;
 				else
-					allele = ALLELE_UNINFORMATIVE_MATERNAL_REF;
+					allele = ALLELE_UNKNOWN;
 			}
 		}
 		else if(left_allele == ALLELE_MATERNAL){
@@ -840,9 +855,9 @@ public:
 			}
 			else{
 				if(rand() % 2 == 0)
-					allele = ALLELE_UNINFORMATIVE_PATERNAL_REF;
+					allele = ALLELE_UNKNOWN;
 				else
-					allele = ALLELE_UNINFORMATIVE_MATERNAL_REF;
+					allele = ALLELE_UNKNOWN;
 			}
 		}
 		return(allele);

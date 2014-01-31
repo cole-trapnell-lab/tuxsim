@@ -319,16 +319,27 @@ void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
 {
     fprintf(sam_out, "@HD\tVN:1.0\tSO:sorted\n");
     map<string, uint32_t> seq_dict;
-    for (RefSequenceTable::const_iterator itr = rt.begin();
+	for (RefSequenceTable::const_iterator itr = rt.begin();
          itr != rt.end();
          ++itr)
     {
+		
         //        fprintf(sam_out,
         //                "@SQ\tSN:%s\tLN:%u\n",
         //                itr->second.name,
         //                itr->second.len);
-        seq_dict[itr->second.name] = itr->second.len;
-    }
+		if(!allele_simulator)
+			seq_dict[itr->second.name] = itr->second.len;
+		else
+		{
+			string paternal_seq(itr->second.name);
+			paternal_seq += "_P";
+			string maternal_seq(itr->second.name);
+			maternal_seq += "_M";
+			seq_dict[paternal_seq] = itr->second.len;
+			seq_dict[maternal_seq] = itr->second.len;
+		}
+	}
     
     for (map<string, uint32_t>::const_iterator itr = seq_dict.begin();
          itr != seq_dict.end();
@@ -371,8 +382,7 @@ void print_fastq_pair(const ReadsForFragment& reads,
 
 void print_aligned_read(const ReadHit& read,
                         RefSequenceTable& rt,
-                        FILE* sam_out,
-						string allele_info)
+                        FILE* sam_out)
 {
     const char* read_name = read.name().c_str();
     
@@ -431,9 +441,6 @@ void print_aligned_read(const ReadHit& read,
     {
         tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
     }
-	if(allele_simulator){
-		tag_str += "\tXA:i:"+allele_info;
-	}
 	
 	string aux_str;
     const vector<string>& aux_fields = read.aux_sam_fields();
@@ -456,7 +463,126 @@ void print_aligned_read(const ReadHit& read,
             qual.c_str(),
             tag_str.c_str(),
             aux_str.c_str());
+	
 }
+
+void print_aligned_read(const ReadHit& read,
+                        RefSequenceTable& rt,
+                        FILE* sam_out,
+						string allele_info,
+						string parent)
+{
+    const char* read_name = read.name().c_str();
+    
+    int sam_flag = read.sam_flag();
+	const char* ref_name = rt.get_name(read.ref_id());
+	string parent_ref_name(ref_name);
+	parent_ref_name += "_"+parent;
+    int ref_pos = read.left();
+    const vector<CigarOp>& cigar = read.cigar();
+    string cigar_str;
+    for (size_t i = 0; i < cigar.size(); ++i)
+    {
+        char buf[256];
+        char opcode = 0;
+        switch(cigar[i].opcode)
+        {
+            case MATCH:
+                opcode = 'M';
+                break;
+            case INS:
+                opcode = 'I';
+                break;
+            case DEL:
+                opcode = 'D';
+                break;
+            case REF_SKIP:
+                opcode = 'N';
+                break;
+            case SOFT_CLIP:
+                opcode = 'S';
+                break;
+            case HARD_CLIP:
+                opcode = 'H';
+                break;
+            case PAD:
+                opcode = 'P';
+                break;
+        }
+        sprintf(buf, "%d%c", cigar[i].length, opcode);
+        cigar_str += buf;
+    }
+    
+    const char* mate_ref_name = rt.get_name(read.partner_ref_id());
+	string parent_mate_ref_name(mate_ref_name);
+	parent_mate_ref_name += "_"+parent;
+	int mate_ref_pos = read.partner_pos();
+    
+    string seq = read.seq();
+    string qual = read.qual();
+    
+    if (sam_flag & BAM_FREVERSE)
+    {
+        reverse_complement(seq);
+        reverse(qual.begin(), qual.end());
+    }
+    
+    string tag_str;
+    CuffStrand source_strand = read.source_strand();
+    if (source_strand != CUFF_STRAND_UNKNOWN)
+    {
+		tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
+	}
+	
+	string aux_str,NM;
+	int edit_dist;
+	const vector<string>& aux_fields = read.aux_sam_fields();
+    for (size_t i = 0; i < aux_fields.size(); ++i)
+    {
+        aux_str += "\t";
+		if(aux_fields[i].substr(0,2) == "NM"){
+			if(allele_info == "1"){
+				NM = "NM:i:";
+				if(parent == "P")
+					edit_dist = read.edit_dist();
+				else if(parent == "M")
+					edit_dist = read.edit_dist()+read.vars();
+				str_appendInt(NM, (int)edit_dist);
+				aux_str += NM;
+			}
+			else if(allele_info == "2"){
+				NM = "NM:i:";
+				if(parent == "M")
+					edit_dist = read.edit_dist();
+				else if(parent == "P")
+					edit_dist = read.edit_dist()+read.vars();
+				str_appendInt(NM, (int)edit_dist);
+				aux_str += NM;
+			}
+			else{
+				aux_str += aux_fields[i];
+			}
+		}
+		else{
+			aux_str += aux_fields[i];
+		}
+	}
+    
+    fprintf(sam_out,
+            "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s%s\n",
+            read_name,
+            sam_flag,
+            parent_ref_name.c_str(),
+            ref_pos + 1,
+            cigar_str.c_str(),
+            parent_mate_ref_name.c_str(),
+            mate_ref_pos + 1,
+            seq.c_str(),
+            qual.c_str(),
+            tag_str.c_str(),
+            aux_str.c_str());	
+}
+
 
 struct TranscriptNameSorter
 {
@@ -517,9 +643,26 @@ void generate_reads(RefSequenceTable& rt,
             
             for (size_t j = 0; j < read_chunk.size(); ++j)
             {
-				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
-            }
-            
+				if(!allele_simulator){
+					print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+					if(single_end) ++j;
+				}
+				else{
+					if(single_end){
+						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
+						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
+						++j;
+					}
+					else{
+						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
+						print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "P");
+						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
+						print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "M");
+						++j;
+					}
+				}
+			}
+			
             read_chunk.clear();
         }
 		
@@ -646,12 +789,38 @@ void generate_reads(RefSequenceTable& rt,
     }
     
     sort(read_chunk.begin(), read_chunk.end(), SortReads());
-    
+    for (size_t j = 0; j < read_chunk.size(); ++j)
+	{
+		if(!allele_simulator){
+			print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+			if(single_end) ++j;
+		}
+		else{
+			if(single_end){
+				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
+				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
+				++j;
+			}
+			else{
+				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
+				print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "P");
+				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
+				print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "M");
+				++j;
+			}
+		}
+	}
+	/*
     for (size_t j = 0; j < read_chunk.size(); ++j)
     {
-		print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
+		if(single_end)
+			if(j%2 != 0) continue;
+		if(!allele_simulator)
+			print_aligned_read(*read_chunk[j], rt, sam_frag_out);
+		else
+			print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
     }
-    
+    */
     read_chunk.clear();
 }
 
@@ -753,7 +922,7 @@ void driver(FILE* sam_out,
 	}
     else if (genome_fasta != "")
     {
-        load_contigs(genome_fasta, rt, source_molecules);
+		load_contigs(genome_fasta, rt, source_molecules);
         if (source_molecules.empty())
         {
             fprintf(stderr, "Error: FASTA files is empty!\n");

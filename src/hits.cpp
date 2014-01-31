@@ -228,7 +228,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   unsigned int edit_dist,
                                RefID source_transcript_id,
                                unsigned int source_transcript_offset,
-							   AlleleInfo allele_info)
+							   AlleleInfo allele_info,
+							   int vars)
 {
 	uint64_t insert_id = _insert_table.get_id(insert_name);
 	uint32_t reference_id = _ref_table.get_id(ref_name, NULL, 0);
@@ -246,7 +247,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   edit_dist,
                    source_transcript_id,
                    source_transcript_offset,
-				   allele_info);	
+				   allele_info,
+				   vars);	
 }
 
 ReadHit HitFactory::create_hit(const string& insert_name, 
@@ -261,7 +263,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   unsigned int edit_dist,
                                RefID source_transcript_id,
                                unsigned int source_transcript_offset,
-							   AlleleInfo allele_info)
+							   AlleleInfo allele_info,
+							   int vars)
 {
 	uint64_t insert_id = _insert_table.get_id(insert_name);
 	uint32_t reference_id = _ref_table.get_id(ref_name, NULL, 0);
@@ -279,7 +282,8 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   edit_dist,
                    source_transcript_id,
                    source_transcript_offset,
-				   allele_info);	
+				   allele_info,
+				   vars);	
 }
 
 int anchor_mismatch = 0;
@@ -469,7 +473,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 	while((tag_buf = strsep((char**)&buf,"\t")))
 	{
 		
-		char* first_colon = strchr(tag_buf, ':');
+		char* first_colon = strchr((char*)&tag_buf, ':');
 		if (first_colon)
 		{
 			*first_colon = 0;
