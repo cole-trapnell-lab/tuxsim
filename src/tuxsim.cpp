@@ -567,8 +567,8 @@ void print_aligned_read(const ReadHit& read,
 			aux_str += aux_fields[i];
 		}
 	}
-    
-    fprintf(sam_out,
+    aux_str += "\tXA:i:"+allele_info;
+	fprintf(sam_out,
             "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s%s\n",
             read_name,
             sam_flag,
