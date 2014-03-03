@@ -20,10 +20,13 @@ class SequencingPolicy
 {
 public:
   virtual ~SequencingPolicy() {}
+	
 	virtual bool reads_for_fragment(const LibraryFragment& frag, 
 									ReadsForFragment& reads,
 									GFastaHandler& gfasta,
-									map<RefID,map<int,pair<char,char> > >& vcfTable) = 0;
+									//allele
+									map<int,char>& pos2var) = 0;
+	
 };
 
 /*******************************************************************************
@@ -46,11 +49,11 @@ struct IlluminaChIPSeqPE : public SequencingPolicy
     _base_generator(base_generator_type(random_seed)),
     _bool_generator(bool_generator_type(_base_generator, uniform_smallint<>(0,1)))
       {}
-  
   bool reads_for_fragment(const LibraryFragment& frag, 
 						  ReadsForFragment& reads,
 						  GFastaHandler& gfasta,
-						  map<RefID,map<int,pair<char,char> > >& vcfTable);
+						  //allele
+						  map<int,char>& pos2var);
  private:
   int _left_len;
   int _right_len;
@@ -69,9 +72,9 @@ bool select_genomic_op_range(const vector<AugmentedCuffOp>& src_ops,
 
 void cuff_op_to_cigar(const vector<AugmentedCuffOp>& cuff_ops,
                       vector<CigarOp>& cigar);
+//allele
 //will fill all genomic positions covered by the read with the read coordinates according to the cigar ops
 void covered_genomic_positions(vector<CigarOp>& read_cigar,
 							   int genomic_start,
 							   map<int,int> &covered);
-
 #endif

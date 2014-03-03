@@ -9,6 +9,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+//allele
 #include <vector>
 #include <boost/foreach.hpp>
 #define foreach         BOOST_FOREACH
@@ -26,7 +27,6 @@ extern int num_reads;
 extern string out_prefix;
 extern int max_edit_dist;
 extern bool single_end;
-
 extern string genome_fasta;
 extern string expr_filename;
 
@@ -39,8 +39,10 @@ extern int indel_seq_error_per_bases;
 // Both fastadir and mrna_gtf must be set, pending resolution of #169
 extern string fastadir;
 extern string mrna_gtf;
+//allele
 extern string vcf_table;
 extern bool allele_simulator;
+extern bool sort_by_position;
 extern bool only_phased_reads;
 
 extern int random_seed;
@@ -55,9 +57,9 @@ float parseFloat(float lower,
 				 void (*print_usage)());
 
 void reverse_complement(string& seq);
+//allele
 void splitString(const string& str,vector<string>& subStrs,const string& delimiter);
 void str_appendInt(string& str, int64_t v);
-
 
 // From SAMtools (Li et al):
 /*! the read is paired in sequencing, no matter whether it is mapped in a pair */
