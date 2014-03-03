@@ -32,8 +32,10 @@ int indel_seq_error_per_bases = 0;
 
 string fastadir;
 string mrna_gtf;
+//allele
 string vcf_table;
 bool allele_simulator = false;
+bool sort_by_position = true;
 bool only_phased_reads = false;
 string expr_filename;
 
@@ -124,6 +126,7 @@ void reverse_complement(string& seq)
     //fprintf(stderr, "rev: %s\n", seq.c_str());
 }
 
+//allele
 void splitString(const string& str,vector<string>& subStrs,const string& delimiter)
 {
 	// Skip delimiter at beginning.

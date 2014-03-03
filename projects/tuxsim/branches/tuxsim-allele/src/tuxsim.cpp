@@ -4,6 +4,7 @@
 #define PACKAGE_VERSION "INTERNAL"
 #endif
 
+//allele
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
@@ -94,8 +95,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 		//read_mRNAs(ref_mRNA_file, false, ref_rnas, ref_rnas, NULL, -1, false);
 		read_mRNAs(ref_mRNA_file, ref_rnas);
 	}
+    
     sort(ref_mRNAs.begin(), ref_mRNAs.end(), ScaffoldSorter(rt));
-
+	
 	int last_gseq_id = -1;
 	GFaSeqGet* faseq = NULL;
 	// Geo groups them by chr.
@@ -287,14 +289,17 @@ public:
     _gfasta(gfasta)
     {}
     
-    bool next_reads(const Scaffold& molecule, ReadsForFragment& reads, map<RefID,map<int,pair<char,char> > >& vcfTable)
+	//allele
+    bool next_reads(const Scaffold& molecule, ReadsForFragment& reads, map<int,char>& pos2var)
     {
         LibraryFragment frag;
         
-        if (_frag_impl.next_fragment(molecule, frag))//?
+        if (_frag_impl.next_fragment(molecule, frag))
         {
-            return _seq_impl.reads_for_fragment(frag, reads, _gfasta, vcfTable);
-        }
+			//allele
+            return _seq_impl.reads_for_fragment(frag, reads, _gfasta, pos2var);
+		}
+
         return false;
     }
     
@@ -315,19 +320,20 @@ struct SortReads
     }
 };
 
+
 void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
 {
     fprintf(sam_out, "@HD\tVN:1.0\tSO:sorted\n");
     map<string, uint32_t> seq_dict;
-	for (RefSequenceTable::const_iterator itr = rt.begin();
+    for (RefSequenceTable::const_iterator itr = rt.begin();
          itr != rt.end();
          ++itr)
     {
-		
         //        fprintf(sam_out,
         //                "@SQ\tSN:%s\tLN:%u\n",
         //                itr->second.name,
         //                itr->second.len);
+		//new
 		if(!allele_simulator)
 			seq_dict[itr->second.name] = itr->second.len;
 		else
@@ -339,7 +345,7 @@ void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
 			seq_dict[paternal_seq] = itr->second.len;
 			seq_dict[maternal_seq] = itr->second.len;
 		}
-	}
+    }
     
     for (map<string, uint32_t>::const_iterator itr = seq_dict.begin();
          itr != seq_dict.end();
@@ -442,14 +448,14 @@ void print_aligned_read(const ReadHit& read,
         tag_str += source_strand == CUFF_FWD ? "\tXS:A:+" : "\tXS:A:-";
     }
 	
-	string aux_str;
+    string aux_str;
     const vector<string>& aux_fields = read.aux_sam_fields();
     for (size_t i = 0; i < aux_fields.size(); ++i)
     {
         aux_str += "\t";
         aux_str += aux_fields[i];
     }
-    
+	
     fprintf(sam_out,
             "%s\t%d\t%s\t%d\t255\t%s\t%s\t%d\t0\t%s\t%s%s%s\n",
             read_name,
@@ -463,7 +469,6 @@ void print_aligned_read(const ReadHit& read,
             qual.c_str(),
             tag_str.c_str(),
             aux_str.c_str());
-	
 }
 
 void print_aligned_read(const ReadHit& read,
@@ -583,19 +588,38 @@ void print_aligned_read(const ReadHit& read,
             aux_str.c_str());	
 }
 
+void get_intersected_vars(Scaffold& mRNA,map<int,pair<char,char> >& pos2vars,map<int,char>& pos2var)
+{
+	int ex;
+	map<int,pair<char,char> >::iterator pos_itr;
+	
+	for(ex = 0;ex < mRNA.augmented_ops().size();++ex)
+	{
+		pos_itr = pos2vars.lower_bound(mRNA.augmented_ops()[ex].g_left()+1);
+		while(pos_itr->first <= mRNA.augmented_ops()[ex].g_right() && pos_itr != pos2vars.end())
+		{
+			if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "P")
+				pos2var[pos_itr->first] = (pos_itr->second).first;
+			else if(mRNA.annotated_trans_id().substr(mRNA.annotated_trans_id().size()-1,1) == "M")
+				pos2var[pos_itr->first] = (pos_itr->second).second;
+			++pos_itr;
+		}
+	}
+}
 
 struct TranscriptNameSorter
 {
     bool operator()(const Scaffold& lhs, const Scaffold& rhs)
     {
+		//allele
 		bool res = false;
-		if (lhs.annotated_gene_id() != rhs.annotated_gene_id())
+        if (lhs.annotated_gene_id() != rhs.annotated_gene_id())
         {
-			if(lhs.annotated_gene_id() < rhs.annotated_gene_id()) res = true;
-		}
+            if(lhs.annotated_gene_id() < rhs.annotated_gene_id()) res = true;
+        }
         else
         {
-			if(!allele_simulator){
+            if(!allele_simulator){
 				if(lhs.annotated_trans_id() < rhs.annotated_trans_id()) res = true;
 			}
 			else{
@@ -604,7 +628,7 @@ struct TranscriptNameSorter
 				}
 				else if(lhs.annotated_trans_id() < rhs.annotated_trans_id()) res = true;
 			}
-		}
+        }
 		return res;
 	}
 };
@@ -617,13 +641,17 @@ void generate_reads(RefSequenceTable& rt,
                     FastqOutfilePair& fastq_out,
                     FILE* expr_out,
                     FILE* gtf_out,
-					map<RefID,map<int,pair<char,char> > > &vcfTable)
+					//allele
+					map<RefID,map<int,pair<char,char> > > vcfTable)
 {
     RefID last_ref_id = 0;
-    int rna_rightmost = 0;
+	int rna_rightmost = 0;
+	//allele
 	string allele_tag;
-	vector<shared_ptr<ReadHit> > read_chunk;
-    
+    vector<shared_ptr<ReadHit> > read_chunk;
+	map<int,char> pos2var;
+	map<RefID,map<int,pair<char,char> > >::iterator id_itr;
+	
     if (expr_out)
     {
         fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\ttss_id\tfrags_generated\n");
@@ -635,15 +663,24 @@ void generate_reads(RefSequenceTable& rt,
     
     for (size_t i = 0; i < ref_mRNAs.size(); ++i)
     {
-        if (last_ref_id &&
+		pos2var.clear();
+		id_itr = vcfTable.find(ref_mRNAs[i].ref_id());
+		
+		if(id_itr != vcfTable.end()){
+			get_intersected_vars(ref_mRNAs[i],id_itr->second,pos2var);
+		}	
+		
+		if (last_ref_id &&
             (last_ref_id != ref_mRNAs[i].ref_id() ||
              rna_rightmost <= ref_mRNAs[i].left()))
         {
-            sort(read_chunk.begin(), read_chunk.end(), SortReads());
-            
+            if(sort_by_position) sort(read_chunk.begin(), read_chunk.end(), SortReads());
+			
             for (size_t j = 0; j < read_chunk.size(); ++j)
             {
-				if(!allele_simulator){
+				//allele
+				//new
+                if(!allele_simulator){
 					print_aligned_read(*read_chunk[j], rt, sam_frag_out);
 					if(single_end) ++j;
 				}
@@ -660,12 +697,12 @@ void generate_reads(RefSequenceTable& rt,
 						print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "M");
 						++j;
 					}
-				}
-			}
-			
+				}				
+            }
+            
             read_chunk.clear();
         }
-		
+        
         int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
         
         if (num_frags_for_mRNA > total_frags)
@@ -682,12 +719,12 @@ void generate_reads(RefSequenceTable& rt,
         for (size_t j = 0; j < num_frags_for_mRNA; ++j)
         {
             ReadsForFragment reads;
-            
-            if (sequencer->next_reads(ref_mRNAs[i], reads, vcfTable))
+            //allele
+            if (sequencer->next_reads(ref_mRNAs[i], reads, pos2var))
             {
                 const ReadHit& left = *(reads.front());
                 const ReadHit& right = *(reads.back());
-				read_chunk.push_back(reads.front());
+                read_chunk.push_back(reads.front());
                 read_chunk.push_back(reads.back());
                 
                 print_fastq_pair(reads, fastq_out);
@@ -759,12 +796,13 @@ void generate_reads(RefSequenceTable& rt,
         
         last_ref_id = ref_mRNAs[i].ref_id();
     }
+    
     if (expr_out)
     {
         sort(ref_mRNAs.begin(), ref_mRNAs.end(), TranscriptNameSorter());
-		for (size_t i = 0; i < ref_mRNAs.size(); ++i)
+        for (size_t i = 0; i < ref_mRNAs.size(); ++i)
         {
-			int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
+            int num_frags_for_mRNA = ref_mRNAs[i].alpha() * total_frags;
             double fpkm = 0.0;
             double cov = 0.0;
             double eff_len = ref_mRNAs[i].effective_length(&frag_policy);
@@ -788,9 +826,12 @@ void generate_reads(RefSequenceTable& rt,
         }
     }
     
-    sort(read_chunk.begin(), read_chunk.end(), SortReads());
+    if(sort_by_position) sort(read_chunk.begin(), read_chunk.end(), SortReads());
+	
     for (size_t j = 0; j < read_chunk.size(); ++j)
-	{
+    {
+		//allele
+        //new
 		if(!allele_simulator){
 			print_aligned_read(*read_chunk[j], rt, sam_frag_out);
 			if(single_end) ++j;
@@ -809,18 +850,8 @@ void generate_reads(RefSequenceTable& rt,
 				++j;
 			}
 		}
-	}
-	/*
-    for (size_t j = 0; j < read_chunk.size(); ++j)
-    {
-		if(single_end)
-			if(j%2 != 0) continue;
-		if(!allele_simulator)
-			print_aligned_read(*read_chunk[j], rt, sam_frag_out);
-		else
-			print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
     }
-    */
+    
     read_chunk.clear();
 }
 
@@ -845,6 +876,7 @@ void load_contigs(const string& genome_fasta,
 	}while(!last);
 }
 
+//allele
 void load_vcf(string& vcf_file, map<RefID,map<int,pair<char,char> > > &vcfTable, RefSequenceTable &rt)
 {
 	ifstream inFile;
@@ -899,7 +931,7 @@ void driver(FILE* sam_out,
     
     vector<Scaffold> source_molecules;
     GFastaHandler gfasta(fastadir.c_str());
-
+    
     if (mrna_gtf != "")
     {
         FILE* ref_gtf = NULL;
@@ -913,16 +945,15 @@ void driver(FILE* sam_out,
         }
         
         load_ref_rnas(ref_gtf, rt, gfasta, source_molecules);
-		
-		if (source_molecules.empty())
+        if (source_molecules.empty())
         {
             fprintf(stderr, "Error: GTF is empty!\n");
             exit(1);
         }
-	}
+    }
     else if (genome_fasta != "")
     {
-		load_contigs(genome_fasta, rt, source_molecules);
+        load_contigs(genome_fasta, rt, source_molecules);
         if (source_molecules.empty())
         {
             fprintf(stderr, "Error: FASTA files is empty!\n");
@@ -934,31 +965,21 @@ void driver(FILE* sam_out,
         fprintf(stderr, "Error: No source_pool input files defined\n");
         exit(1);
     }
-	//allele
-	map<RefID,map<int,pair<char,char> > > vcfTable;//chr2pos2[patSeq,matSeq]
-	
-    if(allele_simulator){
-		load_vcf(vcf_table,vcfTable,rt);
-		if (vcfTable.empty())
-		{
-			fprintf(stderr, "Error: VCF table is empty!\n");
-			exit(1);
-		}
-	}
-		
+    
     // extract exons and merge them in case they overlap with one another.
+    //allele
     vector<AugmentedCuffOp> exons, temp_exons, paternal_exons, maternal_exons, paternal_temp_exons, maternal_temp_exons;
     for (size_t i = 0; i < source_molecules.size(); ++i)
     {
-		const Scaffold& scaf = source_molecules[i];
-		const vector<AugmentedCuffOp>& ops = scaf.augmented_ops();
-		
+        const Scaffold& scaf = source_molecules[i];
+        const vector<AugmentedCuffOp>& ops = scaf.augmented_ops();
+        
+		//allele
 		if(!allele_simulator){
 			for (size_t j = 0; j < ops.size(); ++j)
 			{
-				if (ops[j].opcode == CUFF_MATCH){
+				if (ops[j].opcode == CUFF_MATCH)
 					temp_exons.push_back(ops[j]);
-				}
 			}
 		}
 		else{
@@ -985,12 +1006,13 @@ void driver(FILE* sam_out,
 		}
 	}
 	
-	if(!allele_simulator){			
+	//allele
+	if(!allele_simulator){	
 		sort(temp_exons.begin(), temp_exons.end());
-				
+		
 		if (temp_exons.size() > 0)
 			exons.push_back(temp_exons[0]);
-		
+			
 		for (size_t i = 1; i < temp_exons.size(); ++i)
 		{
 			if (AugmentedCuffOp::overlap_in_genome(exons.back(), temp_exons[i]))
@@ -1038,15 +1060,13 @@ void driver(FILE* sam_out,
 			}
 		}
 	}
-
-	vector<Mismatch> mismatches;
-    generate_true_mismatches(exons, mismatches);
-    print_mismatches(mismatches_out, rt, mismatches);
-    
-    vector<AugmentedCuffOp> indels;
-    generate_true_indels(exons, indels);
-    print_indels(indels_out, rt, indels);
-    
+    vector<Mismatch> mismatches;
+	generate_true_mismatches(exons, mismatches);
+	print_mismatches(mismatches_out, rt, mismatches);
+        
+	vector<AugmentedCuffOp> indels;
+	generate_true_indels(exons, indels);
+	print_indels(indels_out, rt, indels);
     
     FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
     
@@ -1063,7 +1083,8 @@ void driver(FILE* sam_out,
                                 frag_length_std_dev,
                                 read_length, frag_length_mean  + 3 * frag_length_std_dev);
     calc_frag_abundances(&frag_policy, source_molecules);
-	// Set the fragment priming policy, default is uniform random priming.
+    
+    // Set the fragment priming policy, default is uniform random priming.
     if (priming_type == "three_prime")
     {
         shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
@@ -1078,6 +1099,19 @@ void driver(FILE* sam_out,
         source_molecules[i].insert_true_mismatches(mismatches);
         source_molecules[i].insert_true_indels(indels);
     }
+    
+	//allele
+	map<RefID,map<int,pair<char,char> > > vcfTable;//chr2pos2[patSeq,matSeq]
+	
+    if(allele_simulator){
+		load_vcf(vcf_table,vcfTable,rt);
+		if (vcfTable.empty())
+		{
+			fprintf(stderr, "Error: VCF table is empty!\n");
+			exit(1);
+		}
+	}
+
     generate_reads(rt,
                    source_molecules,
                    sequencer,
@@ -1086,6 +1120,7 @@ void driver(FILE* sam_out,
                    fastq_out,
                    expr_out,
                    gtf_out,
+				   //allele
 				   vcfTable);
     
     delete sequencer;
@@ -1191,6 +1226,7 @@ int main(int argc, char** argv)
                 out_indels_filename.c_str());
         exit(1);
 	}
+    
     
 	driver(sam_out, fastq_out, expr_out, frag_gtf_out, mismatches_out, indels_out, expr_in);
     

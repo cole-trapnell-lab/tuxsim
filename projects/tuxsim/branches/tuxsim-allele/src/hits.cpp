@@ -40,7 +40,7 @@ bool hits_eq_mod_id(const ReadHit& lhs, const ReadHit& rhs)
 			lhs.source_strand() == rhs.source_strand() &&
 			lhs.cigar() == rhs.cigar());
 }
-
+//allele
 //identical to hits_eq_mod_id but requiring allele equality
 bool hits_eq_mod_id_allele(const ReadHit& lhs, const ReadHit& rhs)
 {
@@ -74,6 +74,7 @@ bool hits_equals(const MateHit& lhs, const MateHit& rhs)
 	return true;
 }
 
+//allele
 // identical to hits_equals but requiring allele equality
 bool hits_equals_allele(const MateHit& lhs, const MateHit& rhs) 
 {
@@ -101,18 +102,20 @@ bool hits_equals_allele(const MateHit& lhs, const MateHit& rhs)
 void collapse_hits(const vector<MateHit>& hits,
 				   vector<MateHit>& non_redundant,
 				   vector<int>& collapse_counts,
+				   //allele
 				   const bool allele)
 {
 	copy(hits.begin(), hits.end(), back_inserter(non_redundant));
+	//allele
 	vector<MateHit>::iterator new_end;
-	
 	if(!allele)
-	{
+	{	
 		new_end = unique(non_redundant.begin(), 
 						 non_redundant.end(), 
 						 hits_equals);
 	}
-	else{
+	else
+	{
 		new_end = unique(non_redundant.begin(), 
 						 non_redundant.end(), 
 						 hits_equals_allele);
@@ -124,7 +127,9 @@ void collapse_hits(const vector<MateHit>& hits,
 	size_t curr_unique_aln = 0;
 	while (curr_aln < collapse_counts.size())
 	{
-		if(!allele){
+		//allele
+		if(!allele)
+		{
 			if (hits_equals(non_redundant[curr_unique_aln], hits[curr_aln]))
 				collapse_counts[curr_unique_aln]++;
 			else
@@ -228,6 +233,7 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   unsigned int edit_dist,
                                RefID source_transcript_id,
                                unsigned int source_transcript_offset,
+							   //allele
 							   AlleleInfo allele_info,
 							   int vars)
 {
@@ -247,6 +253,7 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   edit_dist,
                    source_transcript_id,
                    source_transcript_offset,
+				   //allele
 				   allele_info,
 				   vars);	
 }
@@ -263,6 +270,7 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 							   unsigned int edit_dist,
                                RefID source_transcript_id,
                                unsigned int source_transcript_offset,
+							   //allele
 							   AlleleInfo allele_info,
 							   int vars)
 {
@@ -282,6 +290,7 @@ ReadHit HitFactory::create_hit(const string& insert_name,
 				   edit_dist,
                    source_transcript_id,
                    source_transcript_offset,
+				   //allele
 				   allele_info,
 				   vars);	
 }
@@ -301,7 +310,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 	if (bwt_buf[0] == '@')
 		return false;
 	
-	const char* buf = bwt_buf;
+	char* buf = bwt_buf;
 	const char* _name = strsep((char**)&buf,"\t");
 	if (!_name)
 		return false;
@@ -468,12 +477,12 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 	CuffStrand source_strand = CUFF_STRAND_UNKNOWN;
 	unsigned char num_mismatches = 0;
 	
-	const char* tag_buf = buf;
+	char* tag_buf = buf;
 	
 	while((tag_buf = strsep((char**)&buf,"\t")))
 	{
 		
-		char* first_colon = strchr((char*)&tag_buf, ':');
+		char* first_colon = strchr(tag_buf, ':');
 		if (first_colon)
 		{
 			*first_colon = 0;

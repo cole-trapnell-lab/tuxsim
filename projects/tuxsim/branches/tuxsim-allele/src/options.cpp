@@ -32,7 +32,8 @@ void print_usage()
 void validate_options()
 {
     bool invalid = false;
-    
+
+	//allele
 	if(allele_simulator){
 		if (mrna_gtf == "" || fastadir == ""){
 			fprintf(stderr, "Error: for allele_simulator both mrna_gtf and fastadir must be set\n");
@@ -46,11 +47,10 @@ void validate_options()
 	
     if (mrna_gtf != "" && fastadir == "")
     {
-		fprintf(stderr, "Error: input.fastadir must be set\n");
+        fprintf(stderr, "Error: input.fastadir must be set\n");
         invalid = true;
     }
-	
-	
+    
     //    // For now, a GTF is required to use TuxSim, which only does RNA-Seq
     //    if (mrna_gtf == "")
     //    {
@@ -95,19 +95,22 @@ int parse_options(int argc, char** argv)
         options_description generic("Command line options");
         generic.add_options()
         ("help,h", "print usage message")
-        ("output.prefix", value(&out_prefix), "")
+        //("output.prefix", value(&out_prefix), "")
         ("expression,e", value(&expr_filename), "Load mRNA expression values from input file instead of generating them")
         ;
         
         options_description config_file_options("Configuration file options");
         config_file_options.add_options()
 	  ("input.fasta_dir", value(&fastadir), "")
-	  ("input.allele_simulator", value<bool>(&allele_simulator)->default_value(false), "")
+			//allele
+  	  ("input.allele_simulator", value<bool>(&allele_simulator)->default_value(false), "")
+	  ("input.sort_by_position", value<bool>(&sort_by_position)->default_value(true), "")
 	  ("input.only_phased_reads", value<bool>(&only_phased_reads)->default_value(false), "")
-      ("output.prefix", value(&out_prefix), "")
+	  ("output.prefix", value(&out_prefix), "")
 	  ("source_pool.mrna_gtf", value(&mrna_gtf)->default_value(""), "")
 	  ("source_pool.genome_fasta", value(&genome_fasta)->default_value(""), "")
-	  ("source_pool.vcf_table", value(&vcf_table)->default_value(""), "")		
+	  //allele
+	  ("source_pool.vcf_table", value(&vcf_table)->default_value(""), "")
 	  ("fragment.priming", value(&priming_type)->default_value("uniform_random"), "")
 	  ("fragment.length.mean", value<double>(&frag_length_mean)->default_value(200), "")
 	  ("fragment.length.std_dev", value<double>(&frag_length_std_dev)->default_value(40), "")
@@ -115,7 +118,7 @@ int parse_options(int argc, char** argv)
 	  ("sequencing.read_length", value<int>(&read_length)->default_value(75), "")
 	  ("sequencing.num_fragments", value<int>(&num_fragments)->default_value(20000000), "")
 	  ("sequencing.max_edit_dist", value<int>(&max_edit_dist)->default_value(0), "")
-	  ("sequencing.single_end", value<bool>(&single_end)->default_value(false), "")	
+      ("sequencing.single_end", value<bool>(&single_end)->default_value(false), "")	
 	  ("mismatch.true_diff_per_bases", value<int>(&mismatch_true_diff_per_bases)->default_value(0), "")
 	  ("mismatch.seq_error_per_bases", value<int>(&mismatch_seq_error_per_bases)->default_value(0), "")
 	  ("indel.true_diff_per_bases", value<int>(&indel_true_diff_per_bases)->default_value(0), "")
@@ -131,7 +134,7 @@ int parse_options(int argc, char** argv)
         ;
         
         options_description cmdline_options;
-        cmdline_options.add(generic).add(hidden);
+        cmdline_options.add(generic).add(config_file_options).add(hidden);
         
         positional_options_description p;
         p.add("input-file", -1);
