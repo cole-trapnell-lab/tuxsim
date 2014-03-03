@@ -36,7 +36,7 @@ class Mismatch;
 
 struct AugmentedCuffOp 
 {
-    AugmentedCuffOp(const CuffOpCode& O, RefID ref_id, int g_off, int g_len) 
+    AugmentedCuffOp(const CuffOpCode O, RefID ref_id, int g_off, int g_len) 
 	: opcode(O),
     _ref_id(ref_id),
     genomic_offset(g_off),
@@ -120,15 +120,21 @@ struct AugmentedCuffOp
     
     bool operator==(const AugmentedCuffOp& rhs) const
     {
-        if (opcode == rhs.opcode &&
+		bool result;
+		//allele
+         if(opcode == rhs.opcode &&
 			_ref_id == rhs._ref_id &&
 			genomic_offset == rhs.genomic_offset &&
-			genomic_length == rhs.genomic_length);
+			genomic_length == rhs.genomic_length)
+			 result = true;
+		 else
+			 result = false;
+		 return result;
 	}
     
     bool operator<(const AugmentedCuffOp& rhs) const
     {
-		if (_ref_id != rhs._ref_id)
+        if (_ref_id != rhs._ref_id)
             return _ref_id < rhs._ref_id;
         
         if (genomic_offset != rhs.genomic_offset)
@@ -139,7 +145,7 @@ struct AugmentedCuffOp
         
         if (opcode != rhs.opcode)
             return opcode == CUFF_MATCH;
-		return false;
+        return false;
     }
     
     bool operator!=(const AugmentedCuffOp& rhs) const
@@ -148,9 +154,9 @@ struct AugmentedCuffOp
     }
     
     CuffOpCode opcode;
+    RefID _ref_id;
     int genomic_offset;
     int genomic_length;
-    RefID _ref_id;
 };
 
 class Scaffold
@@ -315,6 +321,7 @@ public:
     return _target_seq;
   }
   
+	//allele
   string target_seq()
   {
     if (_target_seq.empty())

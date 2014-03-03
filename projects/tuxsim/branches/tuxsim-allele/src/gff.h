@@ -639,19 +639,21 @@ public:
        return (gseq_id==d.gseq_id && start==d.start && end==d.end && strcmp(gffID, d.gffID)==0);
        }
    bool operator>(GffObj& d){
-	   if (gseq_id!=d.gseq_id) return (gseq_id>d.gseq_id);
-	   if (start==d.start) {
-		   if (end==d.end) return strcmp(gffID, d.gffID)>0;
-		   else return end>d.end;
-	   } else return (start>d.start);
-	   return false;
+      if (gseq_id!=d.gseq_id) return (gseq_id>d.gseq_id);
+      if (start==d.start) {
+         if (end==d.end) return strcmp(gffID, d.gffID)>0;
+                      else return end>d.end;
+         } else return (start>d.start);
+	  //allele
+	  return false;
    }
    bool operator<(GffObj& d){
      if (gseq_id!=d.gseq_id) return (gseq_id<d.gseq_id);
      if (start==d.start) {
-		 if (end==d.end) return strcmp(gffID, d.gffID)<0;
-		 else return end<d.end;
-	 } else return (start<d.start);
+        if (end==d.end) return strcmp(gffID, d.gffID)<0;
+                     else return end<d.end;
+        } else return (start<d.start);
+	 //allele
 	 return false;
    }
    char* getID() { return gffID; }
