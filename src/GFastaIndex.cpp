@@ -1,5 +1,5 @@
 /*
- * GFaIdx.cpp
+ * GFastaIndex.cpp
  *
  *  Created on: Aug 25, 2010
  *      Author: gpertea
@@ -22,7 +22,7 @@ void GFastaIndex::addRecord(const char* seqname, uint seqlen, off_t foffs, int l
          records.Add(seqname,farec);
          farec->seqname=records.getLastKey();
          }
-     }
+}
 
 int GFastaIndex::loadIndex(const char* finame) { //load record info from existing fasta index
     if (finame==NULL) finame=fai_name;
@@ -47,13 +47,13 @@ int GFastaIndex::loadIndex(const char* finame) { //load record info from existin
       p++;
       uint len=0;
       int line_len=0, line_blen=0;
-      #ifdef __WIN32__
+#ifdef __WIN32__
          long offset=-1;
          sscanf(p, "%d%ld%d%d", &len, &offset, &line_len, &line_blen);
-      #else
+#else
          long long offset=-1;
          sscanf(p, "%d%lld%d%d", &len, &offset, &line_len, &line_blen);
-      #endif
+#endif
       if (len==0 || line_len==0 || line_blen==0 || line_blen<line_len)
           GError(ERR_FAIDXLINE,p);
       addRecord(s,len,offset,line_len, line_blen);
@@ -61,7 +61,7 @@ int GFastaIndex::loadIndex(const char* finame) { //load record info from existin
     fclose(fi);
     haveFai=(records.Count()>0);
     return records.Count();
-    }
+}
 
 int GFastaIndex::buildIndex() {
     //this parses the whole fasta file, so it could be slow
@@ -77,7 +77,7 @@ int GFastaIndex::buildIndex() {
     char* s=NULL;
     uint seqlen=0;
     int line_len=0,line_blen=0;
-    bool newSeq=false; //set to true after defline
+    bool newSeq=false; //set when FASTA header is encountered
     off_t newSeqOffset=0;
     int prevOffset=0;
     char* seqname=NULL;
@@ -104,23 +104,34 @@ int GFastaIndex::buildIndex() {
         line_blen=0;
         seqlen=0;
         mustbeLastLine=false;
-        } //defline parsing
+     } //defline parsing
      else { //sequence line
        int llen=fl.length();
        int lblen=fl.getFpos()-prevOffset;
         if (newSeq) { //first sequence line after defline
           line_len=llen;
           line_blen=lblen;
-          }
+        }
         else {//next seq lines after first
-          if (mustbeLastLine || llen>last_len)
-             GError(ERR_FALINELEN);
-          if (llen<last_len) mustbeLastLine=true;
+          if (mustbeLastLine) {
+              //could be empty line, adjust for possible spaces
+              if (llen>0) {
+                char *p=s;
+                //trim spaces, tabs etc. on the last line
+                while (*p > 32) ++p;
+                llen=(p-s);
+              }
+              if (llen>0) GError(ERR_FALINELEN);
           }
+          else {
+              if (llen<last_len) mustbeLastLine=true;
+                 else if (llen>last_len) GError(ERR_FALINELEN);
+          }
+        }
         seqlen+=llen;
         last_len=llen;
         newSeq=false;
-        } //sequence line
+     } //sequence line
      prevOffset=fl.getfpos();
      }//for each line of the fasta file
     if (seqlen>0)
@@ -128,7 +139,7 @@ int GFastaIndex::buildIndex() {
     GFREE(seqname);
     fclose(fa);
     return records.Count();
-    }
+}
 
 
 int GFastaIndex::storeIndex(const char* finame) { //write the hash to a file
@@ -140,7 +151,7 @@ int GFastaIndex::storeIndex(const char* finame) { //write the hash to a file
     GFREE(fai_name);
     fai_name=Gstrdup(finame);
     return rcount;
-    }
+}
 
 int GFastaIndex::storeIndex(FILE* fai) {
   int rcount=0;

@@ -1,6 +1,12 @@
 #ifndef G_BASE_DEFINED
 #define G_BASE_DEFINED
-
+#ifndef _POSIX_SOURCE
+//mostly for MinGW
+#define _POSIX_SOURCE
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,37 +14,83 @@
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#if defined __WIN32__ || defined _WIN32
+#include <stdint.h>
+
+#if defined __WIN32__ || defined WIN32 || defined _WIN32 || defined _WIN32_
+  #ifndef __WIN32__
+    #define __WIN32__
+  #endif
   #include <windows.h>
+  #include <direct.h>
+  #include <io.h>
+  #define CHPATHSEP '\\'
+  #undef off_t
+  #define off_t int64_t
+  #ifndef popen
+   #define popen _popen
+  #endif
+  #ifndef fseeko
+		#ifdef _fseeki64
+			#define fseeko(stream, offset, origin) _fseeki64(stream, offset, origin)
+		#else
+			/*
+			#define _DEFINE_WIN32_FSEEKO
+			int fseeko(FILE *stream, off_t offset, int whence);
+			*/
+			#define fseeko fseek
+		#endif
+  #endif
+ #ifndef ftello
+  #ifdef _ftelli64
+    #define ftello(stream) _ftelli64(stream)
+  #else
+    #define ftello ftell
+  #endif
+ #endif
+ #else
+  #define CHPATHSEP '/'
+  #include <unistd.h>
+#endif
+
+#ifndef fseeko
+ #define fseeko fseek
+#endif
+#ifndef ftello
+ #define ftello ftell
 #endif
 
 #ifdef DEBUG
 #undef NDEBUG
+#define _DEBUG 1
+#define _DEBUG_ 1
 #endif
 
-typedef unsigned int uint32;
-typedef int int32;
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int16_t int16;
+typedef uint16_t uint16;
+
 typedef unsigned char uchar;
 typedef unsigned char byte;
-
-// If long is natively 64 bit, use the regular fseek and ftell
-#ifdef _NATIVE_64
- #define ftello ftell
- #define fseeko fseek
-#endif
 
 #ifndef MAXUINT
 #define MAXUINT ((unsigned int)-1)
 #endif
 
-#if defined(_NATIVE_64) || defined(_LP64) || defined(__LP64__)
- typedef long int64;
- typedef unsigned long uint64;
-#else
- //assume 32bit environment with long long for int64 stuff
- typedef long long int64;
- typedef unsigned long long uint64;
+#ifndef MAXINT
+#define MAXINT INT_MAX
 #endif
+
+#ifndef MAX_UINT
+#define MAX_UINT ((unsigned int)-1)
+#endif
+
+#ifndef MAX_INT
+#define MAX_INT INT_MAX
+#endif
+
+typedef int64_t int64;
+typedef uint64_t uint64;
 
 /****************************************************************************/
 
@@ -52,15 +104,6 @@ typedef unsigned char byte;
 
 /****************************************************************************/
 #define ERR_ALLOC "Error allocating memory.\n"
-#if defined (__WIN32__) || defined (WIN32)
-  #define CHPATHSEP '\\'
-  #include <io.h>
-  #define ftello ftell
-  #define fseeko fseek
- #else
-  #define CHPATHSEP '/'
-  #include <unistd.h>
-#endif
 
 //-------------------
 
@@ -102,6 +145,9 @@ typedef void* pointer;
 typedef unsigned int uint;
 
 typedef int GCompareProc(const pointer item1, const pointer item2);
+typedef long GFStoreProc(const pointer item1, FILE* fstorage); //for serialization
+typedef pointer GFLoadProc(FILE* fstorage); //for deserialization
+
 typedef void GFreeProc(pointer item); //usually just delete,
       //but may also support structures with embedded dynamic members
 
@@ -113,63 +159,42 @@ typedef void GFreeProc(pointer item); //usually just delete,
                                      GError(ERR_ALLOC)
 #define GFREE(ptr)       GFree((pointer*)(&ptr))
 
-inline char* min(char *arg1, char *arg2) {
+inline char* strMin(char *arg1, char *arg2) {
     return (strcmp(arg1, arg2) < 0)? arg1 : arg2;
+}
+
+inline char* strMax(char *arg1, char *arg2) {
+    return (strcmp(arg2, arg1) < 0)? arg1 : arg2;
 }
 
 inline int iround(double x) {
    return (int)floor(x + 0.5);
 }
 
+int Gmkdir(const char *path, bool recursive=true, int perms=0775);
+
 
 /****************************************************************************/
-
-inline char* max(char *arg1, char *arg2) {
-    return (strcmp(arg2, arg1) < 0)? arg1 : arg2;
-}
 
 inline int Gintcmp(int a, int b) {
  //return (a>b)? 1 : ((a==b)?0:-1);
   return a-b;
 }
 
-int Gstrcmp(char* a, char* b);
+int Gstrcmp(const char* a, const char* b, int n=-1);
 //same as strcmp but doesn't crash on NULL pointers
 
-int Gstricmp(const char* a, const char* b);
+int Gstricmp(const char* a, const char* b, int n=-1);
+bool GstrEq(const char* a, const char* b);
+bool GstriEq(const char* a, const char* b);
 
-inline void swap(int &arg1, int &arg2){
- arg1 ^= arg2 ^= arg1 ^= arg2;
- }
-
-inline void swap(char* &arg1, char* &arg2){
- register char* swp=arg1;
- arg1=arg2; arg2=swp;
- }
-
-inline void swap(unsigned int &arg1, unsigned int &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(short &arg1, short &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(unsigned short &arg1, unsigned short &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(long &arg1, long &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(unsigned long &arg1, unsigned long &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(char &arg1, char &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(unsigned char &arg1, unsigned char &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
-
-inline void swap(bool &arg1, bool &arg2)
-{ arg1 ^= arg2 ^= arg1 ^= arg2; }
+//basic swap template function
+template<class T> void Gswap(T& lhs, T& rhs) {
+ //register T tmp=lhs;
+ T tmp=lhs; //requires copy operator
+ lhs=rhs;
+ rhs=tmp;
+}
 
 
 /**************** Memory management ***************************/
@@ -179,13 +204,13 @@ bool GCalloc(pointer* ptr, unsigned long size); // Allocate and initialize memor
 bool GRealloc(pointer* ptr,unsigned long size); // Resize memory
 void GFree(pointer* ptr); // Free memory, resets ptr to NULL
 
-/********************* debug functions *********************/
+
+//int saprintf(char **retp, const char *fmt, ...);
 
 void GError(const char* format,...); // Error routine (aborts program)
 void GMessage(const char* format,...);// Log message to stderr
 // Assert failed routine:- usually not called directly but through GASSERT
 void GAssert(const char* expression, const char* filename, unsigned int lineno);
-
 
 // ****************** string manipulation *************************
 char *Gstrdup(const char* str);
@@ -216,34 +241,40 @@ void* Gmemscan(void *mem, unsigned int len,
                   void *part, unsigned int partlen);
 
 // test if a char is in a string:
-bool chrInStr(char c, char* str);
+bool chrInStr(char c, const char* str);
 
 char* rstrchr(char* str, char ch);
 /* returns a pointer to the rightmost
   occurence of ch in str - like rindex for platforms missing it*/
 
-char* strchrs(char* s, const char* chrs);
+char* strchrs(const char* s, const char* chrs);
 //strchr but with a set of chars instead of only one
 
-char* rstrfind(char* str, const char *substr); /* like rindex() but for strings
-or like the right side version of strstr()
-*/
-//reverse character string or
-char* reverseChars(char* str, int slen=0);
+char* rstrfind(const char* str, const char *substr); 
+// like rindex() but for strings;  right side version of strstr()
 
-char* rstrstr(char* rstart, char *lend, char* substr);
+char* reverseChars(char* str, int slen=0); //in place reversal of string 
+
+char* rstrstr(const char* rstart, const char *lend, const char* substr);
 /*the reversed, rightside equivalent of strstr: starts searching
  from right end (rstart), going back to left end (lend) and returns
  a pointer to the last (right) matching character in str */
 
-char* strifind(char* str,  const char* substr);
-// the case insensitive version of strstr -- finding a string within a strin
-
+char* strifind(const char* str,  const char* substr);
+// case insensitive version of strstr -- finding a string within another string
+// returns NULL if not found
 
 //Determines if a string begins with a given prefix
 //(returns false when any of the params is NULL,
 // but true when prefix is '' (empty string)!)
-bool startsWith(char* s, const char* prefix);
+bool startsWith(const char* s, const char* prefix);
+
+bool startsiWith(const char* s, const char* prefix); //case insensitive
+
+
+bool endsWith(const char* s, const char* suffix);
+//Note: returns true if suffix is empty string, but false if it's NULL
+
 
 // ELF hash function for strings
 int strhash(const char* str);
@@ -263,20 +294,24 @@ class GSeg {
   //check for overlap with other segment
   uint len() { return end-start+1; }
   bool overlap(GSeg* d) {
-     return start<d->start ? (d->start<=end) : (start<=d->end);
+     //return start<d->start ? (d->start<=end) : (start<=d->end);
+     return (start<=d->end && end>=d->start);
      }
 
   bool overlap(GSeg& d) {
-     return start<d.start ? (d.start<=end) : (start<=d.end);
+     //return start<d.start ? (d.start<=end) : (start<=d.end);
+     return (start<=d.end && end>=d.start);
      }
 
   bool overlap(GSeg& d, int fuzz) {
-     return start<d.start ? (d.start<=end+fuzz) : (start<=d.end+fuzz);
+     //return start<d.start ? (d.start<=end+fuzz) : (start<=d.end+fuzz);
+     return (start<=d.end+fuzz && end+fuzz>=d.start);
      }
 
   bool overlap(uint s, uint e) {
-    if (s>e) { swap(s,e); }
-     return start<s ? (s<=end) : (start<=e);
+     if (s>e) { Gswap(s,e); }
+     //return start<s ? (s<=end) : (start<=e);
+     return (start<=e && end>=s);
      }
 
   //return the length of overlap between two segments
@@ -291,7 +326,7 @@ class GSeg {
         }
      }
   int overlapLen(uint rstart, uint rend) {
-     if (rstart>rend) { swap(rstart,rend); }
+     if (rstart>rend) { Gswap(rstart,rend); }
      if (start<rstart) {
         if (rstart>end) return 0;
         return (rend>end) ? end-rstart+1 : rend-rstart+1;
@@ -313,9 +348,6 @@ class GSeg {
   bool operator==(GSeg& d){
       return (start==d.start && end==d.end);
       }
-  bool operator>(GSeg& d){
-     return (start==d.start)?(end>d.end):(start>d.start);
-     }
   bool operator<(GSeg& d){
      return (start==d.start)?(end<d.end):(start<d.start);
      }
@@ -328,6 +360,7 @@ class GSeg {
 
 //GLineReader -- text line reading/buffering class
 class GLineReader {
+   bool closeFile;
    int len;
    int allocated;
    char* buf;
@@ -340,6 +373,7 @@ class GLineReader {
    char* chars() { return buf; }
    char* line() { return buf; }
    int readcount() { return lcount; } //number of lines read
+   void setFile(FILE* stream) { file=stream; }
    int length() { return len; }
    int size() { return len; } //same as size();
    bool isEof() {return isEOF; }
@@ -356,7 +390,17 @@ class GLineReader {
                            // the given file position
    void pushBack() { if (lcount>0) pushed=true; } // "undo" the last getLine request
             // so the next call will in fact return the same line
+   GLineReader(const char* fname) {
+      FILE* f=fopen(fname, "rb");
+      if (f==NULL) GError("Error opening file '%s'!\n",fname);
+      closeFile=true;
+      init(f);
+      }
    GLineReader(FILE* stream=NULL, off_t fpos=0) {
+     closeFile=false;
+     init(stream,fpos);
+     }
+   void init(FILE* stream, off_t fpos=0) {
      len=0;
      isEOF=false;
      allocated=1024;
@@ -369,6 +413,7 @@ class GLineReader {
      }
    ~GLineReader() {
      GFREE(buf);
+     if (closeFile) fclose(file);
      }
 };
 
@@ -379,14 +424,21 @@ class GLineReader {
   */
 char* fgetline(char* & buf, int& buflen, FILE* stream, off_t* f_pos=NULL, int* linelen=NULL);
 
+
+//print int/values nicely formatted in 3-digit groups
+char* commaprintnum(uint64 n);
+
 /*********************** File management functions *********************/
 
-// removes the directory part from a full-path file name
-// this is a destructive operation for the given string!
+// removes the last part (file or directory name) of a full path
+// WARNING: this is a destructive operation for the given string!
 void delFileName(char* filepath);
 
-// returns a pointer to the file name part in a full-path filename
-char* getFileName(char* filepath);
+// returns a pointer to the last file or directory name in a full path
+const char* getFileName(const char* filepath);
+// returns a pointer to the file "extension" part in a filename
+const char* getFileExt(const char* filepath);
+
 
 int fileExists(const char* fname);
 //returns 0 if file entry doesn't exist
@@ -394,7 +446,11 @@ int fileExists(const char* fname);
 //        2 if it's a regular file
 //        3 otherwise (?)
 
-off_t fileSize(const char* fpath);
+int64 fileSize(const char* fpath);
+
+//write a formatted fasta record, fasta formatted
+void writeFasta(FILE *fw, const char* seqid, const char* descr,
+        const char* seq, int linelen=60, int seqlen=0);
 
 //parses the next number found in a string at the current position
 //until a non-digit (and not a '.', 'e','E','-','+') is encountered;

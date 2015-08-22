@@ -103,7 +103,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	{
 		for (int j = 0; j < ref_rnas.Count(); ++j)
 		{    //ref data is grouped by genomic sequence
-			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->gseq_id);
+			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->get_gseqid());
 			
 			RefID ref_id = rt.get_id(name, NULL, 0);
 			for (int i = 0; i < ref_rnas[j]->mrnas_f.Count(); ++i)
@@ -144,8 +144,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				{
 					ref_scaff.annotated_trans_id(rna.getID());
 				}
-				if (rna.getGene())
-					ref_scaff.annotated_gene_id(rna.getGene());
+				if (rna.getGeneID())
+					ref_scaff.annotated_gene_id(rna.getGeneID());
 				char* short_name = rna.getAttr("gene_name");
 				if (short_name)
 				{
@@ -220,8 +220,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				{
 					ref_scaff.annotated_trans_id(rna.getID());
 				}
-				if (rna.getGene())
-					ref_scaff.annotated_gene_id(rna.getGene());
+				if (rna.getGeneID())
+					ref_scaff.annotated_gene_id(rna.getGeneID());
 				char* short_name = rna.getAttr("gene_name");
 				if (short_name)
 				{
@@ -310,7 +310,7 @@ private:
 
 struct SortReads
 {
-    bool operator()(shared_ptr<ReadHit> lhs, shared_ptr<ReadHit> rhs)
+    bool operator()(boost::shared_ptr<ReadHit> lhs, boost::shared_ptr<ReadHit> rhs)
     {
         return lhs->left() < rhs->left();
     }
@@ -481,7 +481,7 @@ void generate_reads(RefSequenceTable& rt,
 {
     RefID last_ref_id = 0;
     int rna_rightmost = 0;
-    vector<shared_ptr<ReadHit> > read_chunk;
+    vector<boost::shared_ptr<ReadHit> > read_chunk;
     
     if (expr_out)
     {
@@ -773,7 +773,7 @@ void driver(FILE* sam_out,
     // Set the fragment priming policy, default is uniform random priming.
     if (priming_type == "three_prime")
     {
-        shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
+        boost::shared_ptr<PrimingPolicy> primer = boost::shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
         frag_policy.priming_policy(primer);
     }
     

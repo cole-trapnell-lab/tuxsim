@@ -12,7 +12,7 @@
 #include "fragments.h"
 #include "hits.h"
 
-typedef vector<shared_ptr<ReadHit> > ReadsForFragment;
+typedef vector<boost::shared_ptr<ReadHit> > ReadsForFragment;
 
 class GFastaHandler;
 
