@@ -409,7 +409,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 	while((tag_buf = strsep((char**)&buf,"\t")))
 	{
 		
-		char* first_colon = strchr(tag_buf, ':');
+	  char* first_colon = (char*)strchr(tag_buf, ':');
 		if (first_colon)
 		{
 			*first_colon = 0;
