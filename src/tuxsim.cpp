@@ -90,8 +90,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	
 	if (ref_mRNA_file)
 	{
-		//read_mRNAs(ref_mRNA_file, false, ref_rnas, ref_rnas, NULL, -1, false);
-		read_mRNAs(ref_mRNA_file, ref_rnas);
+        gtf_tracking_verbose=false;
+        boost::crc_32_type gtf_crc_result;
+        read_transcripts(ref_mRNA_file, ref_rnas, gtf_crc_result, true);
 	}
     
     sort(ref_mRNAs.begin(), ref_mRNAs.end(), ScaffoldSorter(rt));
