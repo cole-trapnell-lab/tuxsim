@@ -12,7 +12,7 @@ AC_PREFIX_DEFAULT([`pwd`])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects -Wall -Werror tar-ustar foreign])
 
 #AM_PATH_CPPUNIT(1.10.2)
 
@@ -29,7 +29,7 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_INSTALL
-AM_PROG_AR
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AX_BOOST_BASE([1.38.0])
 AX_BOOST_THREAD
 AX_BOOST_PROGRAM_OPTIONS
@@ -100,7 +100,7 @@ LDFLAGS="$ext_LDFLAGS"
 AC_CHECK_MEMBERS([struct sysinfo.totalram], [], [], [#include <sys/sysinfo.h>])
 AC_CHECK_DECLS([sysctl, CTL_HW, HW_PHYSMEM], [], [], [#include <sys/sysctl.h>])
 
-AM_INIT_AUTOMAKE([-Wall -Werror tar-ustar foreign])
+#AM_INIT_AUTOMAKE
 
 AC_CONFIG_FILES([Makefile				 
 				 src/Makefile])

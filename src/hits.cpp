@@ -168,11 +168,11 @@ bool mate_hit_lt(const MateHit& lhs, const MateHit& rhs)
 	assert ((lhs.right_alignment() == NULL) == (rhs.right_alignment() == NULL));
 	assert ((lhs.left_alignment() == NULL) == (rhs.left_alignment() == NULL));
 	
-	shared_ptr<const ReadHit> lhs_l = lhs.left_alignment();
-	shared_ptr<const ReadHit> lhs_r = lhs.right_alignment();
+    boost::shared_ptr<const ReadHit> lhs_l = lhs.left_alignment();
+	boost::shared_ptr<const ReadHit> lhs_r = lhs.right_alignment();
 	
-	shared_ptr<const ReadHit> rhs_l = rhs.left_alignment();
-	shared_ptr<const ReadHit> rhs_r = rhs.right_alignment();
+	boost::shared_ptr<const ReadHit> rhs_l = rhs.left_alignment();
+	boost::shared_ptr<const ReadHit> rhs_r = rhs.right_alignment();
 	
 	if (lhs_l && rhs_l)
 	{
@@ -482,7 +482,7 @@ bool SAMHitFactory::get_hit_from_buf(int line_num,
 	while((tag_buf = strsep((char**)&buf,"\t")))
 	{
 		
-		char* first_colon = strchr(tag_buf, ':');
+	  char* first_colon = (char*)strchr(tag_buf, ':');
 		if (first_colon)
 		{
 			*first_colon = 0;

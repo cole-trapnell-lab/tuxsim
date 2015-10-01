@@ -1,25 +1,78 @@
+#include "GBase.h"
 #include <stdarg.h>
 #include <ctype.h>
-#include "GBase.h"
-#include <sys/stat.h>
 
-static char msg[4069];
+#ifndef S_ISDIR
+#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#endif
+
+#ifndef S_ISREG
+#define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
+#endif
+
+/*
+#ifdef _DEFINE_WIN32_FSEEKO
+ int fseeko(FILE *stream, off_t offset, int whence) {
+   
+   }
+#endif
+
+#ifdef _DEFINE_WIN32_FTELLO
+ off_t ftello(FILE *stream) {
+  
+  }
+#endif
+*/
+
+/*
+int saprintf(char **retp, const char *fmt, ...) {
+  va_list argp;
+  int len;
+  char *buf;
+
+  va_start(argp, fmt);
+  len = vsnprintf(NULL, 0, fmt, argp);
+  va_end(argp);
+  GMALLOC(buf, (len + 1));
+  if(buf == NULL)
+    {
+    *retp = NULL;
+    return -1;
+    }
+
+  va_start(argp, fmt);
+  vsnprintf(buf, len+1, fmt, argp);
+  va_end(argp);
+
+  *retp = buf;
+  return len;
+}
+*/
+
 //************************* Debug helpers **************************
 // Assert failed routine
 void GAssert(const char* expression, const char* filename, unsigned int lineno){
+  char msg[4096];
   sprintf(msg,"%s(%d): ASSERT(%s) failed.\n",filename,lineno,expression);
   fprintf(stderr,"%s",msg);
-  //abort();
-  }
+  #ifdef DEBUG
+  // modify here if you [don't] want a core dump
+    abort();
+  #endif
+  exit(1);
+}
+
 // Error routine (prints error message and exits!)
 void GError(const char* format,...){
   #ifdef __WIN32__
+    char msg[4096];
     va_list arguments;
     va_start(arguments,format);
-    vsprintf(msg,format,arguments);
+    _vsnprintf(msg, 4095, format, arguments);
+    vfprintf(stderr, format, arguments); // if a console is available
+    msg[4095]=0;
     va_end(arguments);
     OutputDebugString(msg);
-    fprintf(stderr,"%s",msg); // if a console is available
     MessageBox(NULL,msg,NULL,MB_OK|MB_ICONEXCLAMATION|MB_APPLMODAL);
   #else
     va_list arguments;
@@ -27,22 +80,30 @@ void GError(const char* format,...){
     vfprintf(stderr,format,arguments);
     va_end(arguments);
     #ifdef DEBUG
-     // modify here if you want a core dump
+     // modify here if you [don't] want a core dump
      abort();
     #endif
   #endif
     exit(1);
   }
+  
 // Warning routine (just print message without exiting)
 void GMessage(const char* format,...){
-  va_list arguments;
-  va_start(arguments,format);
-  vsprintf(msg,format,arguments);
-  va_end(arguments);
   #ifdef __WIN32__
+    char msg[4096];
+    va_list arguments;
+    va_start(arguments,format);
+    vfprintf(stderr, format , arguments); // if a console is available
+    _vsnprintf(msg, 4095, format, arguments);
+    msg[4095]=0;
+    va_end(arguments);
     OutputDebugString(msg);
+  #else
+    va_list arguments;
+    va_start(arguments,format);
+    vfprintf(stderr,format,arguments);
+    va_end(arguments);
   #endif
-  fprintf(stderr,"%s",msg);fflush(stderr);
   }
 
 /*************** Memory management routines *****************/
@@ -93,14 +154,14 @@ void GFree(pointer* ptr){
 
 char* Gstrdup(const char* str) {
   if (str==NULL) return NULL;
-  char *copy;
+  char *copy=NULL;
   GMALLOC(copy, strlen(str)+1);
   strcpy(copy,str);
   return copy;
   }
 
 char* newEmptyStr() {
-  char* zs;
+  char* zs=NULL;
   GMALLOC(zs,1);
   zs[0]=0;
   return zs;
@@ -108,31 +169,111 @@ char* newEmptyStr() {
 
 char* Gstrdup(const char* sfrom, const char* sto) {
   if (sfrom==NULL || sto==NULL) return NULL;
-  char *copy;
-  if (sfrom[0]==0) return newEmptyStr();
+  char *copy=NULL;
+  if (sfrom[0]==0 || sto<sfrom) return newEmptyStr();
   GMALLOC(copy, sto-sfrom+2);
   strncpy(copy, sfrom, sto-sfrom+1);
   copy[sto-sfrom+1]=0;
   return copy;
   }
 
-int Gstrcmp(char* a, char* b) {
+int Gstrcmp(const char* a, const char* b, int n) {
  if (a==NULL || b==NULL) {
    return a==NULL ? -1 : 1;
    }
- else return strcmp(a,b);
+ else {
+   if (n<0) return strcmp(a,b);
+       else return strncmp(a,b,n);
+ }
+
 }
 
-int Gstricmp(const char* a, const char* b) {
+int G_mkdir(const char* path, int perms=0775) {
+ #ifdef __WIN32__
+     return _mkdir(path);
+ #else
+ //#if _POSIX_C_SOURCE
+ //    return ::mkdir(path);
+ //#else
+     return mkdir(path, perms); // not sure if this works on mac
+ //#endif
+ #endif
+}
+
+
+int Gmkdir(const char *path, bool recursive, int perms) {
+	if (path==NULL || path[0]==0) return -1;
+	if (!recursive) return G_mkdir(path, perms);
+	int plen=strlen(path);
+	char* gpath=NULL;
+	//make sure gpath ends with /
+	if (path[plen-1]=='/') {
+		gpath=Gstrdup(path);
+	}
+	else {
+		GMALLOC(gpath, plen+2);
+		strcpy(gpath,path);
+		gpath[plen]='/';
+		gpath[plen+1]=0;
+	}
+	char* ss=gpath;
+	char* psep = NULL;
+	while (*ss!=0 && (psep=strchr(ss, '/'))!=NULL)  {
+		*psep=0; //now gpath is the path up to this /
+		ss=psep; ++ss; //ss repositioned just after the /
+		// create current level
+		if (fileExists(gpath)!=1 && G_mkdir(gpath, perms)!=0) {
+			GFREE(gpath);
+			return -1;
+		}
+		*psep='/';
+	}
+	GFREE(gpath);
+	return 0;
+}
+
+bool GstrEq(const char* a, const char* b) {
+	 if (a==NULL || b==NULL) return false;
+	 register int i=0;
+	 while (a[i]==b[i]) {
+		 if (a[i]==0) return true;
+		 ++i;
+	 }
+	 return false;
+}
+
+bool GstriEq(const char* a, const char* b) {
+	 if (a==NULL || b==NULL) return false;
+	 register int i=0;
+	 while (tolower((unsigned char)a[i])==tolower((unsigned char)b[i])) {
+		 if (a[i]==0) return true;
+	 }
+	 return false;
+}
+
+int Gstricmp(const char* a, const char* b, int n) {
  if (a==NULL || b==NULL) return a==NULL ? -1 : 1;
  register int ua, ub;
- while ((*a!=0) && (*b!=0)) {
-  ua=tolower((unsigned char)*a);
-  ub=tolower((unsigned char)*b);
-  a++;b++;
-  if (ua!=ub) return ua < ub ? -1 : 1;
+ if (n<0) {
+   while ((*a!=0) && (*b!=0)) {
+    ua=tolower((unsigned char)*a);
+    ub=tolower((unsigned char)*b);
+    a++;b++;
+    if (ua!=ub) return ua < ub ? -1 : 1;
+    }
+    return (*a == 0) ? ( (*b == 0) ? 0 : -1 ) : 1 ;
   }
-  return (*a == 0) ? ( (*b == 0) ? 0 : -1 ) : 1 ;
+ else {
+   while (n && (*a!=0) && (*b!=0)) {
+    ua=tolower((unsigned char)*a);
+    ub=tolower((unsigned char)*b);
+    a++;b++;n--;
+    if (ua!=ub) return ua < ub ? -1 : 1;
+    }
+    //return (*a == 0) ? ( (*b == 0) ? 0 : -1 ) : 1 ;
+   if (n==0) return 0;
+   else { return (*a == 0) ? ( (*b == 0) ? 0 : -1 ) : 1 ; }
+  }
 }
 
 int strsplit(char* str, char** fields, int maxfields, const char* delim) {
@@ -219,7 +360,7 @@ char* Gsubstr(const char* str, char* from, char* to) {
     }
  if (to<from) return newEmptyStr();
  int newlen=to-from+1;
- char* subs;
+ char* subs=NULL;
  GMALLOC(subs, newlen);
  memcpy(subs, str, newlen-1);
  subs[newlen]='\0';
@@ -333,19 +474,19 @@ char* GLineReader::getLine(FILE* stream, off_t& f_pos) {
 
 
 //strchr but with a set of chars instead of only one
-char* strchrs(char* s, const char* chrs) {
+char* strchrs(const char* s, const char* chrs) {
   if (s==NULL || chrs==NULL || *chrs=='\0' || *s=='\0')
          return NULL;
   unsigned int l=strlen(s);
   unsigned int r=strcspn(s, chrs);
   if (r==l) return NULL;
-  return (s+r);
+  return ((char*)s+r);
 }
 
 char* upCase(const char* str) {
  if (str==NULL) return NULL;
  int len=strlen(str);
- char* upstr;
+ char* upstr=NULL;
  GMALLOC(upstr, len+1);
  upstr[len]='\0';
  for (int i=0;i<len;i++) upstr[i]=toupper(str[i]);
@@ -355,7 +496,7 @@ char* upCase(const char* str) {
 char* loCase(const char* str) {
  if (str==NULL) return NULL;
  int len=strlen(str);
- char* lostr;
+ char* lostr=NULL;
  GMALLOC(lostr, len+1);
  lostr[len]='\0';
  for (int i=0;i<len;i++) lostr[i]=tolower(str[i]);
@@ -379,9 +520,9 @@ char* strupper(char * str) {//changes string in place
 
 
 //test if a char is in a given string (set)
-bool chrInStr(char c, char* str) {
+bool chrInStr(char c, const char* str) {
  if (str==NULL || *str=='\0') return false;
- for (char* p=str; (*p)!='\0'; p++) {
+ for (const char* p=str; (*p)!='\0'; p++) {
    if ((*p)==c) return true;
    }
  return false;
@@ -389,17 +530,17 @@ bool chrInStr(char c, char* str) {
 
 
 
-char* rstrfind(char* str, const char* substr) {
+char* rstrfind(const char* str, const char* substr) {
 /* like rindex() for a string */
  int l,i;
  if (str==NULL || *str=='\0') return NULL;
  if (substr==NULL || *substr=='\0') return NULL;
  l=strlen(substr);
- char* p=str+strlen(str)-l;
+ char* p=(char*)str+strlen(str)-l;
    //rightmost position that could match
 
  while (p>=str) {
-    for (i=0; i<l && *(p+i) == *(substr+i); i++);
+    for (i=0; i<l && *(p+i) == *(substr+i); i++) ;
     if (i==l) return p; //found!
     p--;
     }
@@ -407,18 +548,18 @@ char* rstrfind(char* str, const char* substr) {
 }
 
 
-char* strifind(char* str,  const char* substr) {
- // the case insensitive version of strstr -- finding a string within a strin
+char* strifind(const char* str,  const char* substr) {
+ // case insensitive version of strstr -- finding a string within another
   int l,i;
   if (str==NULL || *str==0) return NULL;
   if (substr==NULL || *substr==0) return NULL;
   l=strlen(substr);
-  char* smax=str+strlen(str)-l;
+  char* smax=(char*)str+strlen(str)-l;
   //rightmost position that could match
-  char* p=str;
+  char* p=(char*)str;
   while (p<=smax) {
-     for (i=0; i<l && tolower(*(p+i))==tolower(*(substr+i)); i++);
-     if (i==l) return p; //found!
+     for (i=0; i<l && tolower(*(p+i))==tolower(*(substr+i)); i++) ;
+     if (i==l) return p;
      p++;
      }
   return NULL;
@@ -427,11 +568,30 @@ char* strifind(char* str,  const char* substr) {
 
 
 // tests if string s has the given prefix
-bool startsWith(char* s, const char* prefix) {
+bool startsWith(const char* s, const char* prefix) {
  if (prefix==NULL || s==NULL) return false;
  int i=0;
  while (prefix[i]!='\0' && prefix[i]==s[i]) i++;
  return (prefix[i]=='\0');
+ }
+
+bool startsiWith(const char* s, const char* prefix) {
+ if (prefix==NULL || s==NULL) return false;
+ int i=0;
+ while (prefix[i]!='\0' && tolower(prefix[i])==tolower(s[i])) i++;
+ return (prefix[i]=='\0');
+ }
+
+
+// tests if string s ends with given suffix
+bool endsWith(const char* s, const char* suffix) {
+ if (suffix==NULL || s==NULL) return false;
+ if (suffix[0]==0) return true; //special case: empty suffix
+ int j=strlen(suffix)-1;
+ int i=strlen(s)-1;
+ if (i<j) return false;
+ while (j>=0 && s[i]==suffix[j]) { i--; j--; }
+ return (j==-1);
  }
 
 
@@ -439,24 +599,23 @@ char* reverseChars(char* str, int slen) {
   if (slen==0) slen=strlen(str);
   int l=0;
   int r=slen-1;
-  register char c;
+  char c;
   while (l<r) {
      c=str[l];str[l]=str[r];
      str[r]=c;
-     //swap(str[l],str[r]);
      l++;r--;
      }
   return str;
 }
 
 
-char* rstrstr(char* rstart, char *lend, char* substr) {  /*like strstr, but starts searching
+char* rstrstr(const char* rstart, const char *lend, const char* substr) {  /*like strstr, but starts searching
  from right end, going up to lend and returns a pointer to the last (right)
  matching character in str */
  char *p;
  int l,i;
  l=strlen(substr);
- p=rstart-l+1;
+ p=(char*)rstart-l+1;
  while (p>=lend) {
     for (i=0;i<l;i++) if (*(p+i) != *(substr+i)) break;
     if (i==l) return p+l-1;
@@ -480,24 +639,36 @@ int strhash(const char* str){
   return h;
   }
 
-// removes the directory part from a full-path file name
+// removes the last part (file or directory name) of a full path
 // this is a destructive operation for the given string!!!
 // the trailing '/' is guaranteed to be there
 void delFileName(char* filepath) {
  char *p, *sep;
  if (filepath==NULL) return;
  for (p=filepath, sep=filepath;*p!='\0';p++)
-     if (*p==CHPATHSEP) sep=p+1;
+     if (*p=='/' || *p=='\\') sep=p+1;
  *sep='\0'; // truncate filepath
 }
 
-// returns a pointer to the file name part in a full-path filename
-char* getFileName(char* filepath) {
- char *p, *sep;
+// returns a pointer to the last file or directory name in a full path
+const char* getFileName(const char* filepath) {
+ const char *p, *sep;
  if (filepath==NULL) return NULL;
  for (p=filepath, sep=filepath;*p!='\0';p++)
-     if (*p==CHPATHSEP) sep=p+1;
+     if (*p=='/' || *p=='\\') sep=p+1;
  return sep;
+}
+
+// returns a pointer to the file "extension" part in a filename
+const char* getFileExt(const char* filepath) {
+ const char *p, *dp, *sep;
+ if (filepath==NULL) return NULL;
+ for (p=filepath, dp=filepath, sep=filepath;*p!='\0';p++) {
+     if (*p=='.') dp=p+1;
+       else if (*p=='/' || *p=='\\') 
+                  sep=p+1;
+     }
+ return (dp>sep) ? dp : NULL ;
 }
 
 int fileExists(const char* fname) {
@@ -527,14 +698,14 @@ int fileExists(const char* fname) {
   return true;
 }
 */
-off_t fileSize(const char* fpath) {
+int64 fileSize(const char* fpath) {
   struct stat results;
   if (stat(fpath, &results) == 0)
       // The size of the file in bytes is in
-      return results.st_size;
+      return (int64)results.st_size;
   else
       // An error occurred
-    //GError("Error at stat(%s)!\n", fpath)
+    //GMessage("Error at stat(%s)!\n", fpath);
     return 0;
 }
 
@@ -620,3 +791,62 @@ bool parseHex(char* &p, uint& i) {
  return true;
 }
 
+//write a formatted fasta record, fasta formatted
+void writeFasta(FILE *fw, const char* seqid, const char* descr,
+        const char* seq, int linelen, int seqlen) {
+  fflush(fw);
+  // write header line only if given!
+  if (seqid!=NULL) {
+    if (descr==NULL || descr[0]==0)
+             fprintf(fw,">%s\n",seqid);
+        else fprintf(fw,">%s %s\n",seqid, descr);
+    }
+  fflush(fw);
+  if (seq==NULL || *seq==0) return; //nothing to print
+  if (linelen==0) { //unlimited line length: write the whole sequence on a line
+     if (seqlen>0)
+             fwrite((const void*)seq, 1, seqlen,fw);
+        else fprintf(fw,"%s",seq);
+     fprintf(fw,"\n");
+     fflush(fw);
+     return;
+     }
+  int ilen=0;
+  if (seqlen>0) { //seq length given, so we know when to stop
+    for (int i=0; i < seqlen; i++, ilen++) {
+            if (ilen == linelen) {
+                 fputc('\n', fw);
+                 ilen = 0;
+                 }
+            fputc(seq[i], fw);
+            }
+    fputc('\n', fw);
+    }
+  else { //seq length not given, stop when 0 encountered
+    for (int i=0; seq[i]!=0; i++, ilen++) {
+            if (ilen == linelen) {
+                 fputc('\n', fw);
+                 ilen = 0;
+                 }
+            fputc(seq[i], fw);
+            } //for
+    fputc('\n', fw);
+    }
+  fflush(fw);
+ }
+
+char* commaprintnum(uint64 n) {
+  int comma = ',';
+  char retbuf[48];
+  char *p = &retbuf[sizeof(retbuf)-1];
+  int i = 0;
+  *p = '\0';
+  do {
+    if(i%3 == 0 && i != 0)
+        *--p = comma;
+    *--p = '0' + n % 10;
+    n /= 10;
+    i++;
+  } while(n != 0);
+  return Gstrdup(p);
+}

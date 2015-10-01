@@ -92,8 +92,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	
 	if (ref_mRNA_file)
 	{
-		//read_mRNAs(ref_mRNA_file, false, ref_rnas, ref_rnas, NULL, -1, false);
-		read_mRNAs(ref_mRNA_file, ref_rnas);
+        gtf_tracking_verbose=false;
+        boost::crc_32_type gtf_crc_result;
+        read_transcripts(ref_mRNA_file, ref_rnas, gtf_crc_result, true);
 	}
     
     sort(ref_mRNAs.begin(), ref_mRNAs.end(), ScaffoldSorter(rt));
@@ -105,7 +106,7 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	{
 		for (int j = 0; j < ref_rnas.Count(); ++j)
 		{    //ref data is grouped by genomic sequence
-			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->gseq_id);
+			char* name = GffObj::names->gseqs.getName(ref_rnas[j]->get_gseqid());
 			
 			RefID ref_id = rt.get_id(name, NULL, 0);
 			for (int i = 0; i < ref_rnas[j]->mrnas_f.Count(); ++i)
@@ -146,8 +147,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				{
 					ref_scaff.annotated_trans_id(rna.getID());
 				}
-				if (rna.getGene())
-					ref_scaff.annotated_gene_id(rna.getGene());
+				if (rna.getGeneID())
+					ref_scaff.annotated_gene_id(rna.getGeneID());
 				char* short_name = rna.getAttr("gene_name");
 				if (short_name)
 				{
@@ -222,8 +223,8 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 				{
 					ref_scaff.annotated_trans_id(rna.getID());
 				}
-				if (rna.getGene())
-					ref_scaff.annotated_gene_id(rna.getGene());
+				if (rna.getGeneID())
+					ref_scaff.annotated_gene_id(rna.getGeneID());
 				char* short_name = rna.getAttr("gene_name");
 				if (short_name)
 				{
@@ -296,9 +297,9 @@ public:
         
         if (_frag_impl.next_fragment(molecule, frag))
         {
-			//allele
+            //allele
             return _seq_impl.reads_for_fragment(frag, reads, _gfasta, pos2var);
-		}
+        }
 
         return false;
     }
@@ -314,7 +315,7 @@ private:
 
 struct SortReads
 {
-    bool operator()(shared_ptr<ReadHit> lhs, shared_ptr<ReadHit> rhs)
+    bool operator()(boost::shared_ptr<ReadHit> lhs, boost::shared_ptr<ReadHit> rhs)
     {
         return lhs->left() < rhs->left();
     }
@@ -645,13 +646,13 @@ void generate_reads(RefSequenceTable& rt,
 					map<RefID,map<int,pair<char,char> > > vcfTable)
 {
     RefID last_ref_id = 0;
-	int rna_rightmost = 0;
-	//allele
-	string allele_tag;
+    int rna_rightmost = 0;
+    //allele
+    string allele_tag;
     vector<shared_ptr<ReadHit> > read_chunk;
-	map<int,char> pos2var;
-	map<RefID,map<int,pair<char,char> > >::iterator id_itr;
-	
+    map<int,char> pos2var;
+    map<RefID,map<int,pair<char,char> > >::iterator id_itr;
+
     if (expr_out)
     {
         fprintf(expr_out, "gene_id\ttranscript_id\tFPKM\trho\tread_cov\tphys_cov\teffective_len\ttss_id\tfrags_generated\n");
@@ -966,6 +967,9 @@ void driver(FILE* sam_out,
         exit(1);
     }
     
+    vector<Mismatch> mismatches;
+    vector<AugmentedCuffOp> indels;
+    
     // extract exons and merge them in case they overlap with one another.
     //allele
     vector<AugmentedCuffOp> exons, temp_exons, paternal_exons, maternal_exons, paternal_temp_exons, maternal_temp_exons;
@@ -1060,14 +1064,13 @@ void driver(FILE* sam_out,
 			}
 		}
 	}
-    vector<Mismatch> mismatches;
-	generate_true_mismatches(exons, mismatches);
-	print_mismatches(mismatches_out, rt, mismatches);
+
+    generate_true_mismatches(exons, mismatches);
+    print_mismatches(mismatches_out, rt, mismatches);
         
-	vector<AugmentedCuffOp> indels;
-	generate_true_indels(exons, indels);
-	print_indels(indels_out, rt, indels);
-    
+    generate_true_indels(exons, indels);
+    print_indels(indels_out, rt, indels);
+
     FluxRankAbundancePolicy flux_policy(5e7, -0.6, 9500);
     
     if (expr_in != NULL)
@@ -1087,7 +1090,7 @@ void driver(FILE* sam_out,
     // Set the fragment priming policy, default is uniform random priming.
     if (priming_type == "three_prime")
     {
-        shared_ptr<PrimingPolicy> primer = shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
+        boost::shared_ptr<PrimingPolicy> primer = boost::shared_ptr<PrimingPolicy>(new ThreePrimeEndPriming());
         frag_policy.priming_policy(primer);
     }
     

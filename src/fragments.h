@@ -95,13 +95,13 @@ public:
     _max_frag_length(max_frag_length),
     frag_len_dist(mean_frag_length, frag_length_sd)
 	{
-		_priming_policy = shared_ptr<PrimingPolicy>(new UniformRandomPriming());
+		_priming_policy = boost::shared_ptr<PrimingPolicy>(new UniformRandomPriming());
 	}
 	
 	virtual bool next_fragment(const Scaffold& molecule,
                                LibraryFragment& fragment);
 	
-	void priming_policy(shared_ptr<PrimingPolicy> policy ) 
+	void priming_policy(boost::shared_ptr<PrimingPolicy> policy )
 	{ 
 		_priming_policy = policy; 
 	}
@@ -122,7 +122,7 @@ private:
 	
     normal frag_len_dist; 
     
-    shared_ptr<PrimingPolicy> _priming_policy;
+    boost::shared_ptr<PrimingPolicy> _priming_policy;
     int _min_frag_length;
     int _max_frag_length;
 };

@@ -684,8 +684,8 @@ class MateHit
 {
 public:
 	MateHit(uint32_t refid, 
-			shared_ptr<ReadHit const> left_alignment, 
-			shared_ptr<ReadHit const> right_alignment,
+            boost::shared_ptr<ReadHit const> left_alignment,
+			boost::shared_ptr<ReadHit const> right_alignment,
 			int expected_inner_dist,
 			int max_inner_dist) : 
 	_refid(refid), 
@@ -701,15 +701,15 @@ public:
     
 	//bool closed() {return _closed;}
 	
-	shared_ptr<ReadHit const> left_alignment() const {return _left_alignment;}
-	void left_alignment(shared_ptr<ReadHit const> left_alignment) 
+	boost::shared_ptr<ReadHit const> left_alignment() const {return _left_alignment;}
+    void left_alignment(boost::shared_ptr<ReadHit const> left_alignment)
 	{
-		_left_alignment = shared_ptr<ReadHit const>(left_alignment);
+		_left_alignment = boost::shared_ptr<ReadHit const>(left_alignment);
 		//_closed = true;
 	}
 	
-	shared_ptr<ReadHit const> right_alignment() const {return _right_alignment;}					
-	void right_alignment(shared_ptr<ReadHit const> right_alignment)  
+	boost::shared_ptr<ReadHit const> right_alignment() const {return _right_alignment;}
+	void right_alignment(boost::shared_ptr<ReadHit const> right_alignment)  
 	{
 		_right_alignment = right_alignment;
 		//_closed = true;
@@ -829,8 +829,8 @@ public:
     bool operator<(const MateHit& other) const;
     
 	RefID _refid;
-	shared_ptr<ReadHit const> _left_alignment;
-	shared_ptr<ReadHit const> _right_alignment;
+	boost::shared_ptr<ReadHit const> _left_alignment;
+	boost::shared_ptr<ReadHit const> _right_alignment;
 	//int _expected_inner_dist;
 	//int _max_inner_dist;
 	//bool _closed;
