@@ -94,9 +94,9 @@ void load_ref_rnas(FILE* ref_mRNA_file,
 	{
         gtf_tracking_verbose=false;
         boost::crc_32_type gtf_crc_result;
-        read_transcripts(ref_mRNA_file, ref_rnas, gtf_crc_result, true);
+        read_transcripts(ref_mRNA_file, ref_rnas, gtf_crc_result, true, allele_simulator);
 	}
-    
+
     sort(ref_mRNAs.begin(), ref_mRNAs.end(), ScaffoldSorter(rt));
 	
 	int last_gseq_id = -1;

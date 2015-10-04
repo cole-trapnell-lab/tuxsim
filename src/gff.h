@@ -1010,6 +1010,11 @@ class GffReader {
   FILE* fh;
   char* fname;  //optional fasta file with the underlying genomic sequence to be attached to this reader
   GffLine* gffline;
+
+  // allele
+  char* lastRawLine;
+  bool duplicateLineBeforeReadingNext;
+
   bool transcriptsOnly; //keep only transcripts w/ their exon/CDS features
   GHash<int> discarded_ids; //for transcriptsOnly mode, keep track
                             // of discarded parent IDs
@@ -1047,6 +1052,8 @@ class GffReader {
       gff_warns=gff_show_warnings;
       names=NULL;
       gffline=NULL;
+      lastRawLine=NULL;
+      duplicateLineBeforeReadingNext=false;
       transcriptsOnly=t_only;
       fpos=0;
       fname=NULL;
@@ -1093,10 +1100,11 @@ class GffReader {
       gff_show_warnings=v;
       }
 
-  GffLine* nextGffLine();
+  GffLine* nextGffLine(bool allele_simulator=false);
 
   // load all subfeatures, re-group them:
-  void readAll(bool keepAttr=false, bool mergeCloseExons=false, bool noExonAttr=true);
+  void readAll(bool keepAttr=false, bool mergeCloseExons=false, bool noExonAttr=true,
+               bool allele_simulator=false);
 #ifdef CUFFLINKS
     boost::crc_32_type current_crc_result() const { return _crc_result; }
 #endif

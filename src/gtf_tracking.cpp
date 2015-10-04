@@ -591,13 +591,13 @@ void read_transcripts(FILE* f, GList<GSeqData>& seqdata,
 #ifdef CUFFLINKS
   boost::crc_32_type& crc_result,
 #endif
-   bool keepAttrs) {
+   bool keepAttrs, bool allele_simulator) {
 	rewind(f);
 	GffReader gffr(f, true); //loading only recognizable transcript features
 	gffr.showWarnings(gtf_tracking_verbose);
 
 	//          keepAttrs    mergeCloseExons   noExonAttrs
-	gffr.readAll(keepAttrs,          true,        true);
+	gffr.readAll(keepAttrs,          true,        true,    allele_simulator);
 #ifdef CUFFLINKS
      crc_result = gffr.current_crc_result();
 #endif

@@ -1327,7 +1327,7 @@ void read_transcripts(FILE* f, GList<GSeqData>& seqdata,
 #ifdef CUFFLINKS
   boost::crc_32_type& crc_result, 
 #endif
-  bool keepAttrs=true);
+  bool keepAttrs=true, bool allele_simulator=false);
 
 void sort_GSeqs_byName(GList<GSeqData>& seqdata);
 

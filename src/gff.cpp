@@ -1,4 +1,5 @@
 #include "gff.h"
+#include <cstring>
 
 GffNames* GffObj::names=NULL;
 //global set of feature names, attribute names etc.
@@ -862,21 +863,53 @@ GffObj::GffObj(GffReader *gfrd, GffLine* gffline, bool keepAttr, bool noExonAttr
   */
 }
 
-GffLine* GffReader::nextGffLine() {
+//allele
+char* addSuffixToTranscriptID(char* input, const char* suffix) {
+    char* pos = strstr(input, "transcript_id");
+    if (pos == NULL) return Gstrdup(input);
+
+    char* result;
+    GMALLOC(result, strlen(input) + strlen(suffix) + 1);
+    pos = strchr(pos,   '"'); //  open quote of value for transcript_id
+    pos = strchr(pos+1, '"'); // close quote of value for transcript_id
+    // copy up to last letter of value
+    strncpy(result, input, (size_t) (pos-input));
+    // copy suffix but not null terminator
+    strncpy(result + (pos-input), suffix, strlen(suffix));
+    // copy rest of input, including close quote and null terminator
+    strcpy(result + (pos-input) + strlen(suffix), pos);
+    return result;
+}
+
+GffLine* GffReader::nextGffLine(bool allele_simulator) {
  if (gffline!=NULL) return gffline; //caller should free gffline after processing
  while (gffline==NULL) {
-    int llen=0;
-    buflen=GFF_LINELEN-1;
-    char* l=fgetline(linebuf, buflen, fh, &fpos, &llen);
-    if (l==NULL) {
-         return NULL; //end of file
-         }
+    char* l;
+
+    //allele
+    if (allele_simulator && duplicateLineBeforeReadingNext) {
+        l = addSuffixToTranscriptID(lastRawLine, "_M");
+    } else {
+        int llen=0;
+        buflen=GFF_LINELEN-1;
+    
+        l=fgetline(linebuf, buflen, fh, &fpos, &llen);
+        if (l==NULL) {
+             return NULL; //end of file
+             }
 #ifdef CUFFLINKS
-     _crc_result.process_bytes( linebuf, llen );
+         _crc_result.process_bytes( linebuf, llen );
 #endif
-    int ns=0; //first nonspace position
-    while (l[ns]!=0 && isspace(l[ns])) ns++;
-    if (l[ns]=='#' || llen<10) continue;
+        int ns=0; //first nonspace position
+        while (l[ns]!=0 && isspace(l[ns])) ns++;
+        if (l[ns]=='#' || llen<10) continue;
+
+        if (allele_simulator) {
+            lastRawLine = l;
+            l = addSuffixToTranscriptID(lastRawLine, "_P");
+        }
+    }
+
     gffline=new GffLine(this, l);
     if (gffline->skipLine) {
        delete gffline;
@@ -892,6 +925,10 @@ GffLine* GffReader::nextGffLine() {
         //continue;
         }
     }
+
+if (allele_simulator)
+    duplicateLineBeforeReadingNext = !duplicateLineBeforeReadingNext;
+
 return gffline;
 }
 
@@ -1108,12 +1145,13 @@ GffObj* GffReader::promoteFeature(CNonExon* subp, char*& subp_name, GHash<CNonEx
 //are accepted if they are NOT overlapping/continuous
 //  *** BUT (exception): proximal xRNA features with the same ID, on the same strand, will be merged
 //  and the segments will be treated like exons (e.g. TRNAR15 (rna1940) in RefSeq)
-void GffReader::readAll(bool keepAttr, bool mergeCloseExons, bool noExonAttr) {
+void GffReader::readAll(bool keepAttr, bool mergeCloseExons, bool noExonAttr,
+                        bool allele_simulator) {
 	bool validation_errors = false;
 	//loc_debug=false;
 	GHash<CNonExon> pex; //keep track of any "exon"-like features that have an ID
 	//and thus could become promoted to parent features
-	while (nextGffLine()!=NULL) {
+	while (nextGffLine(allele_simulator)!=NULL) {
 		GffObj* prevseen=NULL;
 		GPVec<GffObj>* prevgflst=NULL;
 		if (gffline->ID && gffline->exontype==0) {
