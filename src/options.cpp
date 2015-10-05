@@ -123,6 +123,9 @@ int parse_options(int argc, char** argv)
 	  ("mismatch.seq_error_per_bases", value<int>(&mismatch_seq_error_per_bases)->default_value(0), "")
 	  ("indel.true_diff_per_bases", value<int>(&indel_true_diff_per_bases)->default_value(0), "")
 	  ("indel.seq_error_per_bases", value<int>(&indel_seq_error_per_bases)->default_value(0), "")
+          ("ase.silenced_allele", value<string>(&silenced_allele)->default_value(""), "")
+          ("ase.silenced_fraction", value<double>(&silenced_fraction)->default_value(1.0), "")
+          ("ase.allele_proportion_natural_stdev", value<double>(&allele_proportion_natural_stdev)->default_value(0.1), "")
 	  //("fragment_length.distribution", value(&frag_dist), "")
         ;
         
