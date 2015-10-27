@@ -182,7 +182,6 @@ void load_ref_rnas(FILE* ref_mRNA_file,
                 
 				ref_scaff.gseq_id(rna.gseq_id);
 				ref_mRNAs.push_back(ref_scaff);
-				
 			}
 			
 			for (int i = 0; i < ref_rnas[j]->mrnas_r.Count(); ++i)
@@ -335,17 +334,17 @@ void print_sam_header(FILE* sam_out, const RefSequenceTable& rt)
         //                itr->second.name,
         //                itr->second.len);
 		//new
-		if(!allele_simulator)
+//		if(!allele_simulator)
 			seq_dict[itr->second.name] = itr->second.len;
-		else
-		{
-			string paternal_seq(itr->second.name);
-			paternal_seq += "_P";
-			string maternal_seq(itr->second.name);
-			maternal_seq += "_M";
-			seq_dict[paternal_seq] = itr->second.len;
-			seq_dict[maternal_seq] = itr->second.len;
-		}
+//		else
+//		{
+//			string paternal_seq(itr->second.name);
+//			paternal_seq += "_P";
+//			string maternal_seq(itr->second.name);
+//			maternal_seq += "_M";
+//			seq_dict[paternal_seq] = itr->second.len;
+//			seq_dict[maternal_seq] = itr->second.len;
+//		}
     }
     
     for (map<string, uint32_t>::const_iterator itr = seq_dict.begin();
@@ -483,7 +482,7 @@ void print_aligned_read(const ReadHit& read,
     int sam_flag = read.sam_flag();
 	const char* ref_name = rt.get_name(read.ref_id());
 	string parent_ref_name(ref_name);
-	parent_ref_name += "_"+parent;
+//	parent_ref_name += "_"+parent;
     int ref_pos = read.left();
     const vector<CigarOp>& cigar = read.cigar();
     string cigar_str;
@@ -521,7 +520,7 @@ void print_aligned_read(const ReadHit& read,
     
     const char* mate_ref_name = rt.get_name(read.partner_ref_id());
 	string parent_mate_ref_name(mate_ref_name);
-	parent_mate_ref_name += "_"+parent;
+//	parent_mate_ref_name += "_"+parent;
 	int mate_ref_pos = read.partner_pos();
     
     string seq = read.seq();
@@ -1186,7 +1185,7 @@ int main(int argc, char** argv)
             exit(1);
         }
 	}
-    //else
+    else
     {
         string out_expr_filename = out_prefix + ".simexpr";
         expr_out = fopen(out_expr_filename.c_str(), "w");
