@@ -474,8 +474,7 @@ void print_aligned_read(const ReadHit& read,
 void print_aligned_read(const ReadHit& read,
                         RefSequenceTable& rt,
                         FILE* sam_out,
-						string allele_info,
-						string parent)
+                        string allele_info)
 {
     const char* read_name = read.name().c_str();
     
@@ -548,19 +547,19 @@ void print_aligned_read(const ReadHit& read,
 		if(aux_fields[i].substr(0,2) == "NM"){
 			if(allele_info == "1"){
 				NM = "NM:i:";
-				if(parent == "P")
+				//if(parent == "P")
 					edit_dist = read.edit_dist();
-				else if(parent == "M")
-					edit_dist = read.edit_dist()+read.vars();
+				//else if(parent == "M")
+				//	edit_dist = read.edit_dist()+read.vars();
 				str_appendInt(NM, (int)edit_dist);
 				aux_str += NM;
 			}
 			else if(allele_info == "2"){
 				NM = "NM:i:";
-				if(parent == "M")
+				//if(parent == "M")
 					edit_dist = read.edit_dist();
-				else if(parent == "P")
-					edit_dist = read.edit_dist()+read.vars();
+				//else if(parent == "P")
+				//	edit_dist = read.edit_dist()+read.vars();
 				str_appendInt(NM, (int)edit_dist);
 				aux_str += NM;
 			}
@@ -686,15 +685,12 @@ void generate_reads(RefSequenceTable& rt,
 				}
 				else{
 					if(single_end){
-						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
-						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
+						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
 						++j;
 					}
 					else{
-						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
-						print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "P");
-						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
-						print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "M");
+						print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
+						print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info());
 						++j;
 					}
 				}				
@@ -838,15 +834,12 @@ void generate_reads(RefSequenceTable& rt,
 		}
 		else{
 			if(single_end){
-				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
-				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
+				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
 				++j;
 			}
 			else{
-				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "P");
-				print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "P");
-				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info(), "M");
-				print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info(), "M");
+				print_aligned_read(*read_chunk[j], rt, sam_frag_out, read_chunk[j]->get_string_allele_info());
+				print_aligned_read(*read_chunk[j+1], rt, sam_frag_out, read_chunk[j+1]->get_string_allele_info());
 				++j;
 			}
 		}
