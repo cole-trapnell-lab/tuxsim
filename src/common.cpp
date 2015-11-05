@@ -38,6 +38,9 @@ bool allele_simulator = false;
 bool sort_by_position = true;
 bool only_phased_reads = false;
 string expr_filename;
+string silenced_allele;
+double silenced_fraction = 1.0;
+double allele_proportion_natural_stdev = 0.1;
 
 int random_seed;
 

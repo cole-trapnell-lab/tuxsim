@@ -2,167 +2,168 @@
 #define GTF_TRACKING_H
 /*
  *  gtf_tracking.h
- *  cufflinks
- *
- *  Created by Cole Trapnell on 9/5/09.
- *  Copyright 2009 Geo Pertea. All rights reserved.
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+#ifdef HEAPROFILE
+#include "gperftools/heap-profiler.h"
 #endif
 
-#include "GList.hh"
+#include "gff.h"
 #include "GFaSeqGet.h"
 #include "GFastaIndex.h"
 #include "GStr.h"
-#include "gff.h"
 
 #define MAX_QFILES 500
-extern const char* ATTR_GENE_NAME;
 
-extern bool verbose;
+extern bool gtf_tracking_verbose;
 
-extern bool largeScale;
+extern bool gtf_tracking_largeScale;
 //many input files, no accuracy stats are generated, no *.tmap
-// exon attributes are discarded
-
-char* getGSeqName(int gseq_id);
+// and exon attributes are discarded
 
 int cmpByPtr(const pointer p1, const pointer p2);
 
-class GLocus;
+bool t_contains(GffObj& a, GffObj& b); 
+//returns true only IF b has fewer exons than a AND a "contains" b
 
+char* getGSeqName(int gseq_id);
 
 //genomic fasta sequence handling
 class GFastaHandler {
-public:
-    char* fastaPath;
-    GFastaIndex* faIdx;
-    char* getFastaFile(int gseq_id) {
-        if (fastaPath==NULL) return NULL;
-        GStr s(fastaPath);
-        s.trimR('/');
-        s.appendfmt("/%s",getGSeqName(gseq_id));
-        GStr sbase(s);
-        if (!fileExists(s.chars())) s.append(".fa");
-        if (!fileExists(s.chars())) s.append("sta");
-        if (fileExists(s.chars())) return Gstrdup(s.chars());
-        else {
-            GMessage("Warning: cannot find genomic sequence file %s{.fa,.fasta}\n",sbase.chars());
-            return NULL;
-        }
-    }
-    
-    GFastaHandler(const char* fpath=NULL) {
-        fastaPath=NULL;
-        faIdx=NULL;
-        if (fpath!=NULL && fpath[0]!=0) init(fpath);
-    }
-    
-    void init(const char* fpath) {
-        if (fpath==NULL || fpath[0]==0) return;
-        if (!fileExists(fpath))
-            GError("Error: file/directory %s does not exist!\n",fpath);
-        fastaPath=Gstrdup(fpath);
-        if (fastaPath!=NULL) {
-            if (fileExists(fastaPath)>1) { //exists and it's not a directory
-                GStr fainame(fastaPath);
-                //the .fai name might have been given directly
-                if (fainame.rindex(".fai")==fainame.length()-4) {
-                    //.fai index file given directly
-                    fastaPath[fainame.length()-4]=0;
-                    if (!fileExists(fastaPath))
-                        GError("Error: cannot find fasta file for index %s !\n", fastaPath);
-                }
-                else fainame.append(".fai");
-                //fainame.append(".fai");
-                faIdx=new GFastaIndex(fastaPath,fainame.chars());
-                GStr fainamecwd(fainame);
-                int ip=-1;
-                if ((ip=fainamecwd.rindex('/'))>=0)
-                    fainamecwd.cut(0,ip+1);
-                if (!faIdx->hasIndex()) { //could not load index
-                    //try current directory
-                    if (fainame!=fainamecwd) {
-                        if (fileExists(fainamecwd.chars())>1) {
-                            faIdx->loadIndex(fainamecwd.chars());
-                        }
+ public:
+  char* fastaPath;
+  GFastaIndex* faIdx;
+  char* getFastaFile(int gseq_id) {
+     if (fastaPath==NULL) return NULL;
+     GStr s(fastaPath);
+     s.trimR('/');
+     s.appendfmt("/%s",getGSeqName(gseq_id));
+     GStr sbase(s);
+     if (!fileExists(s.chars())) s.append(".fa");
+     if (!fileExists(s.chars())) s.append("sta");
+     if (fileExists(s.chars())) return Gstrdup(s.chars());
+         else {
+             GMessage("Warning: cannot find genomic sequence file %s{.fa,.fasta}\n",sbase.chars());
+             return NULL;
+             }
+     }
+     
+   GFastaHandler(const char* fpath=NULL) {
+     fastaPath=NULL;
+     faIdx=NULL;
+     if (fpath!=NULL && fpath[0]!=0) init(fpath);
+     }
+     
+   void init(const char* fpath) {
+     if (fpath==NULL || fpath[0]==0) return;
+     if (!fileExists(fpath))
+       GError("Error: file/directory %s does not exist!\n",fpath);
+     fastaPath=Gstrdup(fpath);
+     if (fastaPath!=NULL) {
+         if (fileExists(fastaPath)>1) { //exists and it's not a directory
+            GStr fainame(fastaPath);
+            //the .fai name might have been given directly
+            if (fainame.rindex(".fai")==fainame.length()-4) {
+               //.fai index file given directly
+               fastaPath[fainame.length()-4]=0;
+               if (!fileExists(fastaPath))
+                  GError("Error: cannot find fasta file for index %s !\n", fastaPath);
+               }
+              else fainame.append(".fai");
+            //fainame.append(".fai");
+            faIdx=new GFastaIndex(fastaPath,fainame.chars());
+            GStr fainamecwd(fainame);
+            int ip=-1;
+            if ((ip=fainamecwd.rindex('/'))>=0)
+               fainamecwd.cut(0,ip+1);
+            if (!faIdx->hasIndex()) { //could not load index
+               //try current directory
+                  if (fainame!=fainamecwd) {
+                    if (fileExists(fainamecwd.chars())>1) {
+                       faIdx->loadIndex(fainamecwd.chars());
+                       }
                     }
-                } //tried to load index
-                if (!faIdx->hasIndex()) {
-                    GMessage("No fasta index found for %s. Rebuilding, please wait..\n",fastaPath);
-                    faIdx->buildIndex();
-                    if (faIdx->getCount()==0) GError("Error: no fasta records found!\n");
-                    GMessage("Fasta index rebuilt.\n");
-                    FILE* fcreate=fopen(fainame.chars(), "w");
-                    if (fcreate==NULL) {
-                        GMessage("Warning: cannot create fasta index %s! (permissions?)\n", fainame.chars());
-                        if (fainame!=fainamecwd) fcreate=fopen(fainamecwd.chars(), "w");
-                        if (fcreate==NULL)
-                            GError("Error: cannot create fasta index %s!\n", fainamecwd.chars());
-                    }
-                    if (faIdx->storeIndex(fcreate)<faIdx->getCount())
-                        GMessage("Warning: error writing the index file!\n");
-                } //index created and attempted to store it
+                  } //tried to load index
+            if (!faIdx->hasIndex()) {
+                 GMessage("No fasta index found for %s. Rebuilding, please wait..\n",fastaPath);
+                 faIdx->buildIndex();
+                 if (faIdx->getCount()==0) GError("Error: no fasta records found!\n");
+                 GMessage("Fasta index rebuilt.\n");
+                 FILE* fcreate=fopen(fainame.chars(), "w");
+                 if (fcreate==NULL) {
+                   GMessage("Warning: cannot create fasta index %s! (permissions?)\n", fainame.chars());
+                   if (fainame!=fainamecwd) fcreate=fopen(fainamecwd.chars(), "w");
+                   if (fcreate==NULL)
+                      GError("Error: cannot create fasta index %s!\n", fainamecwd.chars());
+                   }
+                 if (faIdx->storeIndex(fcreate)<faIdx->getCount())
+                     GMessage("Warning: error writing the index file!\n");
+                 } //index created and attempted to store it
             } //multi-fasta
-        } //genomic sequence given
-    }
-    GFaSeqGet* fetch(int gseq_id, bool checkFasta=false) {
-        if (fastaPath==NULL) return NULL;
-        //genomic sequence given
-        GFaSeqGet* faseq=NULL;
-        if (faIdx!=NULL) { //fastaPath was the multi-fasta file name
-            char* gseqname=getGSeqName(gseq_id);
-            GFastaRec* farec=faIdx->getRecord(gseqname);
-            if (farec!=NULL) {
-                faseq=new GFaSeqGet(fastaPath,farec->seqlen, farec->fpos,
-                                    farec->line_len, farec->line_blen);
-                faseq->loadall(); //just cache the whole sequence, it's faster
-            }
-            else {
-                GMessage("Warning: couldn't find fasta record for '%s'!\n",gseqname);
-                return NULL;
-            }
+         } //genomic sequence given
+     }
+   GFaSeqGet* fetch(int gseq_id, bool checkFasta=false) {
+     if (fastaPath==NULL) return NULL;
+     //genomic sequence given
+     GFaSeqGet* faseq=NULL;
+     if (faIdx!=NULL) { //fastaPath was the multi-fasta file name
+        char* gseqname=getGSeqName(gseq_id);
+        GFastaRec* farec=faIdx->getRecord(gseqname);
+        if (farec!=NULL) {
+             faseq=new GFaSeqGet(fastaPath,farec->seqlen, farec->fpos,
+                               farec->line_len, farec->line_blen);
+             faseq->loadall(); //just cache the whole sequence, it's faster
+             }
+        else {
+          GMessage("Warning: couldn't find fasta record for '%s'!\n",gseqname);
+          return NULL;
+          }
         }
-        else //if (fileExists(fastaPath)==1)
+     else //if (fileExists(fastaPath)==1)
         {
-            char* sfile=getFastaFile(gseq_id);
-            if (sfile!=NULL) {
-                //if (gtf_tracking_verbose)
-                //   GMessage("Processing sequence from fasta file '%s'\n",sfile);
-                faseq=new GFaSeqGet(sfile,checkFasta);
-                faseq->loadall();
-                GFREE(sfile);
+         char* sfile=getFastaFile(gseq_id);
+         if (sfile!=NULL) {
+            //if (gtf_tracking_verbose)
+            //   GMessage("Processing sequence from fasta file '%s'\n",sfile);
+            faseq=new GFaSeqGet(sfile,checkFasta);
+            faseq->loadall();
+            GFREE(sfile);
             }
-        } //one fasta file per contig
-        return faseq;
-    }
-    
-    ~GFastaHandler() {
-        GFREE(fastaPath);
-        delete faIdx;
-    }
+         } //one fasta file per contig
+       return faseq;
+     }
+
+   ~GFastaHandler() {
+     GFREE(fastaPath);
+     delete faIdx;
+     }
 };
 
 
+
+bool betterRef(GffObj* a, GffObj* b); //for better CovLink reference ranking
+
+class GLocus;
+
 class COvLink {
 public:
-    static int coderank(char c) {
+	static int coderank(char c) {
 		switch (c) {
 			case '=': return 0; //ichain match
-			case 'c': return 2; //containment (chain fragment)
-			case 'e': return 4; // overlap exon+intron of unspliced pre-mRNA
-			case 'j': return 6; // overlap with at least a junction match
-			case 'o': return 8; // overlap (exon)
-			case 'r': return 14; //repeats
-			case 'i': return 15; // intra-intron
-			case 'p': return 16; //polymerase run
-			case 'u': return 90; //intergenic
+			case 'c': return 2; //containment (ichain fragment)
+			case 'j': return 4; // overlap with at least a junction match
+			case 'e': return 6; // single exon transfrag overlapping an intron of reference (possible pre-mRNA)
+			case 'o': return 8; // generic exon overlap
+			case 's': return 16; //"shadow" - an intron overlaps with a ref intron on the opposite strand
+			case 'x': return 18; // exon overlap on opposite strand (usually wrong strand mapping)
+			case 'i': return 20; // intra-intron
+			case 'p': return 90; //polymerase run
+			case 'r': return 92; //repeats
+			case 'u': return 94; //intergenic
 			case  0 : return 100;
-			default: return 95;
-        }
+			default: return 96;
+			}
 	}
     char code;
     int rank;
@@ -176,29 +177,62 @@ public:
 	}
     bool operator<(COvLink& b) {
 		if (rank==b.rank)
-			return (ovlen==b.ovlen)? (mrna>b.mrna) : (ovlen>b.ovlen);
+			return (ovlen==b.ovlen)? betterRef(mrna, b.mrna) : (ovlen>b.ovlen);
 		else return rank<b.rank;
-	}
-    bool operator>(COvLink& b) {
-		if (rank==b.rank)
-			return (ovlen==b.ovlen)? (mrna<b.mrna) : (ovlen<b.ovlen);
-		else return rank>b.rank;
 	}
     bool operator==(COvLink& b) {
 		return (rank==b.rank && mrna==b.mrna);
 	}
 };
 
+class GISeg: public GSeg {
+ public:
+   GffObj* t; //pointer to the largest transcript with a segment this exact exon coordinates
+   GISeg(uint s=0,uint e=0, GffObj* ot=NULL):GSeg(s,e) { t=ot; }
+};
+
+class GIArray:public GArray<GISeg> {
+  public:
+   GIArray(bool uniq=true):GArray<GISeg>(true,uniq) { }
+   int IAdd(GISeg* item) {
+     if (item==NULL) return -1;
+     int result=-1;
+     if (Found(*item, result)) {
+         if (fUnique) {
+           //cannot add a duplicate, return index of existing item
+           if (item->t!=NULL && fArray[result].t!=NULL &&
+                  item->t->covlen>fArray[result].t->covlen)
+               fArray[result].t=item->t;
+           return result;
+           }
+         }
+     //Found sets result to the position where the item should be
+     idxInsert(result, *item);
+     return result;
+     }
+
+};
+
+class CEqList: public GList<GffObj> {
+  public:
+    GffObj* head;
+    CEqList():GList<GffObj>((GCompareProc*)cmpByPtr, (GFreeProc*)NULL, true) {
+      head=NULL;
+      }
+};
+
 class CTData { //transcript associated data
 public:
-	GffObj* mrna;
+	GffObj* mrna; //owner transcript
 	GLocus* locus;
 	GList<COvLink> ovls; //overlaps with other transcripts (ref vs query)
 	//-- just for ichain match tracking:
-	GffObj* eqref; //ref having an ichain match
-	int qset; //qry set index (qfidx)
-	GffObj* eqnext;
-	int eqdata;
+	GffObj* eqref; //ref transcript having an ichain match
+	int qset; //qry set index (qfidx), -1 means reference dataset
+	//GffObj* eqnext; //next GffObj in the linked list of matching transfrags
+	bool eqhead;
+	CEqList* eqlist; //keep track of matching transfrags
+	//int eqdata; // flags for EQ list (is it a list head?)
 	// Cufflinks specific data:
 	double FPKM;
 	double conf_hi;
@@ -209,26 +243,111 @@ public:
 		mrna=m;
 		if (mrna!=NULL) mrna->uptr=this;
 		locus=l;
-        classcode=0;
+		classcode=0;
 		eqref=NULL;
-		eqnext=NULL;
-		eqdata=0;
+		eqhead=false;
+		eqlist=NULL;
 		qset=-2;
 		FPKM=0;
 		conf_lo=0;
 		conf_hi=0;
 		cov=0;
 	}
+
 	~CTData() {
 		ovls.Clear();
+		//if ((eqdata & EQHEAD_TAG)!=0) delete eqlist;
+		//if (isEqHead()) delete eqlist;
+		if (eqhead) delete eqlist;
 	}
+
+  //inline bool eqHead() { return ((eqdata & EQHEAD_TAG)!=0); }
+ /*  bool isEqHead() {
+      if (eqlist==NULL) return false;
+      return (eqlist->head==this->mrna);
+      }
+  */
+  void joinEqList(GffObj* m) { //add list from m
+   //list head is set to the transfrag with the lower qset#
+  CTData* md=(CTData*)(m->uptr);
+  //ASSERT(md);
+  if (eqlist==NULL) { //no eqlist yet for this node
+     if (md->eqlist!=NULL) { //m in an eqlist already
+          eqlist=md->eqlist;
+          eqlist->Add(this->mrna);
+          CTData* md_head_d=(CTData*)(md->eqlist->head->uptr);
+          if (this->qset < md_head_d->qset) {
+               eqlist->head=this->mrna;
+               eqhead=true;
+               md_head_d->eqhead=false;
+               }
+        }
+        else { //m was not in an EQ list either
+          eqlist=new CEqList();
+          eqlist->Add(this->mrna);
+          eqlist->Add(m);
+          md->eqlist=eqlist;
+          if (qset<md->qset) {
+        	eqlist->head=this->mrna;
+        	eqhead=true;
+          }
+          else  {
+        	eqlist->head=m;
+        	md->eqhead=true;
+          }
+        }
+      }//no eqlist before
+     else { //merge two eqlists
+      if (eqlist==md->eqlist) //already in the same eqlist, nothing to do
+         return;
+      if (md->eqlist!=NULL) {
+        //copy the smaller list into the larger one
+        CEqList* srclst, *destlst;
+        if (md->eqlist->Count()<eqlist->Count()) {
+           srclst=md->eqlist;
+           destlst=eqlist;
+           }
+         else {
+           srclst=eqlist;
+           destlst=md->eqlist;
+           }
+         for (int i=0;i<srclst->Count();i++) {
+           destlst->Add(srclst->Get(i));
+           CTData* od=(CTData*)((*srclst)[i]->uptr);
+           od->eqlist=destlst;
+           }
+        this->eqlist=destlst;
+        CTData* s_head_d=(CTData*)(srclst->head->uptr);
+        CTData* d_head_d=(CTData*)(destlst->head->uptr);
+        if (s_head_d->qset < d_head_d->qset ) {
+             this->eqlist->head=srclst->head;
+             s_head_d->eqhead=true;
+             d_head_d->eqhead=false;
+        }
+        else {
+          s_head_d->eqhead=false;
+          d_head_d->eqhead=true;
+        }
+        delete srclst;
+      }
+      else { //md->eqlist==NULL
+        eqlist->Add(m);
+        md->eqlist=eqlist;
+        CTData* head_d=(CTData*)(eqlist->head->uptr);
+        if (md->qset<head_d->qset) {
+          eqlist->head=m;
+          md->eqhead=true;
+        }
+      }
+    }
+  }
+
 	void addOvl(char code,GffObj* target=NULL, int ovlen=0) {
 		ovls.AddIfNew(new COvLink(code, target, ovlen));
 	}
 	char getBestCode() {
 		return (ovls.Count()>0) ? ovls[0]->code : 0 ;
     }
-	bool operator>(CTData& b) { return (mrna > b.mrna); }
 	bool operator<(CTData& b) { return (mrna < b.mrna); }
 	bool operator==(CTData& b) { return (mrna==b.mrna); }
 };
@@ -236,6 +355,12 @@ public:
 class GSuperLocus;
 class GTrackLocus;
 class GXLocus;
+
+class GXSeg : public GSeg {
+public:
+	int flags;
+	GXSeg(uint s=0, uint e=0, int f=0):GSeg(s,e),flags(f) { }
+};
 
 //Data structure holding a query locus data (overlapping mRNAs on the same strand)
 // and also the accuracy data of all mRNAs of a query locus
@@ -248,9 +373,9 @@ public:
     GffObj* mrna_maxcov;  //transcript with maximum coverage (for main "ref" transcript)
     GffObj* mrna_maxscore; //transcript with maximum gscore (for major isoform)
     GList<GffObj> mrnas; //list of transcripts (isoforms) for this locus
-	GArray<GSeg> uexons; //list of unique exons (covered segments) in this region
+	GArray<GXSeg> uexons; //list of unique exons (covered segments) in this region
 	GArray<GSeg> mexons; //list of merged exons in this region
-	GArray<GSeg> introns;
+	GIArray introns;
 	GList<GLocus> cmpovl; //temp list of overlapping qry/ref loci to compare to (while forming superloci)
 	
 	//only for reference loci --> keep track of all superloci found for each qry dataset
@@ -262,13 +387,13 @@ public:
 	int spl_rare; // number of GC-AG, AT-AC and other rare splice site consensi
 	int spl_wrong; //number of "wrong" (unrecognized) splice site consensi
 	int ichains; //number of multi-exon mrnas
-	int ichainTP;
-	int ichainATP;
+	int ichainTP; //number of intron chains fully matching reference introns
+	//int ichainATP;
 	int mrnaTP;
-	int mrnaATP;
+	//int mrnaATP;
 	int v; //user flag/data
 	GLocus(GffObj* mrna=NULL, int qidx=-1):mrnas(true,false,false),uexons(true,true),mexons(true,true),
-	introns(true,true), cmpovl(true,false,true) {
+	  introns(), cmpovl(true,false,true) {
 		//this will NOT free mrnas!
 		ichains=0;
 		gseq_id=-1;
@@ -283,15 +408,20 @@ public:
 			start=mrna->exons.First()->start;
 			end=mrna->exons.Last()->end;;
 			gseq_id=mrna->gseq_id;
-			GSeg seg;
+			GISeg seg;
 			for (int i=0;i<mrna->exons.Count();i++) {
 				seg.start=mrna->exons[i]->start;
 				seg.end=mrna->exons[i]->end;
-				uexons.Add(seg);
+				int flags=0; //terminal exon flags (1=left end, 2=right end)
+				if (i==0) flags|=1;
+				if (i==mrna->exons.Count()-1) flags|=2;
+				GXSeg xseg(seg.start, seg.end, flags);
+				uexons.Add(xseg);
 				mexons.Add(seg);
 				if (i>0) {
 					seg.start=mrna->exons[i-1]->end+1;
 					seg.end=mrna->exons[i]->start-1;
+					seg.t=mrna;
 					introns.Add(seg);
 				}
 			}
@@ -309,9 +439,9 @@ public:
 		spl_major=0;spl_rare=0;spl_wrong=0;
 		v=0; //visited/other data
 		ichainTP=0;
-		ichainATP=0;
+		//ichainATP=0;
 		mrnaTP=0;
-		mrnaATP=0;
+		//mrnaATP=0;
 		cmpovl.Clear();
 	}
 	
@@ -361,8 +491,8 @@ public:
 			uexons.Add(locus.uexons[i]);
 		}
 		for (int i=0;i<locus.introns.Count();i++) {
-			introns.Add(locus.introns[i]);
-		}
+			introns.IAdd(&(locus.introns[i]));
+            }
 		
 		// -- add locus.mrnas
 		for (int i=0;i<locus.mrnas.Count();i++) {
@@ -445,11 +575,17 @@ public:
 				seg.start=mrna->exons[i]->start;
 				seg.end=mrna->exons[i]->end;
 				if (!ovlexons.Exists(i)) mexons.Add(seg);
-				uexons.Add(seg);
+				int xterm=0;
+				if (i==0) xterm|=1;
+				if (i==mrna->exons.Count()-1) xterm|=2;
+				GXSeg xseg(seg.start, seg.end, xterm);
+				uexons.Add(xseg);
+				GISeg iseg;
 				if (i>0) {
-					seg.start=mrna->exons[i-1]->end+1;
-					seg.end=mrna->exons[i]->start-1;
-					introns.Add(seg);
+					iseg.start=mrna->exons[i-1]->end+1;
+					iseg.end=mrna->exons[i]->start-1;
+					iseg.t=mrna;
+					introns.Add(iseg);
 				}
 			}
 			
@@ -483,19 +619,19 @@ public:
     GList<GLocus> rloci;
     GList<GffObj> qmrnas; //list of transcripts (isoforms) for this locus
     GArray<GSeg> qmexons; //list of merged exons in this region
-    GArray<GSeg> quexons; //list of unique exons (covered segments) in this region
-    GArray<GSeg> qintrons; //list of unique exons (covered segments) in this region
+    GArray<GXSeg> quexons; //list of unique exons (covered segments) in this region
+    GIArray qintrons; //list of unique introns in this region
     //same lists for reference:
-    GList<GffObj> rmrnas; //list of transcripts (isoforms) for this locus
-    GArray<GSeg> rmexons; //list of merged exons in this region
-    GArray<GSeg> ruexons; //list of unique exons (covered segments) in this region
-    GArray<GSeg> rintrons; //list of unique exons (covered segments) in this region
+    GList<GffObj> rmrnas; //list of ref transcripts (isoforms) for this locus
+    GArray<GSeg> rmexons; //list of ref merged exons in this region
+    GArray<GXSeg> ruexons; //list of ref unique exons (covered segments) in this region
+    GArray<GISeg> rintrons; //list of unique introns in this region
     // store problematic introns for printing:
-    GArray<GSeg> i_missed; //missed reference introns (not overlapped by any qry intron)
-    GArray<GSeg> i_notp;  //wrong ref introns (one or both ends not matching any qry intron)
+    GIArray i_missed; //missed reference introns (not overlapped by any qry intron)
+    GIArray i_notp;  //wrong ref introns (one or both ends not matching any qry intron)
     //
-    GArray<GSeg> i_qwrong; //totally wrong qry introns (not overlapped by any ref intron)
-    GArray<GSeg> i_qnotp;  //imperfect qry introns (may overlap but has no "perfect" match)
+    GIArray i_qwrong; //totally wrong qry introns (not overlapped by any ref intron)
+    GIArray i_qnotp;  //imperfect qry introns (may overlap but has no "perfect" match)
 	
 	
     int qbases_all;
@@ -508,61 +644,61 @@ public:
     int total_qloci_alt; //total qloci with multiple transcripts
 
     int total_qmrnas;
-    int total_qichains; //multi exon mrnas
     int total_qexons; //unique exons
     int total_qmexons;
     int total_qintrons; //unique introns
-    // these ref totals are in fact only limited to data from
-    // loci overlapping any of qry loci
+    int total_qichains; //total multi-exon transfrags predicted (incl. duplicates if -G)
+
+    // NOTE: these ref totals are only limited to data from loci overlapping any qry loci
     int total_rmexons;
-    int total_richains; //multi exon mrnas
     int total_rloci;
     int total_rmrnas;
+    int total_richains; //total multi-exon reference transcripts
     int total_rexons;
     int total_rintrons; //unique introns
 	
     //--- accuracy data after compared to ref loci:
-	int locusTP; // 1 if mrnaTP>0
-	int locusATP; // 1 if ichainATP + mrnaATP > 0
+  int locusQTP;
+  int locusTP; // +1 if ichainTP+mrnaTP > 0
+  //int locusAQTP;
+	//int locusATP; // 1 if ichainATP + mrnaATP > 0
 	int locusFP;
-	int locusAFP;
-	int locusAFN;
+	//int locusAFP;
+	//int locusAFN;
 	int locusFN;
 	//---transcript level accuracy -- all exon coordinates should match (most stringent)
 	int mrnaTP; // number of qry mRNAs with perfect match with ref transcripts
-	int mrnaFP; // number of qry mRNAs with no perfect match with a ref transcript
-	int mrnaFN; // number of ref mRNAs in this region having no perfect match with a qry transcript
-	int mrnaATP;
-	int mrnaAFN;
-	int mrnaAFP;
+	//int mrnaATP;
 	//---intron level accuracy (comparing the ordered set of splice sites):
-	int ichainTP; // number of qry intron chains covering a reference intron chain
-	// (covering meaning that the ordered set of reference splice sites
-	//  is the same with a ordered subset of the query splice sites)
-	int ichainFP; // number of qry intron chains not covering a reference intron chain
-	int ichainFN; // number of ref intron chains in this region not being covered by a reference intron chain
-	// same as above, but approximate -- allowing a 10bp distance error for splice sites
-	int ichainATP;
-	int ichainAFP;
-	int ichainAFN;
+	int ichainTP; // number of fully matched ref intron chains (# correctly predicted ichains)
+	
+	//int ichainFP; // number of qry intron chains not matching a reference intron chain
+	//int ichainFN; // number of ref intron chains in this region not being covered by a reference intron chain
+	/*
+	// same as above, but Approximate -- allowing a 5bp distance around splice site coordinates
+	int ichainATP; //as opposed to ichainTP, this also includes ref intron chains which are 
+                   //sub-chains of qry intron chains (rare cases)
+     */
 	//---projected features ---
 	//---exon level accuracy:
-	int exonTP;  //number of perfectly overlapping exons (true positives)
-	int exonFP; //number of exons of query with no perfect match with a reference exon
-	int exonFN; //number of exons of reference with no perfect match with a query exon
+	int exonTP;  //number of matched reference exons (true positives)
+	int exonQTP; //number of query exons matching reference exons
+	//int exonFP; //number of exons of query with no perfect match with a reference exon
+	//int exonFN; //number of exons of reference with no perfect match with a query exon
 	// same as the above but with acceptable approximation (10bp error window):
-	int exonATP;
+	/*int exonATP;
 	int exonAFP;
-	int exonAFN;
+	int exonAFN;*/
 	
 	int intronTP;  //number of perfectly overlapping introns (true positives)
 	int intronFP; //number of introns of query with no perfect match with a reference intron
 	int intronFN; //number of introns of reference with no perfect match with a query intron
+	/*
 	// same as the above but with acceptable approximation (10bp error window):
 	int intronATP;
 	int intronAFP;
 	int intronAFN;
-	
+	*/
 	//-- EGASP added these too:
 	int m_exons; //number of exons totally missed (not overlapped *at all* by any query exon)
 	int w_exons; //numer of totally wrong exons (query exons not overlapping *at all* any reference exon)
@@ -576,31 +712,32 @@ public:
 	int baseFN; //number of ref bases not overlapping qry
 	//            sorted,free,unique       sorted,unique
     GSuperLocus(uint lstart=0,uint lend=0):qloci(true,false,false),rloci(true,false,false),
-	qmrnas(true,false,false), qmexons(true,false), quexons(true,false), qintrons(true,false),
-	rmrnas(true,false,false), rmexons(true,false), ruexons(true,false), rintrons(true,false),
-	i_missed(true,false),i_notp(true,false), i_qwrong(true,false), i_qnotp(true,false){
+	qmrnas(true,false,false), qmexons(true,false), quexons(true,false), qintrons(false),
+	rmrnas(true,false,false), rmexons(true,false), ruexons(true,false), rintrons(false),
+	i_missed(false),i_notp(false), i_qwrong(false), i_qnotp(false){
 		qfidx=-1;
 		start=lstart;
 		end=lend;
 		qbases_all=0;
 		rbases_all=0;
 		baseTP=0;baseFP=0;baseFN=0;
-		locusTP=0;locusATP=0;
-		locusFP=0;locusAFP=0;locusAFN=0;
+		locusTP=0;locusQTP=0; //locusAQTP=0; locusATP=0;
+		locusFP=0;// locusAFP=0;locusAFN=0;
 		locusFN=0;
 		in_rmrnas=0;
 		in_rloci=0;
 		w_loci=0;
 		m_loci=0;
 		total_superloci=0;
-		mrnaTP=0;mrnaFP=0;mrnaFN=0;
-		mrnaATP=0;mrnaAFP=0;mrnaAFN=0;
-		ichainTP=0;ichainFP=0;ichainFN=0;
-		ichainATP=0;ichainAFP=0;ichainAFN=0;
-		exonTP=0;exonFP=0;exonFN=0;
-		exonATP=0;exonAFP=0;exonAFN=0;
+		mrnaTP=0;//mrnaFP=0;mrnaFN=0;
+		ichainTP=0;//ichainFP=0;ichainFN=0;
+		exonTP=0;exonQTP=0;
+		//exonFP=0;exonFN=0;
 		intronTP=0;intronFP=0;intronFN=0;
-		intronATP=0;intronAFP=0;intronAFN=0;
+		/* mrnaATP=0;//mrnaAFP=0;mrnaAFN=0;
+		ichainATP=0;//ichainAFP=0;ichainAFN=0;
+		exonATP=0;exonAFP=0;exonAFN=0;
+		intronATP=0;intronAFP=0;intronAFN=0; */
 		total_rmexons=0;
 		total_qmexons=0;
 		total_qexons=0;total_qloci=0;total_qmrnas=0;
@@ -651,29 +788,29 @@ public:
 		baseFP=qbases_all-baseTP;
 		baseFN=rbases_all-baseTP;
 		//exon level:
-		exonAFP=total_qexons-exonATP;
-		exonFP=total_qexons-exonTP;
-		exonAFN=total_rexons-exonATP;
-		exonFN=total_rexons-exonTP;
+		//exonFP=total_qexons-exonTP;
+		//exonFN=total_rexons-exonTP;
 		//intron stats
-		intronAFP=total_qintrons-intronATP;
 		intronFP=total_qintrons-intronTP;
-		intronAFN=total_rintrons-intronATP;
 		intronFN=total_rintrons-intronTP;
+		/* intronAFN=total_rintrons-intronATP;
+		intronAFP=total_qintrons-intronATP;
+		exonAFP=total_qexons-exonATP;
+		exonAFN=total_rexons-exonATP; */
 		
 		// ichain and transcript levels:
-		ichainAFP=total_qichains-ichainATP;
-		ichainFP=total_qichains-ichainTP;
-		ichainAFN=total_richains-ichainATP;
-		ichainFN=total_richains-ichainTP;
-		mrnaFP=total_qmrnas-mrnaTP;
-		mrnaFN=total_rmrnas-mrnaTP;
-		mrnaAFP=total_qmrnas-mrnaATP;
-		mrnaAFN=total_rmrnas-mrnaATP;
+		//ichainAFP=total_qichains-ichainATP;
+		//ichainFP=total_qichains-ichainTP;
+		//ichainAFN=total_richains-ichainATP;
+		//ichainFN=total_richains-ichainTP;
+		//mrnaFP=total_qmrnas-mrnaTP;
+		//mrnaFN=total_rmrnas-mrnaTP;
+		//mrnaAFP=total_qmrnas-mrnaATP;
+		//mrnaAFN=total_rmrnas-mrnaATP;
 		// locus/gene level:
-		locusAFP=total_qloci-locusATP;
-		locusFP=total_qloci-locusTP;
-		locusAFN=total_rloci-locusATP;
+		locusFP=total_qloci-locusQTP;
+		/*locusAFN=total_rloci-locusATP;
+		locusAFP=total_qloci-locusAQTP;*/
 		locusFN=total_rloci-locusTP;
 	}
 	
@@ -682,15 +819,20 @@ public:
 		in_rloci+=s.in_rloci;
 		baseTP+=s.baseTP;
 		exonTP+=s.exonTP;
-		exonATP+=s.exonATP;
+		exonQTP+=s.exonQTP;
 		intronTP+=s.intronTP;
-		intronATP+=s.intronATP;
 		ichainTP+=s.ichainTP;
-		ichainATP+=s.ichainATP;
 		mrnaTP+=s.mrnaTP;
-		mrnaATP+=s.mrnaATP;
 		locusTP+=s.locusTP;
+		locusQTP+=s.locusQTP;
+		/*
+		mrnaATP+=s.mrnaATP;
+		exonATP+=s.exonATP;
+		intronATP+=s.intronATP;
+		ichainATP+=s.ichainATP;
 		locusATP+=s.locusATP;
+		locusAQTP+=s.locusAQTP;
+		*/
 		m_exons+=s.m_exons;
 		w_exons+=s.w_exons;
 		m_introns+=s.m_introns;
@@ -718,8 +860,9 @@ public:
 };
 
 class GSeqData {
-public:
 	int gseq_id;
+public:
+    const char* gseq_name;
     GList<GffObj> refs_f; //forward strand mRNAs
     GList<GffObj> refs_r; //reverse strand mRNAs
 	GList<GffObj> mrnas_f; //forward strand mRNAs
@@ -735,6 +878,9 @@ public:
 	GList<GLocus> nloci_u; //"novel" loci with no orientation found
 	
 	GList<CTData> tdata; //transcript data (uptr holder for all mrnas here)
+
+	int get_gseqid() { return gseq_id; }
+
 	//--<
 	GSeqData(int gid=-1):mrnas_f(true,true,false),mrnas_r(true,true,false),
 	loci_f(true,true,true),loci_r(true,true,true),
@@ -742,6 +888,8 @@ public:
 	nloci_f(true,false,true), nloci_r(true,false,true),
 	umrnas(true,true,false), nloci_u(true,true,true), tdata(false,true,false) {
 		gseq_id=gid;
+		if (gseq_id>=0) 
+		  gseq_name=GffObj::names->gseqs.getName(gseq_id);
 	}
 	bool operator==(GSeqData& d){
 		return (gseq_id==d.gseq_id);
@@ -853,7 +1001,7 @@ class GTrackLocus:public GSeg {
    void addQCl(int q, GQCluster* qcl, GLocus* lnkloc) {
       for (int i=0;i<qcl->qloci.Count();i++) {
          GLocus* loc=qcl->qloci[i];
-         if (loc==lnkloc || loc->t_ptr==this) continue;
+         if (loc==lnkloc) continue; // or if loc->t_ptr==this ?
          hasQloci=true;
          loc->t_ptr=this;
          qcls[q]->addLocus(loc);
@@ -931,19 +1079,21 @@ class GXConsensus:public GSeg {
    int id; //XConsensus ID
    int tss_id; //group id for those xconsensi with shared first exon
    int p_id; //group id for those xconsensi with "similar" protein
-   GffObj* tcons; //chosen (longest) transcript to define the "consensus"
+   GffObj* tcons; //longest transcript to represent the combined "consensus" structure
    GffObj* ref; //overlapping reference transcript 
    char refcode; // the code for ref relationship (like in the tracking file)
    char* aa;
    int aalen;
+   GXConsensus* contained; //if contained into another GXConsensus 
    //list of ichain-matching query (cufflinks) transcripts that contributed to this consensus
    GList<GffObj> qchain;
-   GXConsensus(GffObj* c, GList<GffObj> qlst, GffObj* r=NULL, char rcode=0)
+   GXConsensus(GffObj* c, CEqList* qlst, GffObj* r=NULL, char rcode=0)
                    :qchain(false,false,false) {
       ref=r;
       refcode=rcode;
       tcons=c;
-      qchain.Add(qlst);
+      if (qlst!=NULL) qchain.Add(*((GList<GffObj>*)qlst));
+                 else qchain.Add(c);
       count++;
       tss_id=0;
       p_id=0;
@@ -952,6 +1102,7 @@ class GXConsensus:public GSeg {
       aa=NULL;
       start=tcons->start;
       end=tcons->end;
+      contained=NULL;
       }
    ~GXConsensus() {
      if (aa!=NULL) GFREE(aa);
@@ -1030,7 +1181,7 @@ class GXLocus:public GSeg {
           j++; //check the next locus.mexon
         }//while mexons
       if (ovlexons.Count()==0) return false;
-      if (strand=='.' && loc->mrna_maxcov->strand>0)
+      if (strand=='.' && loc->mrna_maxcov->strand!='.')
              strand=loc->mrna_maxcov->strand;
       //have exon overlap:
       //-- add the rest of the non-overlapping mexons:
@@ -1104,30 +1255,94 @@ class GXLocus:public GSeg {
          rloci.Add(oxloc.rloci[i]);
          oxloc.rloci[i]->xlocus=this;
          }
+  } //::addMerge()
+
+
+ void checkContainment() {
+   //checking containment
+  for (int j=0;j<tcons.Count()-1;j++) {
+    GXConsensus* t=tcons[j];
+    for (int i=j+1;i<tcons.Count();i++) {
+       if (tcons[i]->contained!=NULL && t->tcons->exons.Count()>1) continue; //will check the container later anyway
+       int c_status=checkXConsContain(t->tcons, tcons[i]->tcons);
+       if (c_status==0) continue; //no containment relationship between t and tcons[i]
+       if (c_status>0) { //t is a container for tcons[i]
+            tcons[i]->contained=t;
+            }
+         else { //contained into exising XCons
+            t->contained=tcons[i];
+            break;
+            }
+       }
+   }
   }
-};
+ 
+ int checkXConsContain(GffObj* a, GffObj* b) {
+  // returns  1 if a is the container of b
+  //         -1 if a is contained in b
+  //          0 if no 
+  if (a->end<b->start || b->end<a->start) return 0;
+  if (a->exons.Count()==b->exons.Count()) {
+     if (a->exons.Count()>1) return 0; //same number of exons - no containment possible
+                                       //because equivalence was already tested
+           else { //single exon containment testing
+             //this is fuzzy and messy (end result may vary depending on the testing order)
+             int ovlen=a->exons[0]->overlapLen(b->exons[0]);
+             int minlen=GMIN(a->covlen, b->covlen);
+             if (ovlen>=minlen*0.8) { //if at least 80% of the shorter one is covered, it is contained
+                return ((a->covlen>b->covlen) ? 1 : -1);
+                }
+              else return 0;
+             //if (a->start<=b->start+10 && a->end+10>=b->end) return 1;
+             //  else { if (b->start<=a->start+10 && b->end+10>=a->end) return -1;
+             //          else return 0; 
+             //}
+             }
+     }
+   //different number of exons:
+   if (a->exons.Count()>b->exons.Count()) return t_contains(*a, *b) ? 1:0;
+                     else return t_contains(*b, *a) ? -1 : 0;
+  }
+  
+ void addXCons(GXConsensus* t) {
+  tcons.Add(t);
+  }
+  
+}; //GXLocus
 
 
 
-int parse_mRNAs(GList<GffObj>& mrnas,
+int parse_mRNAs(GfList& mrnas,
 				 GList<GSeqData>& glstdata,
 				 bool is_ref_set=true,
-				 bool check_for_dups=false,
-				 int qfidx=-1);
+				 int check_for_dups=0,
+				 int qfidx=-1, bool only_multiexon=false);
 
 //reading a mRNAs from a gff file and grouping them into loci
 void read_mRNAs(FILE* f, GList<GSeqData>& seqdata, GList<GSeqData>* ref_data=NULL, 
-              bool check_for_dups=false, int qfidx=-1, const char* fname=NULL, bool checkseq=false);
+              int check_for_dups=0, int qfidx=-1, const char* fname=NULL,
+              bool only_multiexon=false);
 
+void read_transcripts(FILE* f, GList<GSeqData>& seqdata, 
+#ifdef CUFFLINKS
+  boost::crc_32_type& crc_result, 
+#endif
+  bool keepAttrs=true, bool allele_simulator=false);
 
-bool tMatch(GffObj& a, GffObj& b, int& ovlen, bool equnspl=false);
+void sort_GSeqs_byName(GList<GSeqData>& seqdata);
 
-//"position" a given coordinate x within a list of transcripts sorted by their start (lowest)
-//coordinate, using quick-search; the returned int is the list index of the closest *higher*
-//GffObj - i.e. starting right *ABOVE* the given coordinate
-//Convention: returns -1 if there is no such GffObj (i.e. last GffObj starts below x)
+bool singleExonTMatch(GffObj& m, GffObj& r, int& ovlen);
+
+//strict intron chain match, or single-exon match
+bool tMatch(GffObj& a, GffObj& b, int& ovlen, bool fuzzunspl=false, 
+           bool contain_only=false);
+
+//use qsearch to "position" a given coordinate x within a list of transcripts sorted 
+//by their start (lowest) coordinate; the returned int is the list index of the 
+//closest GffObj starting just *ABOVE* coordinate x
+//Convention: returns -1 if there is no such GffObj (i.e. last GffObj start <= x)
 int qsearch_mrnas(uint x, GList<GffObj>& mrnas);
-int qsearch_segs(uint x, GList<GSeg>& segs); // same as above, but for GSeg lists
+int qsearch_loci(uint x, GList<GLocus>& segs); // same as above, but for GSeg lists
 
 GSeqData* getRefData(int gid, GList<GSeqData>& ref_data); //returns reference GSeqData for a specific genomic sequence
 

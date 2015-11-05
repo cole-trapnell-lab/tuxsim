@@ -73,7 +73,7 @@ void GStr::replace_data(Data *data) {
     my_data = data;
 }
 
-void GStr::make_unique() {//make sure is not a reference to other string
+void GStr::make_unique() {//make sure it's not a reference to other string
     if (my_data->ref_count > 1) {
         Data *data = new_data(length());
         ::memcpy(data->chars, chars(), length());
@@ -106,29 +106,37 @@ bool operator>(const char *s1, const GStr& s2) {
 
 GStr::GStr():my_data(&null_data) {
  fTokenDelimiter=NULL;
+ fTokenizeMode=tkCharSet;
  fLastTokenStart=0;
  readbuf=NULL;
+ readbufsize=0;
  }
 
 GStr::GStr(const GStr& s): my_data(&null_data){
  fTokenDelimiter=NULL;
+ fTokenizeMode=tkCharSet;
  fLastTokenStart=0;
  readbuf=NULL;
+ readbufsize=0;
  replace_data(s.my_data);
  }
 
 GStr::GStr(const char *s): my_data(&null_data) {
   fTokenDelimiter=NULL;
+  fTokenizeMode=tkCharSet;
   fLastTokenStart=0;
   readbuf=NULL;
+  readbufsize=0;
   my_data=new_data(s);
   my_data->ref_count = 1;
  }
 
 GStr::GStr(const int i): my_data(&null_data) {
  fTokenDelimiter=NULL;
+ fTokenizeMode=tkCharSet;
  fLastTokenStart=0;
  readbuf=NULL;
+ readbufsize=0;
  char buf[20];
  sprintf(buf,"%d",i);
  const int len = ::strlen(buf);
@@ -138,8 +146,10 @@ GStr::GStr(const int i): my_data(&null_data) {
 
 GStr::GStr(const double f): my_data(&null_data) {
  fTokenDelimiter=NULL;
+ fTokenizeMode=tkCharSet;
  fLastTokenStart=0;
  readbuf=NULL;
+ readbufsize=0;
  char buf[20];
  sprintf(buf,"%f",f);
  const int len = ::strlen(buf);
@@ -149,8 +159,10 @@ GStr::GStr(const double f): my_data(&null_data) {
 
 GStr::GStr(char c, int n): my_data(&null_data) {
   fTokenDelimiter=NULL;
+  fTokenizeMode=tkCharSet;
   fLastTokenStart=0;
   readbuf=NULL;
+  readbufsize=0;
   replace_data(n); ::memset(chrs(), c, n);
   }
 
@@ -275,28 +287,37 @@ bool GStr::operator!=(const char *s) const {
  return (strcmp(chars(), s) != 0);
  }
 
-GStr& GStr::operator+=(const GStr& s) {
- return append((const char *)s);
- }
-
-GStr& GStr::operator+=(const char* s) {
- return append(s);
- }
-
-GStr& GStr::operator+=(const char c) {
- char buf[4];
+GStr& GStr::append(char c) {
+ char buf[5];
  sprintf(buf,"%c",c);
  return append(buf);
  }
 
-GStr& GStr::operator+=(const int i) {
+GStr& GStr::append(int i) {
  char buf[20];
  sprintf(buf,"%d",i);
  return append(buf);
  }
 
+GStr& GStr::append(uint i) {
+ char buf[20];
+ sprintf(buf,"%u",i);
+ return append(buf);
+ }
 
-GStr& GStr::operator+=(const double f) {
+GStr& GStr::append(long l) {
+ char buf[20];
+ sprintf(buf,"%ld",l);
+ return append(buf);
+ }
+
+GStr& GStr::append(unsigned long l) {
+ char buf[20];
+ sprintf(buf,"%lu", l);
+ return append(buf);
+ }
+
+GStr& GStr::append(double f) {
  char buf[30];
  sprintf(buf,"%f",f);
  return append(buf);
@@ -331,12 +352,29 @@ bool GStr::contains(const char *s) const {
  }
 
 bool GStr::startsWith(const char *s) const {
- return (index(s, 0) == 0);
+ //return (index(s, 0) == 0);
+ return ::startsWith(this->chars(), s);
+ }
+
+bool GStr::startsWith(const GStr& s) const {
+ //return (index(s, 0) == 0);
+ return ::startsWith(this->chars(), s.chars());
+ }
+
+bool GStr::endsWith(const char *s) const {
+ //return (index(s, 0) == 0);
+ return ::endsWith(this->chars(), s);
+ }
+
+bool GStr::endsWith(const GStr& s) const {
+ //return (index(s, 0) == 0);
+ return ::endsWith(this->chars(), s.chars());
  }
 
 bool GStr::contains(char c) const {
  return (index(c, 0) >= 0);
  }
+
 GStr& GStr::format(const char *fmt,...) {
 // Format as in sprintf
   make_unique(); //edit operation ahead
@@ -372,13 +410,13 @@ GStr& GStr::appendfmt(const char *fmt,...) {
 GStr& GStr::trim(char c) {
  register int istart;
  register int iend;
- for (istart=0; istart<length() && chars()[istart]==c;istart++);
+ for (istart=0; istart<length() && chars()[istart]==c;istart++) ;
  if (istart==length()) {
        make_unique(); //edit operation ahead
        replace_data(0); //string was entirely trimmed
        return *this;
        }
- for (iend=length()-1; iend>istart && chars()[iend]==c;iend--);
+ for (iend=length()-1; iend>istart && chars()[iend]==c;iend--) ;
  int newlen=iend-istart+1;
  if (newlen==length())  //nothing to trim
            return *this; 
@@ -392,12 +430,12 @@ GStr& GStr::trim(char c) {
 GStr& GStr::trim(const char* c) {
  register int istart;
  register int iend;
- for (istart=0; istart<length() && strchr(c, chars()[istart])!=NULL ;istart++);
+ for (istart=0; istart<length() && strchr(c, chars()[istart])!=NULL ;istart++) ;
  if (istart==length()) {
         replace_data(0); //string was entirely trimmed
         return *this;
         }
- for (iend=length()-1; iend>istart && strchr(c, chars()[iend])!=NULL;iend--);
+ for (iend=length()-1; iend>istart && strchr(c, chars()[iend])!=NULL;iend--) ;
  int newlen=iend-istart+1;
  if (newlen==length())  //nothing to trim
            return *this; 
@@ -412,7 +450,7 @@ GStr& GStr::trimR(char c) {
  //only trim the right end
  //register int istart;
  register int iend;
- for (iend=length()-1; iend>=0 && chars()[iend]==c;iend--);
+ for (iend=length()-1; iend>=0 && chars()[iend]==c;iend--) ;
  if (iend==-1) {
        replace_data(0); //string was entirely trimmed
        return *this;
@@ -430,7 +468,7 @@ GStr& GStr::trimR(char c) {
 
 GStr& GStr::trimR(const char* c) {
  register int iend;
- for (iend=length()-1; iend>=0 && strchr(c,chars()[iend])!=NULL;iend--);
+ for (iend=length()-1; iend>=0 && strchr(c,chars()[iend])!=NULL;iend--) ;
  if (iend==-1) {
        replace_data(0); //string was entirely trimmed
        return *this;
@@ -471,7 +509,7 @@ GStr& GStr::chomp(const char* cstr) {
 
 GStr& GStr::trimL(char c) {
  register int istart;
- for (istart=0; istart<length() && chars()[istart]==c;istart++);
+ for (istart=0; istart<length() && chars()[istart]==c;istart++) ;
  if (istart==length()) {
        replace_data(0); //string was entirely trimmed
        return *this;
@@ -488,7 +526,7 @@ GStr& GStr::trimL(char c) {
 
 GStr& GStr::trimL(const char* c) {
  register int istart;
- for (istart=0; istart<length() && strchr(c,chars()[istart])!=NULL;istart++);
+ for (istart=0; istart<length() && strchr(c,chars()[istart])!=NULL;istart++) ;
  if (istart==length()) {
        replace_data(0); //string was entirely trimmed
        return *this;
@@ -643,7 +681,7 @@ GStr GStr::substr(int idx, int len) const {
         idx += length();
 
     // A length of -1 specifies the rest of the string.
-    if (len == -1 || len>length()-idx)
+    if (len < 0  || len>length()-idx)
         len = length() - idx;
     
     if (idx<0 || idx>=length() || len<0 )
@@ -653,6 +691,20 @@ GStr GStr::substr(int idx, int len) const {
     newstring.replace_data(len);
     ::memcpy(newstring.chrs(), &chars()[idx], len);
     return newstring;
+}
+
+GStr& GStr::reverse() {
+  make_unique();
+  int l=0;
+  int r=my_data->length-1;
+  char c;
+  while (l<r) {
+     c=my_data->chars[l];
+     my_data->chars[l]=my_data->chars[r];
+     my_data->chars[r]=c;
+     l++;r--;
+     }
+  return *this;
 }
 
 
@@ -975,20 +1027,28 @@ int GStr::index(char c, int start_index) const {
         return idx - chars();
 }
 
-int GStr::rindex(char c) const {   
-    if (c == '\0' || length()==0)
-        return -1;
-    char* idx= rstrchr((char*)chars(), c);
-    if (idx==NULL) return -1;
-                else return idx-chars();
+int GStr::rindex(char c, int end_index) const {   
+    if (c == 0 || length()==0 || end_index>=length()) return -1;
+    if (end_index<0) end_index=my_data->length-1; 
+    for (int i=end_index;i>=0;i--) {
+      if (my_data->chars[i]==c) return i;
+      }
+    return -1;
 }
 
-int GStr::rindex(const char* str) const {
-    if (str==NULL || *str == '\0' || length()==0)
+int GStr::rindex(const char* str, int end_index) const {
+    if (str==NULL || *str == '\0' || length()==0 || end_index>=length())
         return -1;
-    char* idx= rstrfind((char*)chars(), str);
-    if (idx==NULL) return -1;
-                else return idx-chars();
+    int slen=strlen(str);
+    if (end_index<0) end_index=my_data->length-1;
+    //end_index is the index of the right-side boundary 
+    //the scanning starts at the end
+    if (end_index>=0 && end_index<slen-1) return -1;
+    for (int i=end_index-slen+1;i>=0;i--) {
+       if (memcmp((void*)(my_data->chars+i),(void*)str, slen)==0)
+           return i;
+       }
+    return -1;
 }
 
 GStr GStr::split(const char* delim) {
@@ -1050,8 +1110,10 @@ GStr GStr::splitr(char c) {
 
 void GStr::startTokenize(const char* delimiter, enTokenizeMode tokenizemode) {
  GFREE(fTokenDelimiter);
- GMALLOC(fTokenDelimiter,strlen(delimiter)+1);
- strcpy(fTokenDelimiter, delimiter);
+ if (delimiter) {
+    GMALLOC(fTokenDelimiter,strlen(delimiter)+1);
+    strcpy(fTokenDelimiter, delimiter);
+    }
  fLastTokenStart=0;
  fTokenizeMode=tokenizemode;
 }

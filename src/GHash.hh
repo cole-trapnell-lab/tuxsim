@@ -5,23 +5,22 @@
 #ifndef GHash_HH
 #define GHash_HH
 #include "GBase.h"
+
 /**
 * This class maintains a fast-access hash table of entities
-* indexed by a character string.
-* It is typically used to map strings to pointers; however, overloading
-* the createData() and deleteData() members allows any type of data to
-* be indexed by strings.
+* indexed by a character string (essentially, maps strings to pointers)
 */
-typedef struct {
-     char*   key;              // Key string
-     bool    keyalloc;         //shared key flag (to not free the key chars)
-     int     hash;             // Hash value of key
-     pointer data;              // Data
-     bool    mark;             // Entry is marked
-     } GHashEntry;
 
-template <class OBJ> class  GHash {
+
+template <class OBJ> class GHash {
  protected:
+	struct GHashEntry {
+	     char*   key;              // Key string
+	     bool    keyalloc;         //shared key flag (to not free the key chars)
+	     int     hash;             // Hash value of key
+	     pointer data;              // Data
+	     bool    mark;             // Entry is marked
+	     };
   GHashEntry* hash;         // Hash
   int         fCapacity;     // table size
   int         fCount;        // number of valid entries
@@ -54,7 +53,6 @@ protected:
 public:
   static void DefaultFreeProc(pointer item) {
       delete (OBJ*)item;
-      item=NULL;
       }
 public:
   GHash(GFreeProc* freeProc); // constructs of an empty hash
@@ -66,7 +64,7 @@ public:
   int Count() const { return fCount; }// the total number of entries in the table.
   // Insert a new entry into the table given key and mark.
   // If there is already an entry with that key, leave it unchanged,
-  const OBJ* Add(const char* ky, const OBJ* ptr, bool mrk=false);
+  const OBJ* Add(const char* ky, const OBJ* ptr=NULL, bool mrk=false);
   //same as Add, but the key pointer is stored directly, no string duplicate
   //is made (shared-key-Add)
   const OBJ* shkAdd(const char* ky, const OBJ* ptr, bool mrk=false);
@@ -78,7 +76,7 @@ public:
   // Remove a given key and its data
   OBJ* Remove(const char* ky);
   // Find data OBJ* given key.
-  OBJ* Find(const char* ky);
+  OBJ* Find(const char* ky, char** keyptr=NULL);
   bool hasKey(const char* ky);
   char* getLastKey() { return lastkeyptr; }
   OBJ* operator[](const char* ky) { return Find(ky); }
@@ -88,8 +86,18 @@ public:
   OBJ* NextData(char*& nextkey); //returns next valid hash[].data
                                 //or NULL if no more
                                 //nextkey is SET to the corresponding key
-  GHashEntry* NextEntry(); //returns a pointer to a GHashEntry
-
+  GHashEntry* NextEntry() { //returns a pointer to a GHashEntry
+  	 register int pos=fCurrentEntry;
+  	 while (pos<fCapacity && hash[pos].hash<0) pos++;
+  	 if (pos==fCapacity) {
+  	                 fCurrentEntry=fCapacity;
+  	                 return NULL;
+  	                 }
+  	              else {
+  	                 fCurrentEntry=pos+1;
+  	                 return &hash[pos];
+  	                 }
+  }
   /// Clear all entries
   void Clear();
 
@@ -134,7 +142,9 @@ public:
 // Construct empty hash
 template <class OBJ> GHash<OBJ>::GHash(GFreeProc* freeProc) {
   GMALLOC(hash, sizeof(GHashEntry)*DEF_HASH_SIZE);
+  fCurrentEntry=-1;
   fFreeProc=freeProc;
+  lastkeyptr=NULL;
   for (uint i=0; i<DEF_HASH_SIZE; i++)
          hash[i].hash=-1; //this will be an indicator for 'empty' entries
   fCapacity=DEF_HASH_SIZE;
@@ -143,6 +153,8 @@ template <class OBJ> GHash<OBJ>::GHash(GFreeProc* freeProc) {
 
 template <class OBJ> GHash<OBJ>::GHash(bool doFree) {
   GMALLOC(hash, sizeof(GHashEntry)*DEF_HASH_SIZE);
+  fCurrentEntry=-1;
+  lastkeyptr=NULL;
   fFreeProc = (doFree)?&DefaultFreeProc : NULL;
   for (uint i=0; i<DEF_HASH_SIZE; i++)
          hash[i].hash=-1; //this will be an indicator for 'empty' entries
@@ -184,7 +196,7 @@ template <class OBJ> void GHash<OBJ>::Resize(int m){
     }
   }
 
-// add a new entry, leave it alone if already existing
+// add a new entry, or update it if it already exists
 template <class OBJ> const OBJ* GHash<OBJ>::Add(const char* ky,
                       const OBJ* pdata,bool mrk){
   register int p,i,x,h,n;
@@ -314,6 +326,7 @@ template <class OBJ>  OBJ* GHash<OBJ>::Replace(const char* ky,const OBJ* pdata, 
 template <class OBJ> OBJ* GHash<OBJ>::Remove(const char* ky){
   register int p,x,h,n;
   if(!ky){ GError("GHash::remove: NULL key argument.\n"); }
+  OBJ* removed=NULL;
   if(0<fCount){
     h=strhash(ky);
     GASSERT(0<=h);
@@ -330,18 +343,19 @@ template <class OBJ> OBJ* GHash<OBJ>::Remove(const char* ky){
         hash[p].mark=false;
         if (hash[p].keyalloc) GFREE((hash[p].key));
         if (FREEDATA) (*fFreeProc)(hash[p].data);
+            else removed=(OBJ*)hash[p].data;
         hash[p].key=NULL;
         hash[p].data=NULL;
         fCount--;
         if((100*fCount)<=(MIN_LOAD*fCapacity)) Resize(fCount);
         GASSERT(fCount<fCapacity);
-        return NULL;
+        return removed;
         }
       p=(p+x)%fCapacity;
       n--;
       }
     }
-  return NULL;
+  return removed;
   }
 
 
@@ -369,7 +383,7 @@ template <class OBJ> bool GHash<OBJ>::hasKey(const char* ky) {
   return false;
 }
 
-template <class OBJ> OBJ* GHash<OBJ>::Find(const char* ky){
+template <class OBJ> OBJ* GHash<OBJ>::Find(const char* ky, char** keyptr){
   register int p,x,h,n;
   if(!ky){ GError("GHash::find: NULL key argument.\n"); }
   if(0<fCount){
@@ -383,6 +397,7 @@ template <class OBJ> OBJ* GHash<OBJ>::Find(const char* ky){
     n=fCapacity;
     while(n && hash[p].hash!=-1){
       if(hash[p].hash==h && strcmp(hash[p].key,ky)==0){
+        if (keyptr!=NULL) *keyptr = hash[p].key;
         return (OBJ*)hash[p].data;
         }
       p=(p+x)%fCapacity;
@@ -438,19 +453,6 @@ template <class OBJ> OBJ* GHash<OBJ>::NextData(char* &nextkey) {
                  return (OBJ*)hash[pos].data;
                  }
 
-}
-
-template <class OBJ> GHashEntry* GHash<OBJ>::NextEntry() {
- register int pos=fCurrentEntry;
- while (pos<fCapacity && hash[pos].hash<0) pos++;
- if (pos==fCapacity) {
-                 fCurrentEntry=fCapacity;
-                 return NULL;
-                 }
-              else {
-                 fCurrentEntry=pos+1;
-                 return &hash[pos];
-                 }
 }
 
 

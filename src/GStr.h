@@ -2,10 +2,10 @@
 #ifndef GSTR_H
 #define GSTR_H
 //---------------------------------------------------------------------------
+#include "GBase.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "GBase.h"
 
 // This class uses reference counting and copy-on-write semantics
 
@@ -26,7 +26,7 @@ class GStr {
         friend bool operator>(const char* s1, const GStr& s2);
         friend bool operator>=(const char* s1, const GStr& s2);
         friend bool operator!=(const char* s1, const GStr& s2);
-        friend void swap(GStr& s1, GStr& s2);
+        friend void Gswap(GStr& s1, GStr& s2);
     public:
         GStr();
         GStr(const GStr& s);
@@ -59,11 +59,14 @@ class GStr {
         bool operator>=(const char* s) const;
         bool operator!=(const GStr& s) const;
         bool operator!=(const char* s) const;
-        GStr& operator+=(const GStr& s);
-        GStr& operator+=(const char* s);
-        GStr& operator+=(const char c);
-        GStr& operator+=(const int i);
-        GStr& operator+=(const double f);
+        GStr& operator+=(const GStr& s) { return append(s.chars()); }
+        GStr& operator+=(const char* s) { return append(s); }
+        GStr& operator+=(char c) { return append(c); }
+        GStr& operator+=(int i) { return append(i); }
+        GStr& operator+=(uint i) { return append(i); }
+        GStr& operator+=(long l) { return append(l); }
+        GStr& operator+=(unsigned long l) { return append(l); }
+        GStr& operator+=(double f);
       //interface:
       public:
         int length() const;
@@ -75,6 +78,7 @@ class GStr {
         GStr from(char c); //same as to, but starting from the right side
         GStr copy() const;
         GStr& format(const char *fmt,...);
+        GStr& reverse();
         GStr& appendfmt(const char *fmt,...);
         GStr& cut(int index = 0, int len = -1); //delete a specified length
         GStr& remove(int from, int to) {
@@ -89,6 +93,13 @@ class GStr {
         GStr& insert(const char* s, int index = 0);
         GStr& append(const char* s);
         GStr& append(const GStr& s);
+        GStr& append(char c);
+        GStr& append(int i);
+        GStr& append(long l);
+        GStr& append(double f);
+        GStr& append(uint i);
+        GStr& append(unsigned long l);
+
         GStr& upper();
         GStr& lower();
         GStr& clear();//make empty
@@ -96,7 +107,7 @@ class GStr {
         GStr& tr(const char* from, const char* to=NULL);
         //number of occurences of a char in the string:
         int count(char c);
-        void startTokenize(const char* delimiter, enTokenizeMode tokenizemode=tkCharSet);
+        void startTokenize(const char* delimiter=" \t\n", enTokenizeMode tokenizemode=tkCharSet);
         bool nextToken(GStr& token);
         int asInt(int base=10);
         double asReal();
@@ -107,12 +118,15 @@ class GStr {
         int index(const GStr& s, int start_index = 0) const;
         int index(const char* s, int start_index = 0) const;
         int index(char c, int start_index = 0) const;
-        int rindex(char c) const;
-        int rindex(const char* str) const;
+        int rindex(char c, int end_index = -1) const;
+        int rindex(const char* str, int end_index = -1) const;
         bool contains(const GStr& s) const;
         bool contains(const char* s) const;
         bool contains(char c) const;
         bool startsWith(const char* s) const;
+        bool startsWith(const GStr& s) const;
+        bool endsWith(const char* s) const;
+        bool endsWith(const GStr& s) const;
         GStr split(const char* delim);
         GStr split(char c);
            /* splits "this" in two parts, at the first (leftmost)
@@ -147,9 +161,6 @@ class GStr {
         size_t read(FILE* stream, const char* delimiter="\n", size_t bufsize=4096);
           //read next token from stream, using the given string as
           //a marker where the block should stop
-
-        static const int max_token_size = 200;
-        static const int max_line_size = 600;
         const char* chars() const;
         const char* text() const;
     protected:
@@ -196,7 +207,6 @@ inline const char *GStr::text() const {
  return my_data->chars;
  }
 
-
 inline bool operator>=(const char *s1, const GStr& s2) {
  return (strcmp(s1, s2.chars()) >= 0);
  }
@@ -205,10 +215,9 @@ inline bool operator!=(const char *s1, const GStr& s2) {
  return (strcmp(s1, s2.chars()) != 0);
  }
 
-inline void swap(GStr& s1, GStr& s2) {
+inline void Gswap(GStr& s1, GStr& s2) {
  GStr::Data *tmp = s1.my_data; s1.my_data = s2.my_data;
  s2.my_data = tmp;
  }
-
 
 #endif

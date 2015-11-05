@@ -44,6 +44,9 @@ extern string vcf_table;
 extern bool allele_simulator;
 extern bool sort_by_position;
 extern bool only_phased_reads;
+extern string silenced_allele;
+extern double silenced_fraction;
+extern double allele_proportion_natural_stdev;
 
 extern int random_seed;
 

@@ -87,8 +87,7 @@ void load_abundances(FILE* expr_in, vector<Scaffold>& source_molecules)
 	}
 }
 
-void assign_expression_ranks(const vector<Scaffold>& ref_mRNAs,
-							 vector<unsigned int>& expr_rank)
+void assign_expression_ranks(vector<unsigned int>& expr_rank)
 {
 	for (size_t i = 0; i < expr_rank.size(); ++i)
 	{

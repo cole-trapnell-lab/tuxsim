@@ -179,8 +179,8 @@ bool IlluminaChIPSeqPE::reads_for_fragment(const LibraryFragment& frag,
     
     bool reverse_strand_frag = _bool_generator();
     
-    shared_ptr<ReadHit> left_read(new ReadHit());
-    shared_ptr<ReadHit> right_read(new ReadHit());
+    boost::shared_ptr<ReadHit> left_read(new ReadHit());
+    boost::shared_ptr<ReadHit> right_read(new ReadHit());
     
     CuffStrand strand = CUFF_STRAND_UNKNOWN;
     
